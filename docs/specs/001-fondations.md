@@ -1,6 +1,6 @@
 # 001 : fondations
 
-- Statut : **validée** le 25 novembre 2026
+- Statut : **livrée** le 25 novembre 2026 (commit 55d6369)
 - Lot : 0 (voir `docs/PLAN.md`, section 10)
 
 ## Contexte
@@ -41,7 +41,7 @@ Aujourd’hui, https://gharel.github.io/cooking/ affiche la maquette. Après ce 
 - [x] Aucune requête vers une autre origine pendant le chargement (polices comprises).
 - [x] `typographier()` est couverte par des tests (deux-points, guillemets, nombres et unités, heures, grands nombres, texte déjà correct inchangé) ; un test refuse tout tiret cadratin ou demi-cadratin dans `src/`.
 - [x] JavaScript chargé au démarrage : 60 ko compressés au plus (le plan en autorise 100 ; garder la marge pour les lots suivants).
-- [ ] Après un push sur `main`, le workflow passe ; https://gharel.github.io/cooking/ affiche l’application, https://gharel.github.io/cooking/maquette/ la maquette.
+- [x] Après un push sur `main`, le workflow passe ; https://gharel.github.io/cooking/ affiche l’application, https://gharel.github.io/cooking/maquette/ la maquette.
 - [x] Vérifié en émulation iPhone (Playwright WebKit) : thème sombre du système, mode clair choisi, aucun repeint par Dark Reader (paquet `darkreader` injecté).
 
 ## Hors périmètre
