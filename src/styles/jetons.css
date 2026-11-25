@@ -1,0 +1,101 @@
+/* Jetons du design de Fournée : seul fichier où une couleur est écrite. Référence : maquette/index.html. */
+:root {
+  color-scheme: light dark;
+  --police: 'Figtree Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --police-titre: 'Fraunces Variable', Georgia, 'Times New Roman', serif;
+  --rayon: 18px;
+  --rayon-m: 12px;
+
+  --fond: #faf7f2;
+  --surface: #ffffff;
+  --surface-2: #f3eee6;
+  --surface-3: #e9e2d6;
+  --bordure: #e5ddd1;
+  --bordure-forte: #cfc4b4;
+  --controle: #8f8374;
+  --texte: #1f1a14;
+  --texte-doux: #665c52;
+  --focus: #1f5fa8;
+  --primaire: #b4532a;
+  --primaire-survol: #9d4622;
+  --primaire-texte: #9a4320;
+  --primaire-doux: #fbe9df;
+  --sur-primaire: #ffffff;
+  --herbe: #276e4d;
+  --herbe-doux: #e1f1e8;
+  --froid: #1f5fa8;
+  --froid-doux: #e3edf9;
+  --bientot: #8a5a00;
+  --bientot-doux: #fbf0d6;
+  --alerte: #b42318;
+  --alerte-doux: #fde7e4;
+  --famille: #9b2c5a;
+  --famille-doux: #fbe4ef;
+  --ombre: 0 1px 2px rgb(40 30 20 / 0.05), 0 6px 20px rgb(40 30 20 / 0.06);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --fond: #15120f;
+    --surface: #1e1a16;
+    --surface-2: #27221d;
+    --surface-3: #332c25;
+    --bordure: #3a332c;
+    --bordure-forte: #4d443a;
+    --controle: #8a7e70;
+    --texte: #f3ede4;
+    --texte-doux: #b5aa9b;
+    --focus: #8ab8f0;
+    --primaire: #f0936f;
+    --primaire-survol: #f5a688;
+    --primaire-texte: #f4a588;
+    --primaire-doux: #3b231a;
+    --sur-primaire: #1f0e07;
+    --herbe: #6fcf9f;
+    --herbe-doux: #173326;
+    --froid: #8ab8f0;
+    --froid-doux: #182a40;
+    --bientot: #f2c15a;
+    --bientot-doux: #3a2e14;
+    --alerte: #ff8f80;
+    --alerte-doux: #401b17;
+    --famille: #f19cc4;
+    --famille-doux: #44192f;
+    --ombre: 0 1px 2px rgb(0 0 0 / 0.3), 0 6px 20px rgb(0 0 0 / 0.25);
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --fond: #15120f;
+  --surface: #1e1a16;
+  --surface-2: #27221d;
+  --surface-3: #332c25;
+  --bordure: #3a332c;
+  --bordure-forte: #4d443a;
+  --controle: #8a7e70;
+  --texte: #f3ede4;
+  --texte-doux: #b5aa9b;
+  --focus: #8ab8f0;
+  --primaire: #f0936f;
+  --primaire-survol: #f5a688;
+  --primaire-texte: #f4a588;
+  --primaire-doux: #3b231a;
+  --sur-primaire: #1f0e07;
+  --herbe: #6fcf9f;
+  --herbe-doux: #173326;
+  --froid: #8ab8f0;
+  --froid-doux: #182a40;
+  --bientot: #f2c15a;
+  --bientot-doux: #3a2e14;
+  --alerte: #ff8f80;
+  --alerte-doux: #401b17;
+  --famille: #f19cc4;
+  --famille-doux: #44192f;
+  --ombre: 0 1px 2px rgb(0 0 0 / 0.3), 0 6px 20px rgb(0 0 0 / 0.25);
+}
+
+/* Clair choisi : ni le navigateur ni Dark Reader ne doivent l’assombrir. */
+:root[data-theme='light'] {
+  color-scheme: only light;
+}

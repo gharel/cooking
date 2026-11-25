@@ -4,10 +4,10 @@ Relevé du 25 novembre 2026, à partir de comparatifs en ligne et des fiches App
 
 ## Deux familles
 
-| Famille                   | Applications                                                                 | Promesse                                                                     | Limite pour le batch cooking                                                    |
-| ------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| Menus clés en main        | Jow, Basta Batchcooking, Cuisine Addict, WeCook, Batchii, Pancia, CookAhead  | « On choisit pour vous » : menus de la semaine, courses, plan de préparation | Catalogue imposé, abonnement, peu ou pas de place pour ses propres recettes     |
-| Gestionnaires de recettes | Paprika, Plan to Eat, Samsung Food, Mealime, Kitchen Stories, Eat This Much  | « Vos recettes, organisées » : import web, planning, courses                 | Pas pensés pour une session : chaque recette se lit seule, sans orchestration   |
+| Famille                   | Applications                                                                | Promesse                                                                     | Limite pour le batch cooking                                                  |
+| ------------------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Menus clés en main        | Jow, Basta Batchcooking, Cuisine Addict, WeCook, Batchii, Pancia, CookAhead | « On choisit pour vous » : menus de la semaine, courses, plan de préparation | Catalogue imposé, abonnement, peu ou pas de place pour ses propres recettes   |
+| Gestionnaires de recettes | Paprika, Plan to Eat, Samsung Food, Mealime, Kitchen Stories, Eat This Much | « Vos recettes, organisées » : import web, planning, courses                 | Pas pensés pour une session : chaque recette se lit seule, sans orchestration |
 
 ## Fiches
 
