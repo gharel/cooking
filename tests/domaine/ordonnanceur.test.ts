@@ -198,21 +198,26 @@ describe('ordonnanceur : la fournée de démonstration', () => {
 });
 
 describe('hygiène, ménage et session à plusieurs', () => {
-  const fajitas = [{ recetteId: 'soir-soupe-fajitas', portions: 4 }];
+  const fajitas = [{ recetteId: 'soir-fajitas-poulet', portions: 4 }];
   const debutDe = (pl: readonly Placement[], id: string) => pl.find((p) => p.id === id)?.debut ?? NaN;
   const finDe = (pl: readonly Placement[], id: string) => pl.find((p) => p.id === id)?.fin ?? NaN;
 
-  it('soupe fajitas : légumes avant le poulet cru, puis planche et mains lavées par la même personne', () => {
+  it('fajitas au poulet : légumes avant le poulet cru, puis planche et mains lavées par la même personne', () => {
     for (const cuisiniers of [1, 2]) {
       const p = planifier(fajitas, recettes, { ...MAISON, cuisiniers });
-      const legumes = p.taches.find((t) => t.texte.startsWith('Émincer l’oignon'));
+      const legumes = p.taches.filter((t) => /^(Émincer les oignons|Couper l’avocat)/.test(t.texte));
       const poulet = p.taches.find((t) => t.texte.startsWith('Couper le poulet'));
-      expect(legumes && poulet).toBeTruthy();
-      if (!legumes || !poulet) return;
+      expect(legumes).toHaveLength(2);
+      expect(poulet).toBeTruthy();
+      if (!poulet) return;
       expect(estDecoupeCrue(poulet)).toBe(true);
-      expect(poulet.texte).toBe(`Couper le poulet en lanières, ${APRES_CRU}`);
-      expect(poulet.duree).toBeGreaterThanOrEqual(6 + DUREE_APRES_CRU);
-      expect(debutDe(p.placements, poulet.id)).toBeGreaterThanOrEqual(finDe(p.placements, legumes.id) - EPS);
+      expect(legumes.some(estDecoupeCrue)).toBe(false);
+      expect(poulet.texte).toBe(
+        `Couper le poulet en lanières, l’enrober des épices et d’un filet d’huile, ${APRES_CRU}`,
+      );
+      expect(poulet.duree).toBeGreaterThanOrEqual(5 + DUREE_APRES_CRU);
+      for (const l of legumes)
+        expect(debutDe(p.placements, poulet.id)).toBeGreaterThanOrEqual(finDe(p.placements, l.id) - EPS);
     }
   });
 
@@ -237,7 +242,7 @@ describe('hygiène, ménage et session à plusieurs', () => {
   });
 
   it('à deux : chaque tâche active a sa personne, personne n’en fait deux à la fois, la charge est partagée', () => {
-    const demo = ['depart-chili', 'depart-gratin-dauphinois', 'soir-soupe-fajitas'].map((recetteId) => ({
+    const demo = ['depart-chili', 'depart-gratin-dauphinois', 'soir-fajitas-poulet'].map((recetteId) => ({
       recetteId,
       portions: 4,
     }));

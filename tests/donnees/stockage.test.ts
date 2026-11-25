@@ -25,17 +25,37 @@ afterEach(async () => {
 
 describe('recettes de départ', () => {
   it('sont installées une seule fois', async () => {
-    expect(await installerRecettesDeDepart(base)).toBe(20);
+    expect(await installerRecettesDeDepart(base)).toBe(21);
     expect(await installerRecettesDeDepart(base)).toBe(0);
-    expect(await listerRecettes(base)).toHaveLength(20);
+    expect(await listerRecettes(base)).toHaveLength(21);
   });
 
   it('une installation d’avant le lot 6 reçoit seulement les recettes du soir, une fois', async () => {
     await installerRecettesDeDepart(base);
     for (const r of await listerRecettes(base)) if (r.soir) await supprimerRecette(base, r.id);
     await base.reglages.put({ cle: 'recettes-de-depart-installees', valeur: '2026-11-25T10:00:00.000Z' });
-    expect(await installerRecettesDeDepart(base)).toBe(7);
+    expect(await installerRecettesDeDepart(base)).toBe(8);
     expect(await installerRecettesDeDepart(base)).toBe(0);
+  });
+
+  it('« Soupe fajitas » laisse place à la soupe aux légumes et aux fajitas au poulet', async () => {
+    await installerRecettesDeDepart(base);
+    const modele = await base.recettes.get('soir-wraps-poulet');
+    if (!modele) throw new Error('wraps absents');
+    const ancienne = { ...modele, id: 'soir-soupe-fajitas', nom: 'Soupe fajitas' };
+    // Installation du lot 6 : la soupe fajitas, sans les deux nouvelles recettes.
+    await base.recettes.bulkDelete(['soir-soupe-legumes', 'soir-fajitas-poulet']);
+    await base.recettes.add(ancienne);
+    const ids = (await listerRecettes(base)).map((r) => r.id);
+    await base.reglages.put({ cle: 'recettes-de-depart-installees', valeur: ids });
+    expect(await installerRecettesDeDepart(base)).toBe(2);
+    expect(await base.recettes.get('soir-soupe-fajitas')).toBeUndefined();
+    expect(await listerRecettes(base)).toHaveLength(21);
+
+    // Modifiée par l’utilisateur, elle reste.
+    await enregistrerRecette(base, { ...ancienne, nom: 'Notre soupe fajitas' });
+    await installerRecettesDeDepart(base);
+    expect((await base.recettes.get('soir-soupe-fajitas'))?.nom).toBe('Notre soupe fajitas');
   });
 
   it('une recette supprimée ne revient pas, sauf réinstallation des manquantes', async () => {
@@ -44,7 +64,7 @@ describe('recettes de départ', () => {
     expect(await installerRecettesDeDepart(base)).toBe(0);
     expect(await recettesDeDepartManquantes(base)).toBe(1);
     expect(await installerRecettesDeDepart(base, { manquantesSeulement: true })).toBe(1);
-    expect(await listerRecettes(base)).toHaveLength(20);
+    expect(await listerRecettes(base)).toHaveLength(21);
   });
 
   it('une recette de départ modifiée n’est pas écrasée par la réinstallation', async () => {
@@ -102,7 +122,7 @@ describe('export et import', () => {
     const contenu = JSON.parse(JSON.stringify(await exporter(base)));
     const vierge = new BaseFournee(`test-${numero++}`);
     try {
-      expect(await importer(vierge, contenu)).toEqual({ ok: true, ajoutees: 20, ignorees: [] });
+      expect(await importer(vierge, contenu)).toEqual({ ok: true, ajoutees: 21, ignorees: [] });
       const trier = (l: { id: string }[]) => [...l].sort((a, b) => a.id.localeCompare(b.id));
       expect(trier(await listerRecettes(vierge))).toEqual(trier(await listerRecettes(base)));
       const octets = new Uint8Array(
@@ -120,7 +140,7 @@ describe('export et import', () => {
     contenu.recettes[0].nom = 'Nom changé';
     const resultat = await importer(base, contenu);
     expect(resultat.ok && resultat.ajoutees).toBe(0);
-    expect(resultat.ok && resultat.ignorees).toHaveLength(20);
+    expect(resultat.ok && resultat.ignorees).toHaveLength(21);
     expect((await base.recettes.get(contenu.recettes[0].id))?.nom).not.toBe('Nom changé');
   });
 
@@ -130,7 +150,7 @@ describe('export et import', () => {
     contenu.recettes.push({ ...contenu.recettes[0], id: 'nouvelle', nom: '' });
     const resultat = await importer(base, contenu);
     expect(resultat.ok).toBe(false);
-    expect(await listerRecettes(base)).toHaveLength(20);
+    expect(await listerRecettes(base)).toHaveLength(21);
     expect(await base.recettes.get('nouvelle')).toBeUndefined();
   });
 });

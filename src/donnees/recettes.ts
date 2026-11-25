@@ -3,6 +3,9 @@ import { nouvelIdentifiant, type BaseFournee, type Photo } from './base';
 
 const CLE_DEPART = 'recettes-de-depart-installees';
 
+/** Recettes de départ retirées : « Soupe fajitas » était en fait une soupe aux légumes et des fajitas au poulet. */
+const RETIREES = ['soir-soupe-fajitas'];
+
 /** Chargées à la demande : les données et l’analyseur ne pèsent pas sur le démarrage. */
 const chargerDepart = () => import('./recettes-de-depart').then((m) => m.recettesDeDepart());
 
@@ -27,6 +30,11 @@ export async function installerRecettesDeDepart(
           ? depart.filter((r) => !r.soir).map((r) => r.id)
           : [],
     );
+    // Une recette retirée disparaît, sauf si l’utilisateur l’a modifiée : elle est alors à lui.
+    const retirees = (await base.recettes.bulkGet(RETIREES)).filter(
+      (r): r is Recette => r?.origine.type === 'depart' && r.modifieLe === r.creeLe,
+    );
+    await base.recettes.bulkDelete(retirees.map((r) => r.id));
     const presentes = new Set(await base.recettes.toCollection().primaryKeys());
     const aAjouter = depart.filter(
       (r) => !presentes.has(r.id) && (manquantesSeulement || !proposees.has(r.id)),

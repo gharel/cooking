@@ -53,12 +53,13 @@ test('préparer : durée estimée, gain, équipement, veille, déroulé complet'
   await expect(page.getByRole('checkbox', { name: 'Lave-vaisselle' })).not.toBeChecked();
 });
 
-test('soupe fajitas : les légumes passent sur la planche avant le poulet cru', async ({ page }) => {
-  await preparerFournee(page, ['Soupe fajitas']);
+test('fajitas au poulet : les légumes passent sur la planche avant le poulet cru', async ({ page }) => {
+  await preparerFournee(page, ['Fajitas au poulet']);
   const textes = await page.locator('.deroule li strong').allTextContents();
-  const legumes = textes.findIndex((t) => t.startsWith('Émincer l’oignon'));
+  const legumes = textes.findIndex((t) => t.startsWith('Émincer les oignons'));
   const poulet = textes.findIndex((t) => t.startsWith('Couper le poulet'));
   expect(legumes).toBeGreaterThan(0);
+  expect(poulet).toBeGreaterThan(textes.findIndex((t) => t.startsWith('Couper l’avocat')));
   expect(poulet).toBeGreaterThan(legumes);
   expect(textes[poulet]).toContain('puis laver la planche et le couteau, se laver les mains');
 });

@@ -8,18 +8,19 @@ import { genererAnnexe } from '../outils/annexe';
 const recettes = recettesDeDepart();
 
 describe('recettes de départ', () => {
-  it('sont 13 recettes de session et 7 du soir, pour 4 portions, aux identifiants uniques', () => {
+  it('sont 13 recettes de session et 8 du soir, pour 4 portions, aux identifiants uniques', () => {
     expect(recettes.filter((r) => !r.soir)).toHaveLength(13);
     expect(recettes.filter((r) => r.soir).map((r) => r.nom)).toEqual([
       'One pot pasta',
       'Salade composée',
       'Baguettes garnies',
       'Pâtes carbonara',
-      'Soupe fajitas',
+      'Soupe aux légumes',
+      'Fajitas au poulet',
       'Croque-monsieur',
       'Wraps au poulet',
     ]);
-    expect(new Set(recettes.map((r) => r.id)).size).toBe(20);
+    expect(new Set(recettes.map((r) => r.id)).size).toBe(21);
     expect(recettes.every((r) => r.portions === 4)).toBe(true);
   });
 
@@ -56,7 +57,10 @@ describe('recettes de départ', () => {
       'Gratin d’aubergines à la feta',
       'Gratin dauphinois',
     ]);
-    expect(filtrerRecettes(recettes, 'legumes', []).map((r) => r.nom)).toEqual(['Tian de légumes corse']);
+    expect(filtrerRecettes(recettes, 'legumes', []).map((r) => r.nom)).toEqual([
+      'Soupe aux légumes',
+      'Tian de légumes corse',
+    ]);
   });
 
   it('marquent le dessalage de la morue « à anticiper la veille »', () => {

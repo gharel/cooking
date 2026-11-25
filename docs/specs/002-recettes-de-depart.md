@@ -3,7 +3,7 @@
 > Fichier **généré** à partir de `src/donnees/recettes-de-depart.ts` par `npm run annexe` : ne pas le modifier à la main. Un test vérifie qu’il est à jour.
 
 - Quantités et étapes vérifiées le 25 novembre 2026 (sources en fin de document).
-- 13 recettes de session et 7 recettes du soir (lot 6 : à cuisiner le jour même, hors session).
+- 13 recettes de session et 8 recettes du soir (lot 6 : à cuisiner le jour même, hors session).
 - Toutes les recettes sont pour **4 portions** ; le nombre de portions se choisit au moment de prendre un plat.
 
 Lecture des étapes : texte · poste · actif ou passif · durée · dépendances. « Actif » occupe le cuisinier ; « passif » n’occupe que le poste (feu, four, repos). Durées « actif » et « total » calculées par `src/domaine/durees.ts` : « total » va jusqu’au plat prêt avec un seul cuisinier, sans le refroidissement final, les étapes facultatives ni ce qui se fait la veille.
@@ -36,7 +36,8 @@ Filtres attendus (recettes de session) : Végétarien 4, Four 7, Congelable 12, 
 | Salade composée   | 18 min | 18 min |            |      |
 | Baguettes garnies | 15 min | 15 min |            |      |
 | Pâtes carbonara   | 12 min | 23 min |            |      |
-| Soupe fajitas     | 28 min | 48 min |            |      |
+| Soupe aux légumes | 27 min | 52 min | oui        |      |
+| Fajitas au poulet | 36 min | 36 min |            |      |
 | Croque-monsieur   | 10 min | 20 min |            | oui  |
 | Wraps au poulet   | 25 min | 25 min |            |      |
 
@@ -366,7 +367,7 @@ Tomate et basilic · 4 portions · frigo 2 jours · ne se congèle pas
 
 ## Salade composée
 
-Thon, œufs, maïs · 4 portions · frigo 1 jours · ne se congèle pas
+Thon, œufs, maïs · 4 portions · frigo 1 jour · ne se congèle pas
 
 - 1 salade verte
 - 4 tomates
@@ -388,7 +389,7 @@ Thon, œufs, maïs · 4 portions · frigo 1 jours · ne se congèle pas
 
 ## Baguettes garnies
 
-Jambon, fromage, crudités · 4 portions · frigo 1 jours · ne se congèle pas
+Jambon, fromage, crudités · 4 portions · frigo 1 jour · ne se congèle pas
 
 - 2 baguettes
 - 200 g de jambon blanc
@@ -419,33 +420,53 @@ Jambon, fromage, crudités · 4 portions · frigo 1 jours · ne se congèle pas
 4. Mélanger la crème, les jaunes d’œufs et le parmesan, poivrer · plan de travail · actif · 3 min
 5. Égoutter les pâtes, mélanger hors du feu avec les lardons et la crème · plan de travail · actif · 3 min · après 2 et 3 et 4
 
-## Soupe fajitas
+## Soupe aux légumes
 
-Poulet, poivrons, haricots rouges · 4 portions · frigo 3 jours · congélateur 3 mois
+Carottes, poireaux, pommes de terre · 4 portions · frigo 3 jours · congélateur 3 mois
 
-- 400 g de blancs de poulet
-- 2 poivrons (1 rouge, 1 vert)
+- 4 carottes
+- 2 poireaux
+- 3 pommes de terre
+- 1 courgette
 - 1 oignon
-- 2 gousses d’ail
-- 1 boîte de tomates concassées (400 g)
-- 1 boîte de haricots rouges (400 g)
-- 1 boîte de maïs doux (285 g)
-- 1 l de bouillon de volaille
-- 2 c. à c. d’épices à fajitas
-- 1 citron vert
-- 2 c. à s. d’huile
+- 1,5 l de bouillon de légumes
+- 20 g de beurre
 - 10 cl de crème fraîche (facultatif)
+- sel
+- poivre
 
-1. Émincer l’oignon et l’ail, couper les poivrons en lanières · plan de travail · actif · 8 min
-2. Couper le poulet en lanières · plan de travail · actif · 6 min
-3. Faire revenir l’oignon, l’ail et les poivrons dans l’huile · feu · actif · 6 min · après 1
-4. Ajouter le poulet et les épices, faire dorer · feu · actif · 6 min · après 2 et 3
-5. Ajouter les tomates, les haricots rincés, le maïs et le bouillon ; mijoter · feu · passif · 20 min · après 4
-6. Ajouter le jus du citron vert ; servir avec la crème · plan de travail · actif · 2 min · après 5
+1. Éplucher et couper en morceaux les carottes, les pommes de terre et la courgette · plan de travail · actif · 12 min
+2. Émincer l’oignon et les poireaux · plan de travail · actif · 6 min
+3. Faire suer l’oignon et les poireaux dans le beurre · feu · actif · 5 min · après 2
+4. Ajouter les autres légumes et le bouillon ; porter à ébullition puis cuire à couvert · feu · passif · 25 min · après 1 et 3
+5. Mixer la soupe, ajouter la crème, saler et poivrer · plan de travail · actif · 4 min · après 4
+
+## Fajitas au poulet
+
+Poivrons, oignons, avocat · 4 portions · frigo 1 jour · ne se congèle pas
+
+- 600 g de blancs de poulet
+- 3 poivrons (rouge, vert, jaune)
+- 2 oignons
+- 2 c. à s. d’épices à fajitas
+- 3 c. à s. d’huile
+- 1 citron vert
+- 1 avocat
+- 8 galettes de blé
+- 20 cl de crème fraîche
+- 100 g de fromage râpé
+
+1. Émincer les oignons, couper les poivrons en lanières · plan de travail · actif · 8 min
+2. Couper l’avocat en tranches et l’arroser du jus du citron vert · plan de travail · actif · 2 min
+3. Couper le poulet en lanières, l’enrober des épices et d’un filet d’huile · plan de travail · actif · 5 min
+4. Faire revenir les oignons et les poivrons dans l’huile, à feu vif · feu · actif · 7 min · après 1
+5. Ajouter le poulet et le faire dorer · feu · actif · 7 min · après 3 et 4
+6. Réchauffer les galettes à la poêle, sans matière grasse · feu · actif · 3 min · après 5
+7. Garnir les galettes : poulet et poivrons, crème, fromage, avocat ; rouler · plan de travail · actif · 4 min · après 2 et 6
 
 ## Croque-monsieur
 
-4 portions · frigo 1 jours · ne se congèle pas
+4 portions · frigo 1 jour · ne se congèle pas
 
 - 8 tranches de pain de mie
 - 4 tranches de jambon blanc
@@ -460,7 +481,7 @@ Poulet, poivrons, haricots rouges · 4 portions · frigo 3 jours · congélateur
 
 ## Wraps au poulet
 
-4 portions · frigo 1 jours · ne se congèle pas
+4 portions · frigo 1 jour · ne se congèle pas
 
 - 4 galettes de blé
 - 300 g de blancs de poulet

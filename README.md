@@ -12,7 +12,7 @@ Application web de batch cooking : vos recettes (y compris celles de la famille)
 | Courses  | Liste consolidée par rayon (une ligne par ingrédient, quantités mises à l’échelle), placard, articles cochés, partage                                   |
 | Session  | Déroulé calculé à une ou plusieurs personnes (qui fait quoi), hygiène et vaisselle comprises, puis guidage en direct : « Maintenant », minuteurs, frise |
 | Frigo    | Plats préparés (fraîcheur, manger, congeler, décongeler) ; « Ce qu’il reste » : idées anti-gaspi et mini-session sans achat                             |
-| Recettes | 20 recettes de départ (dont 7 du soir), recettes de famille racontées puis structurées, photos, import web, partage, impression, export et import       |
+| Recettes | 21 recettes de départ (dont 8 du soir), recettes de famille racontées puis structurées, photos, import web, partage, impression, export et import       |
 
 Locale d’abord : pas de compte, pas d’abonnement, données sur l’appareil (exportables). Thème clair, sombre ou système.
 

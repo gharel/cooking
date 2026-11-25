@@ -78,7 +78,7 @@ export function genererAnnexe(toutes: Recette[]): string {
 
   const fiches = toutes.map((r) => {
     const conservation = [
-      `frigo ${r.conservation.frigoJours} jours`,
+      `frigo ${r.conservation.frigoJours} jour${r.conservation.frigoJours > 1 ? 's' : ''}`,
       r.conservation.congelateurMois === null
         ? 'ne se congèle pas'
         : `congélateur ${r.conservation.congelateurMois} mois`,

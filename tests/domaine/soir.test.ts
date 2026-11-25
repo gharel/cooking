@@ -99,8 +99,8 @@ describe('les recettes du soir dans la semaine', () => {
   });
 
   it('une recette du soir mise dans la fournée suit la fournée', () => {
-    let f = ajouterPlat(fournee(), 'soir-soupe-fajitas', 4);
-    f = prevoir(f, '2026-12-01', 'soir-soupe-fajitas');
+    let f = ajouterPlat(fournee(), 'soir-fajitas-poulet', 4);
+    f = prevoir(f, '2026-12-01', 'soir-fajitas-poulet');
     expect(platsDuSoir(f, recettes, 2)).toEqual([]);
   });
 });

@@ -65,13 +65,13 @@ test('partager une recette produit un fichier qui s’importe ailleurs, sous-rec
     await ailleurs.getByRole('button', { name: 'Supprimer' }).click();
     await expect(ailleurs).toHaveURL(/#recettes$/);
   }
-  await expect(ailleurs.locator('.carte-recette')).toHaveCount(18);
+  await expect(ailleurs.locator('.carte-recette')).toHaveCount(19);
   await ailleurs.locator('input[type="file"][accept*="json"]').setInputFiles({
     name: 'lasagne.fournee.json',
     mimeType: 'application/json',
     buffer: Buffer.from(JSON.stringify(contenu)),
   });
-  await expect(ailleurs.locator('.carte-recette')).toHaveCount(20);
+  await expect(ailleurs.locator('.carte-recette')).toHaveCount(21);
   await ailleurs.context().close();
 });
 

@@ -171,6 +171,7 @@ export interface Alerte {
 }
 
 const libelleRepas = (r: Repas) => `${nomDuJour(r.jour)} ${r.moment}`;
+const jours = (n: number) => `${n} jour${n > 1 ? 's' : ''}`;
 
 /** Ce qui demande une action : conservation dépassée, portions insuffisantes, préparatifs de la veille. */
 export function alertes(f: Fournee, recettes: readonly Recette[], personnes: number): Alerte[] {
@@ -188,14 +189,14 @@ export function alertes(f: Fournee, recettes: readonly Recette[], personnes: num
         type: 'congeler',
         recetteId: recette.id,
         titre: `${recette.nom}, ${libelleRepas(r)} : ${jourJ} jours après la session`,
-        detail: `Au-delà des ${recette.conservation.frigoJours} jours conseillés au frigo : congelez ces ${personnes} portions le jour de la session et sortez-les ${nomDuJour(ajouterJours(r.jour, -1))} soir.`,
+        detail: `Au-delà de ${jours(recette.conservation.frigoJours)} conseillés au frigo : congelez ces ${personnes} portions le jour de la session et sortez-les ${nomDuJour(ajouterJours(r.jour, -1))} soir.`,
       });
     } else {
       liste.push({
         type: 'avancer',
         recetteId: recette.id,
         titre: `${recette.nom}, ${libelleRepas(r)} : trop tard`,
-        detail: `Se garde ${recette.conservation.frigoJours} jours au frigo et ne se congèle pas : prévoyez-le plus tôt dans la semaine.`,
+        detail: `Se garde ${jours(recette.conservation.frigoJours)} au frigo et ne se congèle pas : prévoyez-le plus tôt dans la semaine.`,
       });
     }
   }

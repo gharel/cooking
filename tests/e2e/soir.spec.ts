@@ -20,7 +20,7 @@ test('rien de prévu : la roulette décide, « Ce soir, c’est ça » le retien
   await widget(page).getByRole('button', { name: 'Roulette' }).click();
   const dialogue = page.getByRole('dialog', { name: 'Roulette' });
   await dialogue.getByRole('button', { name: 'À cuisiner' }).click();
-  await expect(dialogue).toContainText(/7\spossibilités/);
+  await expect(dialogue).toContainText(/8\spossibilités/);
   await dialogue.getByRole('button', { name: 'Lancer la roulette' }).click();
   await page.clock.runFor(2000);
   const nom = (await dialogue.locator('.roulette-nom').textContent()) ?? '';
