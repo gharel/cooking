@@ -51,13 +51,13 @@ describe('adresses du plan B', () => {
     const r = await lireReglages(base);
     await enregistrerReglages(base, {
       ...r,
-      participants: ['Alex', 'Sam'],
+      participants: ['Guillaume', 'Hélène'],
       laveVaisselle: false,
       heureDiner: '20:00',
       choixDuSoir: { jour: '2026-12-01', recetteId: null, adresseId: 'adresse-gino-pizza' },
     });
     expect(await lireReglages(base)).toMatchObject({
-      participants: ['Alex', 'Sam'],
+      participants: ['Guillaume', 'Hélène'],
       laveVaisselle: false,
       heureDiner: '20:00',
       choixDuSoir: { adresseId: 'adresse-gino-pizza' },

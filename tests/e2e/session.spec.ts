@@ -36,10 +36,10 @@ test('préparer : durée estimée, gain, équipement, veille, déroulé complet'
   const avant = await etapes.count();
 
   // À deux : prénoms, répartition, frise par personne.
-  await page.getByLabel('Prénom de la personne 1').fill('Alex');
+  await page.getByLabel('Prénom de la personne 1').fill('Guillaume');
   await page.getByRole('button', { name: 'Ajouter une personne' }).click();
-  await page.getByLabel('Prénom de la personne 2').fill('Sam');
-  await expect(page.locator('.frise-voie', { hasText: 'Sam' })).toHaveCount(1);
+  await page.getByLabel('Prénom de la personne 2').fill('Hélène');
+  await expect(page.locator('.frise-voie', { hasText: 'Hélène' })).toHaveCount(1);
   await expect(page.getByRole('heading', { name: 'Qui fait quoi' })).toBeVisible();
   await expect(page.locator('.repartition-personne')).toHaveCount(2);
   await expect(page.locator('.repartition-personne').nth(1)).toContainText(/\d+\sétapes?\s·/);
@@ -49,7 +49,7 @@ test('préparer : durée estimée, gain, équipement, veille, déroulé complet'
   await page.getByRole('checkbox', { name: 'Lave-vaisselle' }).uncheck();
   await expect(page.locator('.deroule')).toContainText('Faire la vaisselle de la préparation');
   await page.reload();
-  await expect(page.getByLabel('Prénom de la personne 2')).toHaveValue('Sam');
+  await expect(page.getByLabel('Prénom de la personne 2')).toHaveValue('Hélène');
   await expect(page.getByRole('checkbox', { name: 'Lave-vaisselle' })).not.toBeChecked();
 });
 

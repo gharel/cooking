@@ -192,7 +192,7 @@ describe('réglages de la session à plusieurs', () => {
       notificationDiner: false,
       choixDuSoir: null,
     });
-    const trois = completerReglages({ participants: ['Alex', 'Sam', 'Lou'] });
+    const trois = completerReglages({ participants: ['Guillaume', 'Hélène', 'Invité'] });
     expect(equipementDeSession(trois).cuisiniers).toBe(3);
   });
 });
