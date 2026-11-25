@@ -18,7 +18,10 @@ import {
 } from '../domaine/fournee';
 import { estCongelable } from '../domaine/modele';
 import { rappelsDecongelation } from '../domaine/stock';
-import { derniereSession } from '../app/session-etat';
+import { derniereSession, historique } from '../app/session-etat';
+import { statistiques, texteDeLaFournee } from '../domaine/partage';
+import { formaterDuree } from '../domaine/texte';
+import { partagerTexte } from '../app/partager';
 import { plats as platsStock } from '../app/stock-etat';
 import { aujourdhui } from '../domaine/dates';
 import { teinte } from './recettes/commun';
@@ -74,6 +77,7 @@ export function Semaine() {
   const parId = new Map(recettes.value.map((r) => [r.id, r]));
   const plats = f.plats.filter((p) => parId.has(p.recetteId));
   const stock = platsStock.value;
+  const stats = statistiques(historique.value);
   const liste = alertes(f, recettes.value, personnes);
   const rappels = rappelsDecongelation(
     [f, derniereSession.value].filter((x) => x !== null),
@@ -147,6 +151,17 @@ export function Semaine() {
             <Icone nom="flamme" />
             {f.statut === 'session' ? 'Reprendre la session' : 'Préparer la session'}
           </a>
+          <button
+            type="button"
+            class="bouton bouton-secondaire"
+            disabled={plats.length === 0}
+            onClick={() =>
+              void partagerTexte('Fournée', texteDeLaFournee(f, recettes.value, stock, heureLisible(f.heure)))
+            }
+          >
+            <Icone nom="partage" />
+            Partager la fournée
+          </button>
           <a class="bouton bouton-secondaire" href="#courses">
             <Icone nom="courses" />
             Voir les courses
@@ -171,6 +186,17 @@ export function Semaine() {
           <span class="stat-nom">articles à acheter</span>
         </li>
       </ul>
+
+      {stats.sessions > 0 && (
+        <section class="carte carte-stats" aria-labelledby="titre-stats">
+          <h2 id="titre-stats">Vos fournées</h2>
+          <p>
+            {stats.sessions} session{stats.sessions > 1 ? 's' : ''} · {formaterDuree(stats.tempsGagne)}{' '}
+            gagnées en menant les recettes de front · {stats.plats} plats, {stats.portions} portions ·{' '}
+            {formaterDuree(stats.dureeMoyenne)} par session en moyenne
+          </p>
+        </section>
+      )}
 
       <div class="grille-semaine">
         <section class="carte" aria-labelledby="titre-plats">

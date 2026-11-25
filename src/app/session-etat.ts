@@ -32,9 +32,12 @@ export function demarrerHorloge(): () => void {
 
 /** Dernière session terminée (bilan, planning des repas de la semaine en cours). */
 export const derniereSession = signal<Fournee | null>(null);
+/** Toutes les fournées terminées, de la plus récente à la plus ancienne (statistiques). */
+export const historique = signal<Fournee[]>([]);
 
 export async function chargerDerniereSession(): Promise<void> {
-  derniereSession.value = (await fourneesTerminees(obtenirBase()))[0] ?? null;
+  historique.value = await fourneesTerminees(obtenirBase());
+  derniereSession.value = historique.value[0] ?? null;
 }
 
 /** Planning vu maintenant : avant la session, le plan prévu ; pendant, recalculé depuis l’état réel. */
@@ -123,6 +126,7 @@ export async function terminerSession(recettes: readonly Recette[], personnes: n
   });
   void garderEcranAllume(false);
   derniereSession.value = terminee;
+  historique.value = [terminee, ...historique.value];
   await nouvelleFourneeCourante();
   await rafraichirStock();
   return plats.length;

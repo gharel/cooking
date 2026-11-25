@@ -9,6 +9,7 @@ import { exporter, importer } from '../../donnees/echange';
 import { installerRecettesDeDepart } from '../../donnees/recettes';
 import { Etiquettes, resume, teinte } from './commun';
 import { ouvrirEditeur } from './etat-editeur';
+import { importWeb } from './ImportWeb';
 
 async function telechargerExport(): Promise<void> {
   const contenu = await exporter(obtenirBase());
@@ -97,6 +98,14 @@ export function Bibliotheque({ message }: { message?: string | undefined }) {
           <button type="button" class="bouton bouton-secondaire" onClick={telechargerExport}>
             <Icone nom="exporter" />
             Exporter
+          </button>
+          <button
+            type="button"
+            class="bouton bouton-secondaire"
+            onClick={() => (importWeb.value = { texte: '', adresse: '' })}
+          >
+            <Icone nom="livre" />
+            Depuis une page web
           </button>
           <button type="button" class="bouton bouton-primaire" onClick={() => ouvrirEditeur(null)}>
             <Icone nom="plus" />

@@ -6,7 +6,7 @@ Les demandes explicites de l’utilisateur priment sur ce document.
 
 ## État du projet
 
-**Lots 0 et 1 livrés** le 25 novembre 2026 (specs `docs/specs/001-fondations.md` et `002-recettes.md`) : coque, thème, hors ligne, publication ; bibliothèque de recettes (13 recettes de départ, recettes de famille racontées puis structurées, photos, export et import). Semaine, Courses, Session et Frigo renvoient encore vers la maquette (https://gharel.github.io/cooking/maquette/). Prochaine étape : lot 2 (semaine et courses), qui commence par sa spec ; le nombre de portions s’y choisit au moment de prendre un plat (4 proposé).
+**Version 1 livrée** les 25 et 26 novembre 2026 : lots 0 à 5 du plan, une spec par lot (`docs/specs/001` à `006`), toutes au statut « livrée ». Les lots 2 à 5 ont été validés par délégation (objectif donné par l’utilisateur : « livrer l’application en suivant le plan et les décisions prises ») ; les choix faits en route sont écrits dans chaque spec et dans les ADR. La maquette reste en ligne comme référence visuelle (https://gharel.github.io/cooking/maquette/). Toute nouvelle fonctionnalité repart d’une spec `docs/specs/007-…`.
 
 ## Le produit
 
@@ -17,17 +17,20 @@ Une application web responsive (téléphone d’abord), locale d’abord, pour l
 ```
 index.html                 Métadonnées, script du thème en ligne (avant l’affichage), point de montage
 src/main.tsx               Polices, styles, routage par ancre, montage, typographie, service worker
-src/app/                   Coque (bandeau, navigation, écran courant), routage, thème, icônes, typographie du DOM
-src/domaine/               Logique pure, sans DOM, testée : modèle, dictionnaire (clés, rayons), ingrédients,
-                           structuration du texte libre, durées, bibliothèque (filtres), validation des imports,
-                           typographie ; à venir : ordonnanceur, regroupement, courses, conservation, idées
-src/donnees/               IndexedDB (Dexie, schéma v1), recettes, photos, export et import, recettes de départ
-src/ecrans/                Un composant Preact par écran ; recettes/ : Bibliothèque, Fiche, Éditeur (chargé à la demande)
-src/styles/                jetons.css (seul fichier où une couleur est écrite), base, composants, coque
+src/app/                   Coque, routage, thème, icônes, typographie du DOM, écrans à la demande (aLaDemande),
+                           état partagé en signaux (bibliotheque-, fournee-, session-, stock-etat), alarme, partage
+src/domaine/               Logique pure, sans DOM, testée : modèle, dictionnaire, ingrédients, structuration,
+                           durées, bibliothèque, validation, dates, portions, fournée (répartition, alertes),
+                           courses, ordonnanceur, session (direct), stock (frigo, rappels, restes), idées,
+                           schema-org (import web), partage (statistiques, textes), typographie
+src/donnees/               IndexedDB (Dexie, schéma v2), recettes, photos, fournées, réglages, export et import
+src/ecrans/                Un écran par fichier, chargé à la demande ; sous-dossiers recettes/, semaine/, session/
+src/styles/                jetons.css (seul fichier où une couleur est écrite), base, composants, coque, un par écran
 public/favicon.svg         Logo bocal ; icônes PWA générées au build (pwa-assets.config.ts)
 maquette/index.html        Maquette de référence (données fictives), copiée dans dist/maquette/
 outils/budget.js           Poids du JavaScript de démarrage (60 ko gzip au plus)
-tests/domaine/             Vitest ; depart.test.ts compare l’annexe 002 aux données (à venir : fast-check)
+tests/domaine/             Vitest ; ordonnanceur.test.ts vérifie ses propriétés avec fast-check ;
+                           depart.test.ts compare l’annexe 002 aux données
 tests/donnees/             Vitest + fake-indexeddb : installation, duplication, suppression, export et import
 tests/e2e/                 Playwright + axe-core ; iphone.spec.ts tourne dans WebKit (iPhone 13)
 docs/                      PLAN.md, BENCHMARK.md, adr/ (décisions), specs/ (une par fonctionnalité), captures/
@@ -76,7 +79,11 @@ Les recettes de départ (`src/donnees/recettes-de-depart.ts`) sont la source uni
 - **Recettes de famille** : le texte saisi est conservé à l’identique et toujours consultable ; la structuration (étapes, durées, postes) n’est qu’une proposition, enregistrée seulement après relecture, et toute valeur devinée est signalée comme telle. Ne jamais réécrire ni « corriger » le texte d’origine.
 - **Dépôt public** : aucune vraie recette de famille, photo, nom de proche ni donnée personnelle dans le dépôt, les tests ou les captures. Exemples fictifs seulement.
 - **Sécurité alimentaire** : les durées de conservation sont des valeurs par défaut prudentes (3 jours au frigo, 3 mois au congélateur), modifiables par recette et accompagnées de leur source. Ne jamais présenter l’application comme un avis sanitaire.
-- **Ordonnanceur** : fonction pure et déterministe (`src/domaine/ordonnanceur.ts`). Toute modification garde les propriétés testées : dépendances respectées, aucun poste ni cuisinier en double emploi, durée au moins égale au chemin critique.
+- **Ordonnanceur** : fonction pure et déterministe (`src/domaine/ordonnanceur.ts`). Toute modification garde les propriétés testées avec fast-check : dépendances respectées, aucun feu ni cuisinier en double emploi, 2 plats au plus et une seule température par four, durée au moins égale au chemin critique, tâches figées respectées. La session en direct (`src/domaine/session.ts`) fige les tâches réellement commencées (dépendances finies, cuisinier libre) et recalcule le reste à partir de « maintenant ».
+- **Écritures de la fournée** : toujours par `modifierFournee` (`src/app/fournee-etat.ts`), qui applique en mémoire puis met l’écriture en file ; ne jamais écrire la fournée courante directement, sous peine d’écraser une modification plus récente.
+- **Écrans à la demande** : chaque écran est un morceau séparé (`aLaDemande`), préchargé après le premier affichage ; le budget de démarrage (60 ko) le vérifie. Un nouvel écran suit le même chemin.
+- **Partage et import** : un fichier de recette partagé est un export Fournée (sous-recettes et photos comprises) ; l’import web lit le JSON-LD schema.org collé (pas de lecture d’adresse : CORS) ; les partages reçus arrivent en `?titre=&texte=&adresse=` (Web Share Target).
+- **Reconnaissance de texte** : reportée (ADR 0002).
 
 ## Vérification
 

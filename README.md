@@ -2,23 +2,23 @@
 
 Application web de batch cooking : vos recettes (y compris celles de la famille), une session de cuisine orchestrée, un frigo sous contrôle.
 
-> **Statut : lot 1 livré, les recettes.** L’application est en ligne sur https://gharel.github.io/cooking/ : bibliothèque avec 13 recettes de départ, recettes de famille, photos, export et import ; hors ligne. Les autres écrans arrivent lot par lot. La maquette complète reste visible sur https://gharel.github.io/cooking/maquette/ (données fictives). Nom de travail : « Fournée ».
+> **Version 1 en ligne : https://gharel.github.io/cooking/** (installable, utilisable hors ligne). La maquette de départ reste visible sur https://gharel.github.io/cooking/maquette/. Nom de travail : « Fournée ».
 
-## Ce que fera l’application
+## Ce que fait l’application
 
-| Écran    | Rôle                                                                                                                    | Lot |
-| -------- | ----------------------------------------------------------------------------------------------------------------------- | --- |
-| Recettes | Bibliothèque aux étapes structurées ; recettes de famille ou maison saisies comme on les raconte, texte d’origine gardé | 1   |
-| Semaine  | Recettes de la fournée, portions, répartition des repas, alertes de conservation                                        | 2   |
-| Courses  | Liste consolidée par rayon (les oignons de toutes les recettes sur une ligne), placard, hors ligne                      | 2   |
-| Session  | Déroulé calculé par poste (plan de travail, feux, four, refroidissement), minuteurs, mode cuisine                       | 3   |
-| Frigo    | Plats préparés avec dates limites et rappels ; « Ce qu’il reste » : idées et mini-session anti-gaspi                    | 4   |
+| Écran    | Rôle                                                                                                                                                 |
+| -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Semaine  | Plats de la fournée (portions demandées, 4 proposé), répartition des repas, alertes de conservation, rappels de décongélation, statistiques, partage |
+| Courses  | Liste consolidée par rayon (une ligne par ingrédient, quantités mises à l’échelle), placard, articles cochés, partage                                |
+| Session  | Déroulé calculé (recettes menées de front, feux et fours partagés), puis guidage en direct : « Maintenant », minuteurs, frise, mode cuisine          |
+| Frigo    | Plats préparés (fraîcheur, manger, congeler, décongeler) ; « Ce qu’il reste » : idées anti-gaspi et mini-session sans achat                          |
+| Recettes | 13 recettes de départ, recettes de famille racontées puis structurées, photos, import web (schema.org), partage, impression, export et import        |
 
-Locale d’abord : pas de compte, pas d’abonnement, données sur l’appareil, export JSON. Thème clair, sombre ou système. Installable et utilisable hors ligne.
+Locale d’abord : pas de compte, pas d’abonnement, données sur l’appareil (exportables). Thème clair, sombre ou système.
 
 ## Développement
 
-Node 24. Vite, TypeScript strict, Preact (voir `docs/adr/0001-pile-technique.md`).
+Node 24. Vite, TypeScript strict, Preact, Dexie (voir `docs/adr/`).
 
 ```sh
 npm install                              # dépendances et hooks git
@@ -35,5 +35,5 @@ Un push sur `main` lance les vérifications puis publie le site.
 - [Plan produit et technique](docs/PLAN.md)
 - [Analyse des applications existantes](docs/BENCHMARK.md)
 - [Décisions d’architecture](docs/adr/)
-- [Specs des fonctionnalités](docs/specs/)
+- [Specs des fonctionnalités](docs/specs/) (une par lot, toutes livrées)
 - [Consignes pour les agents et les contributeurs](AGENTS.md)

@@ -5,6 +5,9 @@ import { ancreFiche } from '../../app/routage';
 import { ORIGINES, POSTES, type Etape, type Recette } from '../../domaine/modele';
 import { formaterDuree } from '../../domaine/texte';
 import { obtenirBase } from '../../donnees/base';
+import { exporterRecette } from '../../donnees/echange';
+import { partagerFichier } from '../../app/partager';
+import { slug } from '../../domaine/texte';
 import { annulerSuppression, dupliquerRecette, supprimerRecette } from '../../donnees/recettes';
 import { Etiquettes, resume, teinte } from './commun';
 import { ouvrirChoixPlat } from '../semaine/ChoixPlat';
@@ -54,6 +57,12 @@ export function Fiche({ recette: r }: { recette: Recette }) {
       });
   }
 
+  async function partager() {
+    const contenu = await exporterRecette(obtenirBase(), r.id);
+    if (!contenu) return;
+    await partagerFichier(`${slug(r.nom)}.fournee.json`, JSON.stringify(contenu, null, 2), r.nom);
+  }
+
   async function dupliquer() {
     const copie = await dupliquerRecette(obtenirBase(), r.id);
     if (!copie) return;
@@ -85,6 +94,14 @@ export function Fiche({ recette: r }: { recette: Recette }) {
           <button type="button" class="bouton bouton-secondaire" onClick={() => ouvrirEditeur(r.id)}>
             <Icone nom="crayon" />
             Modifier
+          </button>
+          <button type="button" class="bouton bouton-secondaire" onClick={() => void partager()}>
+            <Icone nom="partage" />
+            Partager
+          </button>
+          <button type="button" class="bouton bouton-secondaire" onClick={() => window.print()}>
+            <Icone nom="livre" />
+            Imprimer
           </button>
           <button type="button" class="bouton bouton-secondaire" onClick={dupliquer}>
             <Icone nom="copie" />

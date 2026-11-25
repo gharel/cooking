@@ -33,6 +33,12 @@ export default defineConfig(({ command, isPreview }) => ({
         display: 'standalone',
         background_color: '#faf7f2',
         theme_color: '#faf7f2',
+        // Recevoir le partage d’une page de recette depuis une autre application (Android).
+        share_target: {
+          action: './',
+          method: 'GET',
+          params: { title: 'titre', text: 'texte', url: 'adresse' },
+        },
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],

@@ -136,3 +136,18 @@
 :root[data-theme='light'] {
   color-scheme: only light;
 }
+
+/* Impression : toujours sur fond blanc, quel que soit le thème. */
+@media print {
+  :root,
+  :root[data-theme='dark'],
+  :root:not([data-theme='light']) {
+    color-scheme: light;
+    --fond: #ffffff;
+    --surface: #ffffff;
+    --surface-2: #f3eee6;
+    --bordure: #e5ddd1;
+    --texte: #1f1a14;
+    --texte-doux: #665c52;
+  }
+}

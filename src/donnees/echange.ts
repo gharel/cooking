@@ -59,3 +59,36 @@ export async function importer(base: BaseFournee, donnees: unknown): Promise<Res
     return { ok: true, ajoutees: nouvelles.length, ignorees };
   });
 }
+
+/** Une recette seule, avec ses sous-recettes et leurs photos : à partager avec un proche. */
+export async function exporterRecette(base: BaseFournee, id: string): Promise<Export | null> {
+  const toutes = await base.recettes.toArray();
+  const parId = new Map(toutes.map((r) => [r.id, r]));
+  const choisies = new Map<string, (typeof toutes)[number]>();
+  const ajouter = (rid: string) => {
+    const r = parId.get(rid);
+    if (!r || choisies.has(rid)) return;
+    choisies.set(rid, r);
+    for (const i of r.ingredients) if (i.recetteId) ajouter(i.recetteId);
+    for (const e of r.etapes) if (e.sousRecetteId) ajouter(e.sousRecetteId);
+  };
+  ajouter(id);
+  if (choisies.size === 0) return null;
+  const recettes = [...choisies.values()];
+  const photos = (await base.photos.bulkGet(recettes.flatMap((r) => r.photos))).filter((p): p is Photo =>
+    Boolean(p),
+  );
+  return {
+    format: FORMAT_EXPORT,
+    version: VERSION_EXPORT,
+    exporteLe: new Date().toISOString(),
+    recettes,
+    photos: await Promise.all(
+      photos.map(async (p) => ({
+        id: p.id,
+        type: p.blob.type || 'image/jpeg',
+        donnees: await versBase64(p.blob),
+      })),
+    ),
+  };
+}

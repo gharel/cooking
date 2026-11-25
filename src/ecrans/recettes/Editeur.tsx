@@ -72,10 +72,10 @@ const lignes = (texte: string) =>
 
 const ouNull = (s: string) => (s.trim() === '' ? null : s.trim());
 
-function versRecette(b: Brouillon, existante: Recette | undefined): Recette {
+function versRecette(b: Brouillon, existante: Recette | undefined, depart: Recette | undefined): Recette {
   const maintenant = new Date().toISOString();
   const ingredients = lignes(b.ingredients).map((ligne) => {
-    const connu = existante?.ingredients.find((i) => i.texte === ligne);
+    const connu = depart?.ingredients.find((i) => i.texte === ligne);
     const ingredient = connu ?? analyserIngredient(ligne);
     const rayon = b.rayons[ligne];
     return rayon ? { ...ingredient, rayon } : ingredient;
@@ -97,7 +97,7 @@ function versRecette(b: Brouillon, existante: Recette | undefined): Recette {
       type: b.origine,
       de: ouNull(b.de),
       mot: ouNull(b.mot),
-      source: existante?.origine.source ?? null,
+      source: depart?.origine.source ?? null,
     },
     texteOriginal: b.texteOriginal.trim() === '' ? null : b.texteOriginal,
     photos: [...b.photos, ...b.nouvelles.map((p) => p.id)],
@@ -223,10 +223,11 @@ function EtapeEditable({
   );
 }
 
-export function Editeur({ recetteId }: { recetteId: string | null }) {
+export function Editeur({ recetteId, modele }: { recetteId: string | null; modele: Recette | null }) {
   const existante = recetteId ? recettes.value.find((r) => r.id === recetteId) : undefined;
-  const [b, setB] = useState<Brouillon>(() => depuisRecette(existante));
-  const initiale = useMemo(() => empreinte(depuisRecette(existante)), [existante]);
+  const depart = existante ?? modele ?? undefined;
+  const [b, setB] = useState<Brouillon>(() => depuisRecette(depart));
+  const initiale = useMemo(() => empreinte(depuisRecette(depart)), [depart]);
   const [erreur, setErreur] = useState('');
   const [resumeProposition, setResumeProposition] = useState('');
   const dialogue = useRef<HTMLDialogElement>(null);
@@ -297,7 +298,7 @@ export function Editeur({ recetteId }: { recetteId: string | null }) {
       base,
       (existante?.photos ?? []).filter((id) => !b.photos.includes(id)),
     );
-    const recette = await enregistrerRecette(base, versRecette(b, existante));
+    const recette = await enregistrerRecette(base, versRecette(b, existante, depart));
     await rafraichir();
     dialogue.current?.close();
     fermerEditeur();
@@ -306,7 +307,7 @@ export function Editeur({ recetteId }: { recetteId: string | null }) {
   }
 
   const apercu = lignes(b.ingredients).map((ligne) => {
-    const connu = existante?.ingredients.find((i) => i.texte === ligne);
+    const connu = depart?.ingredients.find((i) => i.texte === ligne);
     return { ligne, ingredient: connu ?? analyserIngredient(ligne) };
   });
   const origines = (Object.keys(ORIGINES) as TypeOrigine[]).filter(

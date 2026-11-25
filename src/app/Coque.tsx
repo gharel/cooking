@@ -106,7 +106,6 @@ export function Coque() {
         <div class="colonne">
           <header class="barre">
             <Marque classe="marque" />
-            <span class="pastille pastille-chantier">En construction</span>
             <span class="barre-espace" />
             <BoutonTheme />
           </header>

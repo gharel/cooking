@@ -22,6 +22,15 @@ import { demarrerTypographie } from './app/typographie-dom';
 const montage = document.getElementById('app');
 if (!montage) throw new Error('Point de montage #app introuvable');
 
+// Partage reçu d’une autre application (Android) : on ouvre l’import prérempli.
+const recu = new URLSearchParams(location.search);
+if (recu.has('texte') || recu.has('adresse')) {
+  const texte = [recu.get('titre'), recu.get('texte')].filter(Boolean).join(String.fromCharCode(10));
+  const adresse = recu.get('adresse') ?? /https?:\/\/\S+/.exec(texte)?.[0] ?? '';
+  history.replaceState(null, '', `${location.pathname}#recettes`);
+  void import('./ecrans/recettes/ImportWeb').then((m) => (m.importWeb.value = { texte, adresse }));
+}
+
 route.value = lireAncre(location.hash);
 addEventListener('hashchange', () => {
   route.value = lireAncre(location.hash);

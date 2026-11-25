@@ -1,6 +1,6 @@
 # Plan produit et technique : Fournée
 
-> Statut : **validé le 25 novembre 2026**, avec deux ajouts demandés : les recettes de famille ou maison, et le mode « Ce qu’il reste ». « Fournée » est un nom de travail (une fournée, c’est un batch). Maquette : `maquette/index.html`, publiée sur https://gharel.github.io/cooking/.
+> Statut : **version 1 livrée** les 25 et 26 novembre 2026 (lots 0 à 5, specs `docs/specs/001` à `006`). Validé le 25 novembre avec deux ajouts demandés : les recettes de famille ou maison, et le mode « Ce qu’il reste ». « Fournée » est un nom de travail (une fournée, c’est un batch). Application : https://gharel.github.io/cooking/ ; maquette : https://gharel.github.io/cooking/maquette/.
 >
 > Décisions : charte propre (projet personnel, pas la charte Skazy) ; Preact + TypeScript ; dépôt public `gharel/cooking` publié sur GitHub Pages.
 
@@ -227,5 +227,15 @@ L’import direct par URL se heurte au CORS dans un navigateur : au MVP, on coll
 | Pile         | Preact + TypeScript (ADR 0001 accepté)                                                                                                                    |
 | Dépôt        | Public, `gharel/cooking`, publié sur https://gharel.github.io/cooking/                                                                                    |
 | Dépôt public | Aucune vraie recette de famille, photo ou donnée personnelle dans le dépôt : exemples fictifs seulement ; les recettes de chacun restent sur son appareil |
+
+Décisions prises en livrant (détail dans les specs) :
+
+- **Portions** : 4 par défaut, demandées au moment de choisir un plat ; 1 repas = 1 portion par personne du foyer (2 par défaut).
+- **Temps de préparation** : ×2 portions donne ×1,5 de préparation ; les cuissons ne changent pas.
+- **Fours** : 2 plats par four à la même température ; un préchauffage devient inutile si le four est déjà chaud.
+- **Décongélation** : 24 h au frigo ; rappel la veille au soir.
+- **Écrans chargés à la demande** pour tenir le budget de 60 ko au démarrage (56 ko avec Dexie).
+- **Reconnaissance de texte sur photo** reportée (ADR 0002) ; import web par copier-coller (CORS).
+- **Référencement** : la page reste en `noindex`, comme les autres outils de gharel.github.io : une application personnelle, locale, n’a rien à gagner à être indexée.
 
 Points ouverts : nom définitif (« Fournée » en attendant), licence du code (aucune pour l’instant, donc tous droits réservés).

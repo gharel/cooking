@@ -122,3 +122,31 @@ main:focus {
     scroll-behavior: auto !important;
   }
 }
+
+/* Impression : la fiche seule, sans navigation ni boutons. */
+@media print {
+  .navigation,
+  .barre,
+  .annonce-zone,
+  .lien-evitement,
+  .actions,
+  .retour,
+  .bandeau,
+  .photo-recette.vide {
+    display: none !important;
+  }
+  body {
+    background: var(--fond);
+    color: var(--texte);
+  }
+  .app {
+    display: block;
+  }
+  main {
+    padding: 0;
+  }
+  .carte {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+}
