@@ -89,6 +89,29 @@ test('le texte affiché suit la typographie française (espaces insécables)', a
   expect(sousTitre).not.toMatch(/ [:;!?]/);
 });
 
+// Une pilule à rayon infini (999px) devient un ovale disgracieux quand son texte passe sur deux lignes.
+test('sur téléphone, les boutons et pastilles gardent un arrondi propre, même sur deux lignes', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 360, height: 740 });
+  await ouvrir(page);
+  for (const ecran of ECRANS) {
+    await page.evaluate((id) => (location.hash = id), ecran.id);
+    const mesures = await page.evaluate(() =>
+      [...document.querySelectorAll<HTMLElement>('.bouton, .pastille')]
+        .filter((e) => e.getClientRects().length > 0)
+        .map((e) => ({
+          texte: e.textContent?.trim() ?? '',
+          rayon: parseFloat(getComputedStyle(e).borderTopLeftRadius),
+        })),
+    );
+    expect(
+      mesures.filter((m) => m.rayon > 28),
+      `rayons sur ${ecran.id}`,
+    ).toEqual([]);
+  }
+});
+
 test('aucune requête vers une autre origine (polices comprises)', async ({ page }) => {
   const externes: string[] = [];
   page.on('request', (r) => {

@@ -340,7 +340,7 @@
 
       .bouton {
         display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-        min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid transparent;
+        min-height: 44px; padding: 6px 18px; line-height: 1.25; border-radius: 22px; border: 1px solid transparent;
         font-weight: 600; font-size: 0.95rem; text-decoration: none; white-space: nowrap; cursor: pointer;
         background: transparent;
         transition: background-color 0.15s, border-color 0.15s, transform 0.1s;
@@ -353,12 +353,12 @@
       .bouton-texte { color: var(--primaire-texte); padding: 0 12px; }
       .bouton-texte:hover { background: var(--primaire-doux); }
       .bouton-icone { width: 44px; padding: 0; }
-      .bouton-petit { min-height: 36px; padding: 0 14px; font-size: 0.88rem; }
-      .bouton-grand { min-height: 56px; padding: 0 26px; font-size: 1.05rem; }
+      .bouton-petit { min-height: 36px; padding: 4px 14px; font-size: 0.88rem; }
+      .bouton-grand { min-height: 56px; padding: 8px 26px; font-size: 1.05rem; border-radius: 28px; }
       .bouton[aria-pressed="true"] { background: var(--texte); color: var(--fond); border-color: var(--texte); }
 
       .pastille {
-        display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px;
+        display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 12px;
         font-size: 0.75rem; font-weight: 700; white-space: nowrap;
         background: var(--surface-2); color: var(--texte-doux);
       }
@@ -411,7 +411,7 @@
       }
       .ligne-recette-texte { display: flex; flex-direction: column; flex: 1; min-width: 0; }
       .ligne-recette-texte span { font-size: 0.84rem; color: var(--texte-doux); }
-      .compteur { display: flex; align-items: center; gap: 2px; padding: 2px; border-radius: 999px; background: var(--surface); border: 1px solid var(--bordure-forte); }
+      .compteur { display: flex; align-items: center; gap: 2px; padding: 2px; border-radius: 21px; background: var(--surface); border: 1px solid var(--bordure-forte); }
       .compteur button { width: 36px; height: 36px; display: grid; place-items: center; border: 0; border-radius: 50%; background: transparent; cursor: pointer; }
       .compteur button:hover { background: var(--surface-2); }
       .compteur svg { width: 16px; height: 16px; }
@@ -468,7 +468,7 @@
       .rayons { columns: 2 340px; column-gap: 16px; }
       .rayon { break-inside: avoid; margin-bottom: 16px; }
       .rayon h2 { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; font-size: 1.05rem; }
-      .compte { padding: 2px 9px; border-radius: 99px; background: var(--surface-2); font-family: var(--police); font-size: 0.78rem; font-weight: 700; color: var(--texte-doux); }
+      .compte { padding: 2px 9px; border-radius: 11px; background: var(--surface-2); font-family: var(--police); font-size: 0.78rem; font-weight: 700; color: var(--texte-doux); }
       .articles li + li { border-top: 1px solid var(--bordure); }
       .article label { display: flex; align-items: center; gap: 12px; min-height: 54px; padding: 8px 2px; cursor: pointer; }
       .article input {
@@ -588,13 +588,13 @@
         border: 1px solid color-mix(in srgb, var(--alerte) 30%, transparent);
       }
       .bandeau-alerte svg { color: var(--alerte); margin-top: 2px; }
-      .segments { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; margin-bottom: 16px; border-radius: 999px; background: var(--surface-2); }
+      .segments { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; margin-bottom: 16px; border-radius: 24px; background: var(--surface-2); }
       .segments button {
         display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 16px;
-        border: 0; border-radius: 999px; background: transparent; color: var(--texte-doux); font-weight: 600; cursor: pointer;
+        border: 0; border-radius: 20px; background: transparent; color: var(--texte-doux); font-weight: 600; cursor: pointer;
       }
       .segments button[aria-pressed="true"] { background: var(--surface); color: var(--texte); box-shadow: var(--ombre); }
-      .segments button span { padding: 1px 7px; border-radius: 99px; background: var(--surface-3); font-size: 0.75rem; }
+      .segments button span { padding: 1px 7px; border-radius: 9px; background: var(--surface-3); font-size: 0.75rem; }
       .grille-stock { display: grid; gap: 16px; }
       @media (min-width: 1100px) { .grille-stock { grid-template-columns: minmax(0, 1fr) 340px; align-items: start; } }
       .liste-stock { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
@@ -632,7 +632,7 @@
       }
       .puces-filtre { display: flex; flex-wrap: wrap; gap: 6px; }
       .puce-filtre {
-        min-height: 38px; padding: 0 14px; border-radius: 999px; cursor: pointer;
+        min-height: 38px; padding: 0 14px; border-radius: 19px; cursor: pointer;
         border: 1px solid var(--controle); background: var(--surface); font-size: 0.88rem; font-weight: 600;
       }
       .puce-filtre[aria-pressed="true"] { background: var(--texte); color: var(--fond); border-color: var(--texte); }
@@ -670,7 +670,7 @@
       .etapes-structurees li:first-child { border-top: 0; }
       .numero { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; border: 2px solid var(--c); background: var(--cd); font-size: 0.8rem; font-weight: 700; }
       .attributs { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
-      .attribut { padding: 2px 8px; border-radius: 99px; background: var(--surface-2); font-size: 0.72rem; font-weight: 700; color: var(--texte-doux); }
+      .attribut { padding: 2px 8px; border-radius: 10px; background: var(--surface-2); font-size: 0.72rem; font-weight: 700; color: var(--texte-doux); }
       .attribut.actif { background: var(--primaire-doux); color: var(--primaire-texte); }
       .attribut.passif { background: var(--froid-doux); color: var(--froid); }
       .detail-recette .actions { margin-top: 16px; }
@@ -710,7 +710,7 @@
       .choix input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
       .choix span {
         display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 14px;
-        border: 1px solid var(--controle); border-radius: 999px; font-size: 0.9rem; font-weight: 600;
+        border: 1px solid var(--controle); border-radius: 20px; font-size: 0.9rem; font-weight: 600;
       }
       .choix svg { width: 16px; height: 16px; }
       .choix input:checked + span { background: var(--texte); color: var(--fond); border-color: var(--texte); }
@@ -733,7 +733,7 @@
       .grille-reste { display: grid; gap: 16px; }
       @media (min-width: 1100px) { .grille-reste { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); align-items: start; } }
       .restes { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
-      .reste { display: inline-flex; align-items: center; max-width: 100%; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--bordure); }
+      .reste { display: inline-flex; align-items: center; max-width: 100%; border-radius: 20px; background: var(--surface-2); border: 1px solid var(--bordure); }
       .reste.vite { background: var(--bientot-doux); border-color: color-mix(in srgb, var(--bientot) 45%, transparent); }
       .reste-nom {
         display: inline-flex; align-items: center; gap: 6px; min-width: 0; min-height: 40px; padding: 0 4px 0 14px;
@@ -741,7 +741,7 @@
       }
       .reste-nom svg { width: 15px; height: 15px; color: var(--bientot); }
       .reste-nom .pastille { padding: 1px 7px; font-size: 0.68rem; }
-      .reste-retirer { display: grid; place-items: center; width: 38px; height: 40px; border: 0; border-radius: 0 999px 999px 0; background: transparent; color: var(--texte-doux); cursor: pointer; }
+      .reste-retirer { display: grid; place-items: center; width: 38px; height: 40px; border: 0; border-radius: 0 20px 20px 0; background: transparent; color: var(--texte-doux); cursor: pointer; }
       .reste-retirer svg { width: 16px; height: 16px; }
       .ajout-reste { display: flex; flex-wrap: wrap; gap: 8px; }
       .ajout-reste input {
