@@ -1,0 +1,1993 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="darkreader-lock" />
+    <meta name="theme-color" content="#faf7f2" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#15120f" media="(prefers-color-scheme: dark)" />
+    <meta name="robots" content="noindex" />
+    <meta name="description" content="Maquette de Fournée, application web de batch cooking : semaine, courses, session orchestrée, stock et recettes." />
+    <title>Semaine · Fournée</title>
+    <script>
+      // Thème avant l'affichage : seulement pour un choix explicite (sinon, celui du système).
+      (function () {
+        try {
+          var t = JSON.parse(localStorage.getItem("skazy-outils:theme"));
+          if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+        } catch (e) {}
+      })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap"
+    />
+    <style>
+      /* ---------- Jetons : seul endroit où une couleur est écrite ---------- */
+      :root {
+        color-scheme: light dark;
+        --police: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        --police-titre: "Fraunces", Georgia, "Times New Roman", serif;
+        --rayon: 18px;
+        --rayon-m: 12px;
+
+        --fond: #faf7f2;
+        --surface: #ffffff;
+        --surface-2: #f3eee6;
+        --surface-3: #e9e2d6;
+        --bordure: #e5ddd1;
+        --bordure-forte: #cfc4b4;
+        --controle: #8f8374;
+        --texte: #1f1a14;
+        --texte-doux: #665c52;
+        --focus: #1f5fa8;
+        --primaire: #b4532a;
+        --primaire-survol: #9d4622;
+        --primaire-texte: #9a4320;
+        --primaire-doux: #fbe9df;
+        --sur-primaire: #ffffff;
+        --herbe: #276e4d;
+        --herbe-doux: #e1f1e8;
+        --sur-herbe: #ffffff;
+        --froid: #1f5fa8;
+        --froid-doux: #e3edf9;
+        --bientot: #8a5a00;
+        --bientot-doux: #fbf0d6;
+        --alerte: #b42318;
+        --alerte-doux: #fde7e4;
+        --ombre: 0 1px 2px rgb(40 30 20 / 0.05), 0 6px 20px rgb(40 30 20 / 0.06);
+
+        --r-chili: #d6455d;
+        --r-chili-doux: #fbe3e7;
+        --r-curry: #c98a12;
+        --r-curry-doux: #fbefd6;
+        --r-gratin: #7c5cc9;
+        --r-gratin-doux: #ece6fa;
+        --r-taboule: #2f9467;
+        --r-taboule-doux: #def3e8;
+        --r-commun: #5b6b80;
+        --r-commun-doux: #e6eaf0;
+        --r-soupe: #e07a2e;
+        --r-soupe-doux: #fdebdc;
+        --r-bolo: #9b5b3c;
+        --r-bolo-doux: #f3e6df;
+        --r-tikka: #c2417f;
+        --r-tikka-doux: #f9e2ee;
+        --r-cookies: #8a6d3b;
+        --r-cookies-doux: #f2eadb;
+        --r-sauce: #c0392b;
+        --r-sauce-doux: #fbe2df;
+        --r-hachis: #4a6fa5;
+        --r-hachis-doux: #e4ecf7;
+        --r-dahl: #1f8a8a;
+        --r-dahl-doux: #dcf2f1;
+        --famille: #9b2c5a;
+        --famille-doux: #fbe4ef;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          --fond: #15120f;
+          --surface: #1e1a16;
+          --surface-2: #27221d;
+          --surface-3: #332c25;
+          --bordure: #3a332c;
+          --bordure-forte: #4d443a;
+          --controle: #8a7e70;
+          --texte: #f3ede4;
+          --texte-doux: #b5aa9b;
+          --focus: #8ab8f0;
+          --primaire: #f0936f;
+          --primaire-survol: #f5a688;
+          --primaire-texte: #f4a588;
+          --primaire-doux: #3b231a;
+          --sur-primaire: #1f0e07;
+          --herbe: #6fcf9f;
+          --herbe-doux: #173326;
+          --sur-herbe: #0d2318;
+          --froid: #8ab8f0;
+          --froid-doux: #182a40;
+          --bientot: #f2c15a;
+          --bientot-doux: #3a2e14;
+          --alerte: #ff8f80;
+          --alerte-doux: #401b17;
+          --ombre: 0 1px 2px rgb(0 0 0 / 0.3), 0 6px 20px rgb(0 0 0 / 0.25);
+          --r-chili: #f07a8e;
+          --r-chili-doux: #47202a;
+          --r-curry: #f2c15a;
+          --r-curry-doux: #3f3117;
+          --r-gratin: #ab92f0;
+          --r-gratin-doux: #2d2550;
+          --r-taboule: #6fd3a4;
+          --r-taboule-doux: #183a2b;
+          --r-commun: #a9b7c9;
+          --r-commun-doux: #262d38;
+          --r-soupe: #f5a25e;
+          --r-soupe-doux: #43291a;
+          --r-bolo: #d29a7c;
+          --r-bolo-doux: #3b2820;
+          --r-tikka: #ee86b8;
+          --r-tikka-doux: #45192f;
+          --r-cookies: #d4b483;
+          --r-cookies-doux: #3a3020;
+          --r-sauce: #f28b7d;
+          --r-sauce-doux: #441d18;
+          --r-hachis: #8fb0e3;
+          --r-hachis-doux: #1f2c42;
+          --r-dahl: #6fd6d3;
+          --r-dahl-doux: #163837;
+          --famille: #f19cc4;
+          --famille-doux: #44192f;
+        }
+      }
+      :root[data-theme="dark"] {
+        color-scheme: dark;
+        --fond: #15120f;
+        --surface: #1e1a16;
+        --surface-2: #27221d;
+        --surface-3: #332c25;
+        --bordure: #3a332c;
+        --bordure-forte: #4d443a;
+        --controle: #8a7e70;
+        --texte: #f3ede4;
+        --texte-doux: #b5aa9b;
+        --focus: #8ab8f0;
+        --primaire: #f0936f;
+        --primaire-survol: #f5a688;
+        --primaire-texte: #f4a588;
+        --primaire-doux: #3b231a;
+        --sur-primaire: #1f0e07;
+        --herbe: #6fcf9f;
+        --herbe-doux: #173326;
+        --sur-herbe: #0d2318;
+        --froid: #8ab8f0;
+        --froid-doux: #182a40;
+        --bientot: #f2c15a;
+        --bientot-doux: #3a2e14;
+        --alerte: #ff8f80;
+        --alerte-doux: #401b17;
+        --ombre: 0 1px 2px rgb(0 0 0 / 0.3), 0 6px 20px rgb(0 0 0 / 0.25);
+        --r-chili: #f07a8e;
+        --r-chili-doux: #47202a;
+        --r-curry: #f2c15a;
+        --r-curry-doux: #3f3117;
+        --r-gratin: #ab92f0;
+        --r-gratin-doux: #2d2550;
+        --r-taboule: #6fd3a4;
+        --r-taboule-doux: #183a2b;
+        --r-commun: #a9b7c9;
+        --r-commun-doux: #262d38;
+        --r-soupe: #f5a25e;
+        --r-soupe-doux: #43291a;
+        --r-bolo: #d29a7c;
+        --r-bolo-doux: #3b2820;
+        --r-tikka: #ee86b8;
+        --r-tikka-doux: #45192f;
+        --r-cookies: #d4b483;
+        --r-cookies-doux: #3a3020;
+        --r-sauce: #f28b7d;
+        --r-sauce-doux: #441d18;
+        --r-hachis: #8fb0e3;
+        --r-hachis-doux: #1f2c42;
+        --r-dahl: #6fd6d3;
+        --r-dahl-doux: #163837;
+        --famille: #f19cc4;
+        --famille-doux: #44192f;
+      }
+      :root[data-theme="light"] {
+        color-scheme: only light;
+      }
+
+      .r-chili { --c: var(--r-chili); --cd: var(--r-chili-doux); }
+      .r-curry { --c: var(--r-curry); --cd: var(--r-curry-doux); }
+      .r-gratin { --c: var(--r-gratin); --cd: var(--r-gratin-doux); }
+      .r-taboule { --c: var(--r-taboule); --cd: var(--r-taboule-doux); }
+      .r-commun { --c: var(--r-commun); --cd: var(--r-commun-doux); }
+      .r-soupe { --c: var(--r-soupe); --cd: var(--r-soupe-doux); }
+      .r-bolo { --c: var(--r-bolo); --cd: var(--r-bolo-doux); }
+      .r-tikka { --c: var(--r-tikka); --cd: var(--r-tikka-doux); }
+      .r-cookies { --c: var(--r-cookies); --cd: var(--r-cookies-doux); }
+      .r-sauce { --c: var(--r-sauce); --cd: var(--r-sauce-doux); }
+      .r-hachis { --c: var(--r-hachis); --cd: var(--r-hachis-doux); }
+      .r-dahl { --c: var(--r-dahl); --cd: var(--r-dahl-doux); }
+
+      /* ---------- Base ---------- */
+      *, *::before, *::after { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        background: var(--fond);
+        color: var(--texte);
+        font-family: var(--police);
+        font-size: 1rem;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+      }
+      h1, h2, h3 { margin: 0; line-height: 1.2; }
+      h1, h2 { font-family: var(--police-titre); font-weight: 600; letter-spacing: -0.01em; }
+      h1 { font-size: clamp(1.6rem, 1.2rem + 1.6vw, 2.2rem); }
+      h2 { font-size: 1.2rem; }
+      h3 { font-size: 0.95rem; }
+      p { margin: 0; }
+      ul, ol { margin: 0; padding: 0; list-style: none; }
+      a { color: inherit; }
+      button, input, textarea { font: inherit; color: inherit; }
+      svg {
+        width: 20px; height: 20px; flex: none;
+        fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+      }
+      :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+      [hidden] { display: none !important; }
+      h1:focus { outline: none; }
+      .lien-evitement {
+        position: absolute; left: 12px; top: -60px; z-index: 100;
+        background: var(--texte); color: var(--fond); padding: 10px 16px; border-radius: 10px;
+      }
+      .lien-evitement:focus { top: 12px; }
+
+      /* ---------- Coque : barre, navigation, contenu ---------- */
+      .colonne { min-width: 0; }
+      .barre {
+        position: sticky; top: 0; z-index: 20;
+        display: flex; align-items: center; gap: 12px;
+        min-height: 60px;
+        padding: calc(8px + env(safe-area-inset-top)) 16px 8px;
+        background: color-mix(in srgb, var(--fond) 88%, transparent);
+        -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--bordure);
+      }
+      .marque { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+      .marque-nom { font-family: var(--police-titre); font-weight: 700; font-size: 1.25rem; }
+      .logo {
+        display: grid; place-items: center; width: 36px; height: 36px; flex: none;
+        border-radius: 11px; background: var(--primaire); color: var(--sur-primaire);
+      }
+      .barre-espace { flex: 1; }
+      .barre-contexte { display: none; align-items: center; gap: 8px; font-size: 0.88rem; color: var(--texte-doux); }
+      .barre-contexte svg { width: 16px; height: 16px; }
+      @media (min-width: 600px) { .barre-contexte { display: inline-flex; } }
+
+      .navigation {
+        position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+        padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+        background: color-mix(in srgb, var(--surface) 94%, transparent);
+        -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+        border-top: 1px solid var(--bordure);
+      }
+      .navigation ul { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 2px; }
+      .navigation ul a {
+        display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+        min-height: 54px; padding: 4px 2px; border-radius: 14px;
+        color: var(--texte-doux); text-decoration: none; font-size: 0.72rem; font-weight: 600;
+      }
+      .navigation ul a svg { width: 22px; height: 22px; }
+      .navigation ul a:hover { color: var(--texte); }
+      .navigation ul a[aria-current="page"] { color: var(--primaire-texte); background: var(--primaire-doux); }
+      .nav-marque, .nav-pied { display: none; }
+
+      main { padding: 20px 16px calc(100px + env(safe-area-inset-bottom)); }
+      .vue { max-width: 1200px; margin: 0 auto; }
+
+      @media (min-width: 900px) {
+        .app { display: grid; grid-template-columns: 248px minmax(0, 1fr); }
+        .navigation {
+          position: sticky; top: 0; height: 100dvh; align-self: start;
+          display: flex; flex-direction: column; gap: 28px;
+          padding: 20px 14px; background: var(--surface);
+          -webkit-backdrop-filter: none; backdrop-filter: none;
+          border-top: 0; border-right: 1px solid var(--bordure);
+        }
+        .navigation ul { grid-template-columns: 1fr; gap: 4px; }
+        .navigation ul a {
+          flex-direction: row; justify-content: flex-start; gap: 12px;
+          min-height: 46px; padding: 0 14px; border-radius: 12px; font-size: 0.98rem;
+        }
+        .nav-marque { display: flex; align-items: center; gap: 12px; padding: 4px 8px; text-decoration: none; }
+        .nav-marque strong { display: block; font-family: var(--police-titre); font-size: 1.3rem; line-height: 1.1; }
+        .nav-marque small { color: var(--texte-doux); font-size: 0.8rem; }
+        .nav-pied {
+          display: flex; gap: 10px; margin-top: auto; padding: 14px;
+          border-radius: var(--rayon-m); background: var(--surface-2);
+          font-size: 0.82rem; color: var(--texte-doux);
+        }
+        .nav-pied svg { width: 18px; height: 18px; margin-top: 1px; color: var(--herbe); }
+        .barre .marque { display: none; }
+        .barre { padding: 10px 32px; }
+        main { padding: 28px 32px 56px; }
+      }
+
+      /* ---------- Composants ---------- */
+      .entete { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+      .surtitre {
+        display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
+        font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--primaire-texte);
+      }
+      .sous-titre { margin-top: 6px; color: var(--texte-doux); }
+      .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+      .carte {
+        background: var(--surface); border: 1px solid var(--bordure);
+        border-radius: var(--rayon); padding: 18px; box-shadow: var(--ombre);
+      }
+      .carte-entete { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; margin-bottom: 14px; }
+      .etiquette {
+        display: inline-flex; align-items: center; gap: 6px; margin-bottom: 6px;
+        font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--primaire-texte);
+      }
+      .etiquette svg { width: 16px; height: 16px; }
+
+      .bouton {
+        display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid transparent;
+        font-weight: 600; font-size: 0.95rem; text-decoration: none; white-space: nowrap; cursor: pointer;
+        background: transparent;
+        transition: background-color 0.15s, border-color 0.15s, transform 0.1s;
+      }
+      .bouton:active { transform: scale(0.98); }
+      .bouton-primaire { background: var(--primaire); color: var(--sur-primaire); }
+      .bouton-primaire:hover { background: var(--primaire-survol); }
+      .bouton-secondaire { background: var(--surface); border-color: var(--controle); }
+      .bouton-secondaire:hover { background: var(--surface-2); }
+      .bouton-texte { color: var(--primaire-texte); padding: 0 12px; }
+      .bouton-texte:hover { background: var(--primaire-doux); }
+      .bouton-icone { width: 44px; padding: 0; }
+      .bouton-petit { min-height: 36px; padding: 0 14px; font-size: 0.88rem; }
+      .bouton-grand { min-height: 56px; padding: 0 26px; font-size: 1.05rem; }
+      .bouton[aria-pressed="true"] { background: var(--texte); color: var(--fond); border-color: var(--texte); }
+
+      .pastille {
+        display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px;
+        font-size: 0.75rem; font-weight: 700; white-space: nowrap;
+        background: var(--surface-2); color: var(--texte-doux);
+      }
+      .pastille svg { width: 14px; height: 14px; }
+      .pastille-alerte { background: var(--alerte-doux); color: var(--alerte); }
+      .pastille-bientot { background: var(--bientot-doux); color: var(--bientot); }
+      .pastille-froid { background: var(--froid-doux); color: var(--froid); }
+      .pastille-ok { background: var(--herbe-doux); color: var(--herbe); }
+      .pastille-maquette { background: var(--primaire-doux); color: var(--primaire-texte); }
+      .puce { width: 10px; height: 10px; border-radius: 50%; background: var(--c); flex: none; }
+
+      .jauge { height: 8px; border-radius: 99px; background: var(--surface-3); overflow: hidden; }
+      .jauge span { display: block; height: 100%; border-radius: inherit; background: var(--primaire); transition: width 0.3s; }
+      .progression-texte { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; font-size: 0.92rem; }
+      .progression-texte span:last-child { color: var(--texte-doux); }
+
+      .toast {
+        position: fixed; left: 50%; bottom: calc(84px + env(safe-area-inset-bottom)); z-index: 50;
+        transform: translateX(-50%); max-width: calc(100% - 32px);
+        padding: 12px 18px; border-radius: 12px; box-shadow: var(--ombre);
+        background: var(--texte); color: var(--fond); font-size: 0.9rem;
+      }
+      @media (min-width: 900px) { .toast { bottom: 24px; } }
+
+      /* ---------- Semaine ---------- */
+      .carte-session {
+        display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px;
+        background: linear-gradient(135deg, var(--primaire-doux), var(--surface) 70%);
+        border-color: color-mix(in srgb, var(--primaire) 25%, var(--bordure));
+      }
+      .carte-session h2 { font-size: 1.4rem; margin-bottom: 4px; }
+      .carte-session p:not(.etiquette) { color: var(--texte-doux); max-width: 52ch; }
+      .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 16px 0; }
+      .stat {
+        display: flex; flex-direction: column; gap: 2px; padding: 14px 16px;
+        background: var(--surface); border: 1px solid var(--bordure); border-radius: var(--rayon-m);
+      }
+      .stat-valeur { font-family: var(--police-titre); font-size: 1.6rem; font-weight: 700; line-height: 1.15; }
+      .stat-valeur small { font-size: 0.95rem; color: var(--texte-doux); font-weight: 600; }
+      .stat-nom { font-size: 0.85rem; color: var(--texte-doux); }
+      .grille-semaine { display: grid; gap: 16px; }
+      @media (min-width: 1100px) {
+        .grille-semaine { grid-template-columns: 1.1fr 1fr; }
+        .carte-repas { grid-column: 1 / -1; }
+      }
+      .liste-recettes { display: flex; flex-direction: column; gap: 8px; }
+      .ligne-recette {
+        display: flex; align-items: center; gap: 12px; padding: 10px 10px 10px 14px;
+        border-radius: var(--rayon-m); background: var(--surface-2); border-left: 4px solid var(--c);
+      }
+      .ligne-recette-texte { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+      .ligne-recette-texte span { font-size: 0.84rem; color: var(--texte-doux); }
+      .compteur { display: flex; align-items: center; gap: 2px; padding: 2px; border-radius: 999px; background: var(--surface); border: 1px solid var(--bordure-forte); }
+      .compteur button { width: 36px; height: 36px; display: grid; place-items: center; border: 0; border-radius: 50%; background: transparent; cursor: pointer; }
+      .compteur button:hover { background: var(--surface-2); }
+      .compteur svg { width: 16px; height: 16px; }
+      .compteur output { min-width: 2ch; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; }
+      .ajout {
+        display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 48px;
+        border: 1.5px dashed var(--bordure-forte); border-radius: var(--rayon-m); background: transparent;
+        color: var(--texte-doux); font-weight: 600; cursor: pointer;
+      }
+      .ajout:hover { color: var(--primaire-texte); border-color: var(--primaire); }
+      .astuce { display: flex; align-items: flex-start; gap: 10px; margin-top: 14px; font-size: 0.88rem; color: var(--texte-doux); }
+      .astuce svg { color: var(--r-commun); margin-top: 1px; }
+      .vigilance { display: flex; flex-direction: column; gap: 10px; }
+      .vigilance li { display: flex; gap: 12px; padding: 12px; border-radius: var(--rayon-m); background: var(--surface-2); }
+      .vigilance li.bientot { background: var(--bientot-doux); }
+      .vigilance strong { display: block; font-size: 0.95rem; }
+      .vigilance span { font-size: 0.88rem; color: var(--texte-doux); }
+      .vigilance .bouton { margin-top: 8px; }
+      .rond { width: 36px; height: 36px; flex: none; display: grid; place-items: center; border-radius: 50%; background: var(--surface); }
+      .rond svg { width: 18px; height: 18px; }
+      .rond.bientot { color: var(--bientot); }
+      .rond.froid { color: var(--froid); }
+      .rond.ok { color: var(--herbe); }
+      .jours { display: grid; grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); gap: 8px; }
+      .jour { display: flex; flex-direction: column; gap: 6px; padding: 10px; border-radius: var(--rayon-m); background: var(--surface-2); }
+      .jour h3 { display: flex; justify-content: space-between; align-items: baseline; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--texte-doux); }
+      .jour h3 span { font-family: var(--police-titre); font-size: 1.05rem; color: var(--texte); letter-spacing: 0; text-transform: none; }
+      .repas {
+        display: flex; flex-direction: column; gap: 1px; min-height: 60px; padding: 7px 9px;
+        border-radius: 10px; background: var(--surface); border-left: 4px solid var(--c);
+      }
+      .moment { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--texte-doux); }
+      .repas-nom { font-size: 0.86rem; font-weight: 600; line-height: 1.25; }
+      .repas-info { display: flex; align-items: center; gap: 4px; margin-top: 2px; font-size: 0.72rem; font-weight: 700; color: var(--froid); }
+      .repas-info.bientot { color: var(--bientot); }
+      .repas-info svg { width: 13px; height: 13px; }
+      .repas-libre { border: 1.5px dashed var(--bordure-forte); background: transparent; }
+      .repas-libre .repas-nom { color: var(--texte-doux); font-weight: 500; }
+
+      /* ---------- Courses ---------- */
+      .progression-courses { display: grid; gap: 12px; margin-bottom: 16px; }
+      .interrupteur { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; cursor: pointer; font-size: 0.92rem; }
+      .interrupteur input {
+        appearance: none; -webkit-appearance: none; position: relative; flex: none; margin: 0; cursor: pointer;
+        width: 46px; height: 28px; border-radius: 99px; background: var(--surface-3); border: 1px solid var(--controle);
+        transition: background-color 0.2s;
+      }
+      .interrupteur input::after {
+        content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%;
+        background: var(--surface); box-shadow: 0 1px 3px rgb(0 0 0 / 0.3); transition: transform 0.2s;
+      }
+      .interrupteur input:checked { background: var(--herbe); border-color: var(--herbe); }
+      .interrupteur input:checked::after { transform: translateX(18px); }
+      .rayons { columns: 2 340px; column-gap: 16px; }
+      .rayon { break-inside: avoid; margin-bottom: 16px; }
+      .rayon h2 { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; font-size: 1.05rem; }
+      .compte { padding: 2px 9px; border-radius: 99px; background: var(--surface-2); font-family: var(--police); font-size: 0.78rem; font-weight: 700; color: var(--texte-doux); }
+      .articles li + li { border-top: 1px solid var(--bordure); }
+      .article label { display: flex; align-items: center; gap: 12px; min-height: 54px; padding: 8px 2px; cursor: pointer; }
+      .article input {
+        appearance: none; -webkit-appearance: none; flex: none; margin: 0; cursor: pointer;
+        display: grid; place-items: center; width: 24px; height: 24px; border-radius: 7px;
+        border: 2px solid var(--controle); background: var(--surface);
+      }
+      .article input:checked { background: var(--herbe); border-color: var(--herbe); }
+      .article input:checked::after {
+        content: ""; width: 6px; height: 11px; transform: translateY(-1px) rotate(45deg);
+        border: solid var(--sur-herbe); border-width: 0 2.5px 2.5px 0;
+      }
+      .article-texte { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+      .article-nom { font-weight: 600; }
+      .article-detail { font-size: 0.8rem; color: var(--texte-doux); }
+      .article-qte { font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+      .article.coche .article-nom, .article.coche .article-qte { text-decoration: line-through; color: var(--texte-doux); }
+      .rayons.masquer .article.coche { display: none; }
+      .placard li { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 46px; padding: 6px 2px; color: var(--texte-doux); }
+
+      /* ---------- Session ---------- */
+      .point-direct { width: 9px; height: 9px; border-radius: 50%; background: var(--alerte); animation: pouls 1.8s infinite; }
+      @keyframes pouls {
+        0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--alerte) 60%, transparent); }
+        70%, 100% { box-shadow: 0 0 0 8px transparent; }
+      }
+      .progression-session { display: grid; gap: 10px; margin-bottom: 16px; }
+      .grille-session { display: grid; gap: 16px; grid-template-areas: "maintenant" "minuteurs" "ensuite"; }
+      @media (min-width: 1000px) {
+        .grille-session { grid-template-columns: 1.2fr 1fr; grid-template-areas: "maintenant minuteurs" "ensuite ensuite"; }
+      }
+      .maintenant { grid-area: maintenant; border: 2px solid var(--c); background: linear-gradient(160deg, var(--cd), var(--surface) 65%); }
+      .maintenant h2 { font-size: clamp(1.5rem, 1.1rem + 1.8vw, 2.2rem); margin: 4px 0 10px; }
+      .maintenant-detail { font-size: 1.02rem; margin-bottom: 14px; max-width: 60ch; }
+      .meta { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-bottom: 18px; font-size: 0.9rem; color: var(--texte-doux); }
+      .meta li { display: flex; align-items: center; gap: 6px; }
+      .meta svg { width: 16px; height: 16px; }
+      .note-ecran { display: flex; align-items: center; gap: 6px; margin-top: 14px; font-size: 0.8rem; color: var(--texte-doux); }
+      .note-ecran svg { width: 15px; height: 15px; }
+      .minuteurs { grid-area: minuteurs; }
+      .minuteurs ul { display: flex; flex-direction: column; gap: 8px; }
+      .minuteur {
+        display: flex; align-items: center; gap: 12px; padding: 10px 10px 10px 12px;
+        border-radius: var(--rayon-m); background: var(--surface-2); border-left: 4px solid var(--c);
+      }
+      .minuteur-icone { width: 36px; height: 36px; flex: none; display: grid; place-items: center; border-radius: 50%; background: var(--cd); }
+      .minuteur-icone svg { width: 18px; height: 18px; }
+      .minuteur-texte { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+      .minuteur-texte span { font-size: 0.8rem; color: var(--texte-doux); }
+      .minuteur-temps { font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+      .minuteur.bientot .minuteur-temps { color: var(--bientot); }
+      .minuteur.urgent { background: var(--alerte-doux); }
+      .minuteur.urgent .minuteur-temps { color: var(--alerte); }
+      .minuteur.fini .minuteur-temps { color: var(--herbe); font-size: 1.05rem; }
+      .minuteur .bouton-icone { width: 40px; min-height: 40px; background: var(--surface); border-color: var(--bordure-forte); }
+      @media (max-width: 400px) { .minuteur-icone { display: none; } }
+      .ensuite { grid-area: ensuite; }
+      .ensuite h2 { margin-bottom: 12px; }
+      .suite { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+      .suite li { display: flex; gap: 12px; padding: 12px; border-radius: var(--rayon-m); background: var(--surface-2); border-left: 4px solid var(--c); }
+      .suite li.masquee { border-left-style: dashed; }
+      .suite time { font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; font-size: 0.9rem; }
+      .suite strong { display: block; font-size: 0.95rem; line-height: 1.3; }
+      .suite span { font-size: 0.82rem; color: var(--texte-doux); }
+      .chronologie { margin: 16px 0 0; }
+      .chronologie figcaption { margin-bottom: 12px; }
+      .chronologie figcaption p { color: var(--texte-doux); font-size: 0.92rem; margin-top: 4px; }
+      .gantt-defilement { overflow-x: auto; margin: 0 -18px; padding: 0 18px 8px; overscroll-behavior-x: contain; }
+      .gantt { --col: 128px; min-width: 800px; }
+      .gantt-axe, .gantt-ligne { display: grid; grid-template-columns: var(--col) minmax(0, 1fr); }
+      .gantt-ligne { border-top: 1px solid var(--bordure); }
+      .gantt-poste {
+        position: sticky; left: 0; z-index: 4; display: flex; align-items: center; gap: 8px; padding-right: 10px;
+        background: var(--surface); font-size: 0.84rem; font-weight: 600; color: var(--texte-doux);
+      }
+      .gantt-poste svg { width: 16px; height: 16px; }
+      .gantt-piste {
+        position: relative; margin-right: 24px;
+        background-image: linear-gradient(to right, var(--bordure) 1px, transparent 1px);
+        background-size: calc(100% * 15 / 125) 100%;
+      }
+      .gantt-ligne .gantt-piste::after {
+        content: ""; position: absolute; top: 0; bottom: 0; left: var(--maintenant); width: 2px; z-index: 2; background: var(--primaire);
+      }
+      .gantt-axe .gantt-piste { height: 46px; background: none; }
+      .tic { position: absolute; bottom: 4px; transform: translateX(-50%); font-size: 0.72rem; color: var(--texte-doux); white-space: nowrap; }
+      .tic:first-child { transform: none; }
+      .repere-maintenant {
+        position: absolute; top: 0; left: var(--maintenant); transform: translateX(-50%); z-index: 3;
+        padding: 1px 8px; border-radius: 99px; background: var(--primaire); color: var(--sur-primaire);
+        font-size: 0.68rem; font-weight: 700; white-space: nowrap;
+      }
+      .etape {
+        position: absolute; height: 34px; display: flex; align-items: center; padding: 0 8px; overflow: hidden;
+        border-radius: 8px; background: var(--cd); border-left: 4px solid var(--c);
+        font-size: 0.76rem; font-weight: 600; white-space: nowrap; color: var(--texte);
+      }
+      .etape span { overflow: hidden; text-overflow: ellipsis; }
+      .etape.passive { background-image: repeating-linear-gradient(135deg, transparent 0 6px, color-mix(in srgb, var(--c) 24%, transparent) 6px 9px); }
+      .etape.masquee { border-left-style: dashed; }
+      .etape.finie { opacity: 0.5; }
+      .etape.en-cours { box-shadow: 0 0 0 2px var(--c); z-index: 1; }
+      .legende { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 12px; font-size: 0.84rem; color: var(--texte-doux); }
+      .legende li { display: flex; align-items: center; gap: 6px; }
+      .echantillon { width: 18px; height: 12px; border-radius: 3px; background: var(--cd); border-left: 3px solid var(--c); }
+      .echantillon.passive { background-image: repeating-linear-gradient(135deg, transparent 0 3px, color-mix(in srgb, var(--c) 40%, transparent) 3px 5px); }
+      .mode-cuisine .ensuite, .mode-cuisine .chronologie, .mode-cuisine .progression-session { display: none; }
+      .mode-cuisine .grille-session { grid-template-columns: 1fr; grid-template-areas: "maintenant" "minuteurs"; }
+      .mode-cuisine .maintenant h2 { font-size: clamp(2rem, 1.4rem + 3vw, 3.2rem); }
+      .mode-cuisine .maintenant-detail { font-size: 1.25rem; }
+      .mode-cuisine .minuteur-temps { font-size: 2rem; }
+
+      /* ---------- Stock ---------- */
+      .bandeau-alerte {
+        display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; padding: 14px 16px;
+        border-radius: var(--rayon-m); background: var(--alerte-doux);
+        border: 1px solid color-mix(in srgb, var(--alerte) 30%, transparent);
+      }
+      .bandeau-alerte svg { color: var(--alerte); margin-top: 2px; }
+      .segments { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; margin-bottom: 16px; border-radius: 999px; background: var(--surface-2); }
+      .segments button {
+        display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 16px;
+        border: 0; border-radius: 999px; background: transparent; color: var(--texte-doux); font-weight: 600; cursor: pointer;
+      }
+      .segments button[aria-pressed="true"] { background: var(--surface); color: var(--texte); box-shadow: var(--ombre); }
+      .segments button span { padding: 1px 7px; border-radius: 99px; background: var(--surface-3); font-size: 0.75rem; }
+      .grille-stock { display: grid; gap: 16px; }
+      @media (min-width: 1100px) { .grille-stock { grid-template-columns: minmax(0, 1fr) 340px; align-items: start; } }
+      .liste-stock { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+      .plat {
+        display: flex; flex-direction: column; gap: 8px; padding: 14px 16px;
+        background: var(--surface); border: 1px solid var(--bordure); border-top: 5px solid var(--c); border-radius: var(--rayon);
+      }
+      .plat-entete { display: flex; align-items: center; gap: 8px; }
+      .plat-entete h2 { flex: 1; font-family: var(--police); font-size: 1rem; font-weight: 700; }
+      .plat-meta { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--texte-doux); }
+      .plat-meta svg { width: 16px; height: 16px; }
+      .fraicheur { height: 6px; border-radius: 99px; background: var(--surface-3); overflow: hidden; }
+      .fraicheur span { display: block; height: 100%; border-radius: inherit; background: var(--herbe); }
+      .fraicheur.bientot span { background: var(--bientot); }
+      .fraicheur.alerte span { background: var(--alerte); }
+      .fraicheur.froid span { background: var(--froid); }
+      .plat-limite { font-size: 0.85rem; }
+      .plat-conseil { display: flex; align-items: flex-start; gap: 6px; font-size: 0.82rem; font-weight: 600; color: var(--bientot); }
+      .plat-conseil svg { width: 15px; height: 15px; margin-top: 2px; }
+      .plat-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; padding-top: 4px; }
+      .rappels ul { display: flex; flex-direction: column; gap: 14px; margin: 12px 0 16px; }
+      .rappels li { display: flex; gap: 12px; }
+      .rappels li svg { margin-top: 2px; color: var(--primaire-texte); }
+      .rappels strong { display: block; font-size: 0.92rem; }
+      .rappels span { font-size: 0.86rem; color: var(--texte-doux); }
+      .note { padding-top: 12px; border-top: 1px solid var(--bordure); font-size: 0.8rem; color: var(--texte-doux); }
+
+      /* ---------- Recettes ---------- */
+      .outils-recettes { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 16px; }
+      .recherche { position: relative; flex: 1 1 240px; }
+      .recherche svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--texte-doux); pointer-events: none; }
+      .recherche input {
+        width: 100%; min-height: 46px; padding: 0 16px 0 44px;
+        border-radius: 999px; border: 1px solid var(--controle); background: var(--surface);
+      }
+      .puces-filtre { display: flex; flex-wrap: wrap; gap: 6px; }
+      .puce-filtre {
+        min-height: 38px; padding: 0 14px; border-radius: 999px; cursor: pointer;
+        border: 1px solid var(--controle); background: var(--surface); font-size: 0.88rem; font-weight: 600;
+      }
+      .puce-filtre[aria-pressed="true"] { background: var(--texte); color: var(--fond); border-color: var(--texte); }
+      .grille-recettes { display: grid; gap: 16px; }
+      @media (min-width: 1100px) {
+        .grille-recettes { grid-template-columns: minmax(0, 1fr) 380px; align-items: start; }
+        .detail-recette { position: sticky; top: 84px; }
+      }
+      .cartes-recettes { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
+      .carte-recette {
+        display: flex; flex-direction: column; width: 100%; height: 100%; padding: 0; overflow: hidden; text-align: left; cursor: pointer;
+        border: 1px solid var(--bordure); border-radius: var(--rayon); background: var(--surface); box-shadow: var(--ombre);
+      }
+      .carte-recette[aria-pressed="true"] { outline: 3px solid var(--c); outline-offset: -2px; }
+      .carte-recette-visuel {
+        display: grid; place-items: center; height: 76px; color: var(--c);
+        background:
+          radial-gradient(circle at 85% 15%, color-mix(in srgb, var(--c) 35%, transparent) 0 22%, transparent 23%),
+          linear-gradient(135deg, var(--cd), color-mix(in srgb, var(--c) 22%, var(--cd)));
+      }
+      .carte-recette-visuel svg { width: 32px; height: 32px; stroke-width: 1.6; }
+      .carte-recette-corps { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px 14px; }
+      .carte-recette-titre { font-weight: 700; font-size: 1rem; line-height: 1.25; }
+      .meta-recette { font-size: 0.82rem; color: var(--texte-doux); }
+      .etiquettes { display: flex; flex-wrap: wrap; gap: 4px; }
+      .vide { padding: 24px; color: var(--texte-doux); }
+      .detail-recette h2 { font-size: 1.5rem; margin-bottom: 4px; }
+      .detail-recette h3 { margin: 16px 0 6px; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--texte-doux); }
+      .conservation { display: flex; align-items: center; gap: 6px; margin-top: 8px; font-size: 0.88rem; }
+      .conservation svg { width: 16px; height: 16px; color: var(--froid); }
+      .ingredients { columns: 2 150px; font-size: 0.9rem; }
+      .ingredients li { break-inside: avoid; padding: 2px 0; }
+      .aide { font-size: 0.82rem; color: var(--texte-doux); }
+      .etapes-structurees li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; padding: 10px 0; border-top: 1px solid var(--bordure); }
+      .etapes-structurees li:first-child { border-top: 0; }
+      .numero { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; border: 2px solid var(--c); background: var(--cd); font-size: 0.8rem; font-weight: 700; }
+      .attributs { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+      .attribut { padding: 2px 8px; border-radius: 99px; background: var(--surface-2); font-size: 0.72rem; font-weight: 700; color: var(--texte-doux); }
+      .attribut.actif { background: var(--primaire-doux); color: var(--primaire-texte); }
+      .attribut.passif { background: var(--froid-doux); color: var(--froid); }
+      .detail-recette .actions { margin-top: 16px; }
+      .pastille-famille { background: var(--famille-doux); color: var(--famille); }
+      .origine { display: flex; align-items: center; gap: 12px; margin-top: 14px; padding: 12px; border-radius: var(--rayon-m); background: var(--famille-doux); }
+      .origine .rond { color: var(--famille); }
+      .origine strong { display: block; }
+      .origine span { font-size: 0.84rem; color: var(--texte-doux); }
+      .mot { margin: 10px 0 0; padding: 6px 14px; border-left: 3px solid var(--famille); font-family: var(--police-titre); font-style: italic; font-size: 1.02rem; }
+      .photo-fiche {
+        display: flex; align-items: center; gap: 10px; width: 100%; min-height: 60px; margin-top: 10px; padding: 0 14px; cursor: pointer;
+        border: 1.5px dashed var(--bordure-forte); border-radius: var(--rayon-m); background: var(--surface-2); color: var(--texte-doux); font-weight: 600;
+      }
+
+      /* ---------- Éditeur de recette ---------- */
+      .editeur {
+        width: min(720px, calc(100vw - 16px)); max-width: none; max-height: calc(100dvh - 16px); padding: 0;
+        border: 1px solid var(--bordure); border-radius: var(--rayon); background: var(--surface); color: var(--texte);
+        box-shadow: 0 20px 60px rgb(0 0 0 / 0.35);
+      }
+      .editeur::backdrop { background: rgb(20 15 10 / 0.55); }
+      .editeur-forme { display: flex; flex-direction: column; max-height: calc(100dvh - 18px); }
+      .editeur-entete { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 18px 18px 12px; border-bottom: 1px solid var(--bordure); }
+      .editeur-corps { display: flex; flex-direction: column; gap: 16px; padding: 16px 18px; overflow: auto; }
+      .editeur-pied { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; padding: 12px 18px calc(12px + env(safe-area-inset-bottom)); border-top: 1px solid var(--bordure); }
+      .champ { display: flex; flex-direction: column; gap: 6px; min-width: 0; margin: 0; padding: 0; border: 0; }
+      .champ > label, .champ legend { padding: 0; font-size: 0.92rem; font-weight: 600; }
+      .champ legend { margin-bottom: 6px; }
+      .champ input, .champ textarea {
+        width: 100%; min-height: 46px; padding: 10px 14px; border: 1px solid var(--controle); border-radius: 12px;
+        background: var(--surface); color: var(--texte); line-height: 1.5;
+      }
+      .champ textarea { resize: vertical; }
+      .champs-ligne { display: grid; grid-template-columns: minmax(0, 1fr) 110px; gap: 12px; }
+      .choix { display: flex; flex-wrap: wrap; gap: 6px; }
+      .choix label { position: relative; }
+      .choix input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+      .choix span {
+        display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 14px;
+        border: 1px solid var(--controle); border-radius: 999px; font-size: 0.9rem; font-weight: 600;
+      }
+      .choix svg { width: 16px; height: 16px; }
+      .choix input:checked + span { background: var(--texte); color: var(--fond); border-color: var(--texte); }
+      .choix input:focus-visible + span { outline: 3px solid var(--focus); outline-offset: 2px; }
+      .proposition { padding: 14px; border-radius: var(--rayon-m); background: var(--surface-2); }
+      .proposition h3 { font-size: 1rem; }
+      .proposition .etapes-structurees li { border-top-color: var(--bordure-forte); }
+      .ingredients-detectes { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 6px; }
+      .ingredients-detectes .pastille { background: var(--surface); }
+      .attribut.devinee { background: transparent; border: 1.5px dashed var(--controle); }
+
+      /* ---------- Frigo : onglets et « Ce qu'il reste » ---------- */
+      .onglets-vue { display: flex; gap: 4px; margin-bottom: 16px; overflow-x: auto; border-bottom: 1px solid var(--bordure); }
+      .onglets-vue [role="tab"] {
+        display: inline-flex; align-items: center; gap: 8px; min-height: 46px; margin-bottom: -1px; padding: 0 16px; cursor: pointer; white-space: nowrap;
+        border: 0; border-bottom: 3px solid transparent; background: transparent; color: var(--texte-doux); font-weight: 600;
+      }
+      .onglets-vue [role="tab"][aria-selected="true"] { color: var(--primaire-texte); border-bottom-color: var(--primaire); }
+      .onglets-vue svg { width: 18px; height: 18px; }
+      .grille-reste { display: grid; gap: 16px; }
+      @media (min-width: 1100px) { .grille-reste { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); align-items: start; } }
+      .restes { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+      .reste { display: inline-flex; align-items: center; max-width: 100%; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--bordure); }
+      .reste.vite { background: var(--bientot-doux); border-color: color-mix(in srgb, var(--bientot) 45%, transparent); }
+      .reste-nom {
+        display: inline-flex; align-items: center; gap: 6px; min-width: 0; min-height: 40px; padding: 0 4px 0 14px;
+        border: 0; background: transparent; cursor: pointer; font-size: 0.9rem; font-weight: 600; text-align: left;
+      }
+      .reste-nom svg { width: 15px; height: 15px; color: var(--bientot); }
+      .reste-nom .pastille { padding: 1px 7px; font-size: 0.68rem; }
+      .reste-retirer { display: grid; place-items: center; width: 38px; height: 40px; border: 0; border-radius: 0 999px 999px 0; background: transparent; color: var(--texte-doux); cursor: pointer; }
+      .reste-retirer svg { width: 16px; height: 16px; }
+      .ajout-reste { display: flex; flex-wrap: wrap; gap: 8px; }
+      .ajout-reste input {
+        flex: 1 1 200px; min-width: 0; min-height: 44px; padding: 0 16px;
+        border: 1px solid var(--controle); border-radius: 999px; background: var(--surface); color: var(--texte);
+      }
+      .restes-session { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 14px; padding: 12px; border-radius: var(--rayon-m); background: var(--surface-2); font-size: 0.88rem; }
+      .restes-session p { flex: 1 1 200px; color: var(--texte-doux); }
+      .mini-session {
+        display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; padding: 14px 16px;
+        border-radius: var(--rayon-m); background: linear-gradient(135deg, var(--herbe-doux), var(--surface-2));
+      }
+      .mini-session .etiquette { color: var(--herbe); margin-bottom: 0; }
+      .mini-session span { font-size: 0.88rem; color: var(--texte-doux); }
+      .mini-session .bouton { margin-top: 4px; }
+      .idees { display: flex; flex-direction: column; gap: 8px; }
+      .idee { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 12px 12px 12px 14px; border-radius: var(--rayon-m); background: var(--surface-2); border-left: 4px solid var(--c); }
+      .idee-texte { display: flex; flex-direction: column; gap: 2px; flex: 1 1 220px; min-width: 0; }
+      .idee-texte span { font-size: 0.84rem; color: var(--texte-doux); }
+      .idee .pastille { white-space: normal; }
+      .visuellement-cache { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <svg hidden xmlns="http://www.w3.org/2000/svg">
+      <symbol id="i-bocal" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="3" rx="1" /><path d="M6 8a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3v11a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3z" /><path d="M6 12h12" /></symbol>
+      <symbol id="i-calendrier" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></symbol>
+      <symbol id="i-courses" viewBox="0 0 24 24"><path d="m3 17 2 2 4-4M3 7l2 2 4-4M13 6h8M13 12h8M13 18h8" /></symbol>
+      <symbol id="i-flamme" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.4-.5-2-1-3-1.1-2.1-.2-4.1 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.2.4-2.3 1-3a2.5 2.5 0 0 0 2.5 2.5z" /></symbol>
+      <symbol id="i-flocon" viewBox="0 0 24 24"><path d="M12 2v20M4.9 7l14.2 10M4.9 17 19.1 7M9 4l3 3 3-3M9 20l3-3 3 3" /></symbol>
+      <symbol id="i-frigo" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" /><path d="M5 10h14M9 5v2M9 13v3" /></symbol>
+      <symbol id="i-livre" viewBox="0 0 24 24"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2zM22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z" /></symbol>
+      <symbol id="i-soleil" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4" /></symbol>
+      <symbol id="i-lune" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z" /></symbol>
+      <symbol id="i-systeme" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M12 3v18a9 9 0 0 0 0-18z" fill="currentColor" /></symbol>
+      <symbol id="i-lecture" viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z" /></symbol>
+      <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14" /></symbol>
+      <symbol id="i-valider" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" /></symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></symbol>
+      <symbol id="i-moins" viewBox="0 0 24 24"><path d="M5 12h14" /></symbol>
+      <symbol id="i-horloge" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></symbol>
+      <symbol id="i-recherche" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" /></symbol>
+      <symbol id="i-import" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14" /></symbol>
+      <symbol id="i-partage" viewBox="0 0 24 24"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v13" /></symbol>
+      <symbol id="i-alerte" viewBox="0 0 24 24"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01" /></symbol>
+      <symbol id="i-fusion" viewBox="0 0 24 24"><circle cx="18" cy="18" r="3" /><circle cx="6" cy="6" r="3" /><path d="M6 21V9a9 9 0 0 0 9 9" /></symbol>
+      <symbol id="i-ustensiles" viewBox="0 0 24 24"><path d="M3 2v7a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V2M7 2v20M21 15V2a5 5 0 0 0-5 5v6a2 2 0 0 0 2 2h3zm0 0v7" /></symbol>
+      <symbol id="i-four" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M3 9h18M7 6h.01M11 6h.01" /><rect x="7" y="12" width="10" height="6" rx="1" /></symbol>
+      <symbol id="i-agrandir" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3" /></symbol>
+      <symbol id="i-cadenas" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></symbol>
+      <symbol id="i-bol" viewBox="0 0 24 24"><path d="M3 11h18a9 9 0 0 1-18 0zM8 7c0-1.5 1-2 1-3.5M12 7c0-1.5 1-2 1-3.5M16 7c0-1.5 1-2 1-3.5" /></symbol>
+      <symbol id="i-ecran" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" /><path d="M11 18h2" /></symbol>
+      <symbol id="i-coeur" viewBox="0 0 24 24"><path d="M19 14c1.5-1.5 3-3.3 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7z" /></symbol>
+      <symbol id="i-maison" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" /></symbol>
+      <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="9" cy="9" r="2" /><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21" /></symbol>
+      <symbol id="i-appareil" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z" /><circle cx="12" cy="13" r="3" /></symbol>
+      <symbol id="i-croix" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12" /></symbol>
+      <symbol id="i-etincelles" viewBox="0 0 24 24"><path d="m12 3 1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9zM19 3v4M17 5h4" /></symbol>
+    </svg>
+
+    <a class="lien-evitement" href="#contenu">Aller au contenu</a>
+
+    <div class="app">
+      <nav class="navigation" aria-label="Navigation principale">
+        <a class="nav-marque" href="#semaine">
+          <span class="logo"><svg><use href="#i-bocal" /></svg></span>
+          <span><strong>Fournée</strong><small>Batch cooking</small></span>
+        </a>
+        <ul>
+          <li><a href="#semaine" data-vue="semaine"><svg><use href="#i-calendrier" /></svg><span>Semaine</span></a></li>
+          <li><a href="#courses" data-vue="courses"><svg><use href="#i-courses" /></svg><span>Courses</span></a></li>
+          <li><a href="#session" data-vue="session"><svg><use href="#i-flamme" /></svg><span>Session</span></a></li>
+          <li><a href="#frigo" data-vue="frigo"><svg><use href="#i-frigo" /></svg><span>Frigo</span></a></li>
+          <li><a href="#recettes" data-vue="recettes"><svg><use href="#i-livre" /></svg><span>Recettes</span></a></li>
+        </ul>
+        <div class="nav-pied">
+          <svg><use href="#i-cadenas" /></svg>
+          <p>Vos données restent sur cet appareil, même hors ligne. Export et import en JSON.</p>
+        </div>
+      </nav>
+
+      <div class="colonne">
+        <header class="barre">
+          <a class="marque" href="#semaine">
+            <span class="logo"><svg><use href="#i-bocal" /></svg></span>
+            <span class="marque-nom">Fournée</span>
+          </a>
+          <span class="pastille pastille-maquette">Maquette</span>
+          <span class="barre-espace"></span>
+          <span class="barre-contexte"><svg><use href="#i-horloge" /></svg>Session dimanche 29 novembre · 14 h</span>
+          <button id="bouton-theme" class="bouton bouton-secondaire bouton-icone" type="button" aria-label="Thème&nbsp;: celui du système. Changer de thème" title="Thème&nbsp;: celui du système. Changer de thème">
+            <svg><use href="#i-systeme" /></svg>
+          </button>
+        </header>
+
+        <main id="contenu" tabindex="-1">
+          <!-- ================= SEMAINE ================= -->
+          <section class="vue" data-vue="semaine" aria-labelledby="titre-semaine">
+            <div class="entete">
+              <div>
+                <p class="surtitre">Fournée n° 12</p>
+                <h1 id="titre-semaine" tabindex="-1">Semaine du 30 novembre au 6 décembre</h1>
+                <p class="sous-titre">Foyer de 2 personnes · 4 recettes · 18 portions</p>
+              </div>
+            </div>
+
+            <div class="carte carte-session">
+              <div>
+                <p class="etiquette"><svg><use href="#i-flamme" /></svg>Session prévue</p>
+                <h2>Dimanche 29 novembre à 14 h</h2>
+                <p>2 h 05 estimées au lieu de 3 h 40 en enchaînant les recettes une à une : le chili, le curry et le gratin cuisent pendant que vous préparez la suite.</p>
+              </div>
+              <div class="actions">
+                <a class="bouton bouton-primaire" href="#session"><svg><use href="#i-lecture" /></svg>Lancer la session</a>
+                <a class="bouton bouton-secondaire" href="#courses">Voir les courses</a>
+              </div>
+            </div>
+
+            <ul class="stats">
+              <li class="stat"><span class="stat-valeur">9<small> sur 14</small></span><span class="stat-nom">repas couverts</span></li>
+              <li class="stat"><span class="stat-valeur">1 h 35</span><span class="stat-nom">gagnée sur la session</span></li>
+              <li class="stat"><span class="stat-valeur">4</span><span class="stat-nom">portions pour le congélateur</span></li>
+              <li class="stat"><span class="stat-valeur">22</span><span class="stat-nom">articles à acheter</span></li>
+            </ul>
+
+            <div class="grille-semaine">
+              <section class="carte" aria-labelledby="titre-fournee">
+                <div class="carte-entete">
+                  <h2 id="titre-fournee">Recettes de la fournée</h2>
+                  <span class="pastille">Portions</span>
+                </div>
+                <ul class="liste-recettes">
+                  <li class="ligne-recette r-chili">
+                    <div class="ligne-recette-texte"><strong>Chili sin carne</strong><span>Actif 20 min · total 1 h 10 · congelable</span></div>
+                    <div class="compteur" role="group" aria-label="Portions de chili sin carne">
+                      <button type="button" class="compteur-moins" aria-label="Une portion de moins"><svg><use href="#i-moins" /></svg></button>
+                      <output aria-live="polite">6</output>
+                      <button type="button" class="compteur-plus" aria-label="Une portion de plus"><svg><use href="#i-plus" /></svg></button>
+                    </div>
+                  </li>
+                  <li class="ligne-recette r-curry">
+                    <div class="ligne-recette-texte"><strong>Curry de lentilles corail</strong><span>Actif 15 min · total 40 min · congelable</span></div>
+                    <div class="compteur" role="group" aria-label="Portions de curry de lentilles corail">
+                      <button type="button" class="compteur-moins" aria-label="Une portion de moins"><svg><use href="#i-moins" /></svg></button>
+                      <output aria-live="polite">4</output>
+                      <button type="button" class="compteur-plus" aria-label="Une portion de plus"><svg><use href="#i-plus" /></svg></button>
+                    </div>
+                  </li>
+                  <li class="ligne-recette r-gratin">
+                    <div class="ligne-recette-texte"><strong>Gratin de courge butternut</strong><span>Actif 25 min · total 1 h 20 · four</span></div>
+                    <div class="compteur" role="group" aria-label="Portions de gratin de courge butternut">
+                      <button type="button" class="compteur-moins" aria-label="Une portion de moins"><svg><use href="#i-moins" /></svg></button>
+                      <output aria-live="polite">4</output>
+                      <button type="button" class="compteur-plus" aria-label="Une portion de plus"><svg><use href="#i-plus" /></svg></button>
+                    </div>
+                  </li>
+                  <li class="ligne-recette r-taboule">
+                    <div class="ligne-recette-texte"><strong>Taboulé de quinoa</strong><span>Actif 20 min · total 35 min · frigo seulement</span></div>
+                    <div class="compteur" role="group" aria-label="Portions de taboulé de quinoa">
+                      <button type="button" class="compteur-moins" aria-label="Une portion de moins"><svg><use href="#i-moins" /></svg></button>
+                      <output aria-live="polite">4</output>
+                      <button type="button" class="compteur-plus" aria-label="Une portion de plus"><svg><use href="#i-plus" /></svg></button>
+                    </div>
+                  </li>
+                  <li><button type="button" class="ajout" data-maquette="Maquette : ouvrirait la bibliothèque pour choisir une recette."><svg><use href="#i-plus" /></svg>Ajouter une recette</button></li>
+                </ul>
+                <p class="astuce"><svg><use href="#i-fusion" /></svg>3 préparations communes regroupées dans la session : les oignons, l’ail et le rinçage du quinoa et des lentilles.</p>
+              </section>
+
+              <section class="carte" aria-labelledby="titre-vigilance">
+                <div class="carte-entete"><h2 id="titre-vigilance">À surveiller</h2></div>
+                <ul class="vigilance">
+                  <li class="bientot">
+                    <span class="rond bientot"><svg><use href="#i-alerte" /></svg></span>
+                    <div>
+                      <strong>Gratin de jeudi midi : 4 jours après la session</strong>
+                      <span>Au-delà des 3 jours conseillés au frigo. Congelez ces 2 portions dimanche, elles seront prêtes jeudi.</span>
+                      <div><button type="button" class="bouton bouton-secondaire bouton-petit" data-maquette="Maquette : les 2 portions passeraient au congélateur, avec un rappel de décongélation.">Congeler 2 portions</button></div>
+                    </div>
+                  </li>
+                  <li>
+                    <span class="rond froid"><svg><use href="#i-flocon" /></svg></span>
+                    <div>
+                      <strong>Chili de jeudi soir, au congélateur</strong>
+                      <span>Rappel de décongélation mercredi à 19 h.</span>
+                    </div>
+                  </li>
+                  <li>
+                    <span class="rond ok"><svg><use href="#i-bol" /></svg></span>
+                    <div>
+                      <strong>Il reste une demi-courgette, de la feta et de la crème</strong>
+                      <span>Des idées pour les finir avant la session de dimanche.</span>
+                      <div><a class="bouton bouton-secondaire bouton-petit" href="#reste">Que faire avec ce qu’il reste ?</a></div>
+                    </div>
+                  </li>
+                  <li>
+                    <span class="rond ok"><svg><use href="#i-valider" /></svg></span>
+                    <div>
+                      <strong>Soupe de potimarron dimanche midi</strong>
+                      <span>Déjà au congélateur : 3 portions, jusqu’au 8 février.</span>
+                    </div>
+                  </li>
+                </ul>
+              </section>
+
+              <section class="carte carte-repas" aria-labelledby="titre-repas">
+                <div class="carte-entete">
+                  <h2 id="titre-repas">Repas de la semaine</h2>
+                  <span class="pastille">Glisser pour déplacer</span>
+                </div>
+                <ol class="jours">
+                  <li class="jour">
+                    <h3>Lun. <span>30</span></h3>
+                    <div class="repas r-taboule"><span class="moment">Midi</span><span class="repas-nom">Taboulé de quinoa</span></div>
+                    <div class="repas r-chili"><span class="moment">Soir</span><span class="repas-nom">Chili sin carne</span></div>
+                  </li>
+                  <li class="jour">
+                    <h3>Mar. <span>1er</span></h3>
+                    <div class="repas r-taboule"><span class="moment">Midi</span><span class="repas-nom">Taboulé de quinoa</span></div>
+                    <div class="repas r-curry"><span class="moment">Soir</span><span class="repas-nom">Curry de lentilles</span></div>
+                  </li>
+                  <li class="jour">
+                    <h3>Mer. <span>2</span></h3>
+                    <div class="repas r-gratin"><span class="moment">Midi</span><span class="repas-nom">Gratin de courge</span></div>
+                    <div class="repas r-curry"><span class="moment">Soir</span><span class="repas-nom">Curry de lentilles</span></div>
+                  </li>
+                  <li class="jour">
+                    <h3>Jeu. <span>3</span></h3>
+                    <div class="repas r-gratin"><span class="moment">Midi</span><span class="repas-nom">Gratin de courge</span><span class="repas-info bientot"><svg><use href="#i-alerte" /></svg>À congeler</span></div>
+                    <div class="repas r-chili"><span class="moment">Soir</span><span class="repas-nom">Chili sin carne</span><span class="repas-info"><svg><use href="#i-flocon" /></svg>Sortir mercredi</span></div>
+                  </li>
+                  <li class="jour">
+                    <h3>Ven. <span>4</span></h3>
+                    <div class="repas repas-libre"><span class="moment">Midi</span><span class="repas-nom">Libre</span></div>
+                    <div class="repas repas-libre"><span class="moment">Soir</span><span class="repas-nom">Libre</span></div>
+                  </li>
+                  <li class="jour">
+                    <h3>Sam. <span>5</span></h3>
+                    <div class="repas repas-libre"><span class="moment">Midi</span><span class="repas-nom">Libre</span></div>
+                    <div class="repas repas-libre"><span class="moment">Soir</span><span class="repas-nom">Libre</span></div>
+                  </li>
+                  <li class="jour">
+                    <h3>Dim. <span>6</span></h3>
+                    <div class="repas r-soupe"><span class="moment">Midi</span><span class="repas-nom">Soupe de potimarron</span><span class="repas-info"><svg><use href="#i-flocon" /></svg>Du stock</span></div>
+                    <div class="repas repas-libre"><span class="moment">Soir</span><span class="repas-nom">Libre</span></div>
+                  </li>
+                </ol>
+              </section>
+            </div>
+          </section>
+
+          <!-- ================= COURSES ================= -->
+          <section class="vue" data-vue="courses" aria-labelledby="titre-courses" hidden>
+            <div class="entete">
+              <div>
+                <p class="surtitre">Fournée n° 12</p>
+                <h1 id="titre-courses" tabindex="-1">Courses</h1>
+                <p class="sous-titre">Quantités regroupées pour les 4 recettes, classées par rayon.</p>
+              </div>
+              <div class="actions">
+                <button type="button" class="bouton bouton-secondaire" data-maquette="Maquette : partagerait la liste en texte (SMS, messagerie, notes)."><svg><use href="#i-partage" /></svg>Partager</button>
+              </div>
+            </div>
+
+            <div class="carte progression-courses">
+              <div class="progression-texte"><span><strong id="courses-compte">0 sur 22</strong> articles dans le panier</span><span>Hors ligne : la liste reste disponible</span></div>
+              <div class="jauge"><span id="courses-jauge"></span></div>
+              <label class="interrupteur"><input type="checkbox" id="masquer-coches" /><span>Masquer les articles cochés</span></label>
+            </div>
+
+            <div class="rayons">
+              <section class="carte rayon" aria-labelledby="rayon-legumes">
+                <h2 id="rayon-legumes">Fruits et légumes <span class="compte">10</span></h2>
+                <ul class="articles">
+                  <li class="article"><label><input type="checkbox" checked /><span class="article-texte"><span class="article-nom">Oignons jaunes</span><span class="article-detail">Chili 2 · curry 2</span></span><span class="article-qte">4</span></label></li>
+                  <li class="article"><label><input type="checkbox" checked /><span class="article-texte"><span class="article-nom">Ail</span><span class="article-detail">Chili 2 gousses · curry 2 gousses</span></span><span class="article-qte">1 tête</span></label></li>
+                  <li class="article"><label><input type="checkbox" /><span class="article-texte"><span class="article-nom">Courge butternut</span><span class="article-detail">Gratin</span></span><span class="article-qte">1,2 kg</span></label></li>
+                  <li class="article"><label><input type="checkbox" /><span class="article-texte"><span class="article-nom">Poivrons rouges</span><span class="article-detail">Chili</span></span><span class="article-qte">2</span></label></li>
+                  <li class="article"><label><input type="checkbox" /><span class="article-texte"><span class="article-nom">Tomates</span><span class="article-detail">Taboulé</span></span><span class="article-qte">4</span></label></li>
+                  <li class="article"><label><input type="checkbox" checked /><span class="article-texte"><span class="article-nom">Concombre</span><span class="article-detail">Taboulé</span></span><span class="article-qte">1</span></label></li>
+                  <li class="article"><label><input type="checkbox" /><span class="article-texte"><span class="article-nom">Persil plat</span><span class="article-detail">Taboulé</span></span><span class="article-qte">1 botte</span></label></li>
+                  <li class="article"><label><input type="checkbox" /><span class="article-texte"><span class="article-nom">Menthe fraîche</span><span class="article-detail">Taboulé</span></span><span class="article-qte">1 botte</span></label></li>
+                  <li class="article"><label><input type="checkbox" /><span class="article-texte"><span class="article-nom">Citrons</span><span class="article-detail">Taboulé 1 · curry 1</span></span><span class="article-qte">2</span></label></li>
+                  <li class="article"><label><input type="checkbox" /><span class="article-texte"><span class="article-nom">Gingembre frais</span><span class="article-detail">Curry</span></span><span class="article-qte">3 cm</span></label></li>
+                </ul>
+              </section>
+              <section class="carte rayon" aria-labelledby="rayon-epicerie">
+                <h2 id="rayon-epicerie">Épicerie <span class="compte">6</span></h2>
+                <ul class="articles">
+                  <li class="article"><label><input type="checkbox" checked /><span class="article-texte"><span class="article-nom">Lentilles corail</span><span class="article-detail">Curry</span></span><span class="article-qte">300 g</span></label></li>
+                  <li class="article"><label><input type="checkbox" /><span class="article-texte"><span class="article-nom">Haricots rouges</span><span class="article-detail">Chili</span></span><span class="article-qte">2 boîtes</span></label></li>
+                  <li class="article"><label><input type="checkbox" /><span class="article-texte"><span class="article-nom">Tomates concassées</span><span class="article-detail">Chili</span></span><span class="article-qte">2 boîtes</span></label></li>
+                  <li class="article"><label><input type="checkbox" checked /><span class="article-texte"><span class="article-nom">Quinoa</span><span class="article-detail">Taboulé</span></span><span class="article-qte">250 g</span></label></li>
+                  <li class="article"><label><input type="checkbox" checked /><span class="article-texte"><span class="article-nom">Lait de coco</span><span class="article-detail">Curry</span></span><span class="article-qte">40 cl</span></label></li>
+                  <li class="article"><label><input type="checkbox" /><span class="article-texte"><span class="article-nom">Bouillon de légumes</span><span class="article-detail">Curry</span></span><span class="article-qte">1 cube</span></label></li>
+                </ul>
+              </section>
+              <section class="carte rayon" aria-labelledby="rayon-cremerie">
+                <h2 id="rayon-cremerie">Crèmerie <span class="compte">3</span></h2>
+                <ul class="articles">
+                  <li class="article"><label><input type="checkbox" /><span class="article-texte"><span class="article-nom">Crème liquide</span><span class="article-detail">Gratin</span></span><span class="article-qte">20 cl</span></label></li>
+                  <li class="article"><label><input type="checkbox" /><span class="article-texte"><span class="article-nom">Emmental râpé</span><span class="article-detail">Gratin</span></span><span class="article-qte">150 g</span></label></li>
+                  <li class="article"><label><input type="checkbox" /><span class="article-texte"><span class="article-nom">Feta</span><span class="article-detail">Taboulé</span></span><span class="article-qte">200 g</span></label></li>
+                </ul>
+              </section>
+              <section class="carte rayon" aria-labelledby="rayon-materiel">
+                <h2 id="rayon-materiel">Contenants <span class="compte">3</span></h2>
+                <ul class="articles">
+                  <li class="article"><label><input type="checkbox" /><span class="article-texte"><span class="article-nom">Boîtes en verre</span><span class="article-detail">9 boîtes prévues, 3 libres à la maison</span></span><span class="article-qte">6</span></label></li>
+                  <li class="article"><label><input type="checkbox" /><span class="article-texte"><span class="article-nom">Sacs de congélation</span><span class="article-detail">Chili et gratin</span></span><span class="article-qte">4</span></label></li>
+                  <li class="article"><label><input type="checkbox" checked /><span class="article-texte"><span class="article-nom">Étiquettes</span><span class="article-detail">Dates de préparation et limites</span></span><span class="article-qte">1 rouleau</span></label></li>
+                </ul>
+              </section>
+              <section class="carte rayon" aria-labelledby="rayon-placard">
+                <h2 id="rayon-placard">Déjà au placard <span class="compte">6</span></h2>
+                <ul class="placard">
+                  <li>Huile d’olive <span class="pastille">À vérifier</span></li>
+                  <li>Cumin, paprika fumé <span class="pastille">À vérifier</span></li>
+                  <li>Curry en poudre <span class="pastille">À vérifier</span></li>
+                  <li>Muscade <span class="pastille">À vérifier</span></li>
+                  <li>Sel, poivre <span class="pastille">À vérifier</span></li>
+                </ul>
+              </section>
+            </div>
+          </section>
+
+          <!-- ================= SESSION ================= -->
+          <section class="vue vue-session" data-vue="session" aria-labelledby="titre-session" hidden>
+            <div class="entete">
+              <div>
+                <p class="surtitre"><span class="point-direct"></span>En cours</p>
+                <h1 id="titre-session" tabindex="-1">Session du dimanche</h1>
+                <p class="sous-titre">Démarrée à 14 h · fin estimée à 16 h 05</p>
+              </div>
+              <div class="actions">
+                <button type="button" class="bouton bouton-secondaire" id="mode-cuisine" aria-pressed="false"><svg><use href="#i-agrandir" /></svg>Mode cuisine</button>
+              </div>
+            </div>
+
+            <div class="carte progression-session">
+              <div class="progression-texte"><span><strong>Étape 6 sur 15</strong></span><span>40 min écoulées · 85 min restantes</span></div>
+              <div class="jauge"><span style="width: 32%"></span></div>
+            </div>
+
+            <div class="grille-session">
+              <article class="carte maintenant r-gratin" aria-labelledby="titre-maintenant">
+                <p class="etiquette">Maintenant · plan de travail</p>
+                <h2 id="titre-maintenant">Monter le gratin de courge</h2>
+                <p class="maintenant-detail">Disposer la courge en couches, verser 20 cl de crème, saler, poivrer, râper un peu de muscade et couvrir d’emmental.</p>
+                <ul class="meta">
+                  <li><span class="puce"></span>Gratin de courge butternut</li>
+                  <li><svg><use href="#i-horloge" /></svg>7 min restantes</li>
+                  <li><svg><use href="#i-four" /></svg>Four chaud à 14 h 47</li>
+                </ul>
+                <div class="actions">
+                  <button type="button" class="bouton bouton-primaire bouton-grand" data-maquette="Maquette : l’étape suivante prendrait sa place, la frise serait recalculée."><svg><use href="#i-valider" /></svg>Étape terminée</button>
+                  <button type="button" class="bouton bouton-secondaire bouton-grand" data-maquette="Maquette : la suite serait décalée de 5 minutes.">+5 min</button>
+                </div>
+                <p class="note-ecran"><svg><use href="#i-ecran" /></svg>Écran maintenu allumé pendant la session</p>
+              </article>
+
+              <section class="carte minuteurs" aria-labelledby="titre-minuteurs">
+                <div class="carte-entete">
+                  <h2 id="titre-minuteurs">Minuteurs</h2>
+                  <span class="pastille">4 en cours</span>
+                </div>
+                <ul>
+                  <li class="minuteur r-gratin" data-secondes="420">
+                    <span class="minuteur-icone"><svg><use href="#i-four" /></svg></span>
+                    <span class="minuteur-texte"><strong>Four à 180 °C</strong><span>Préchauffage</span></span>
+                    <span class="minuteur-temps">07:00</span>
+                    <button type="button" class="bouton bouton-icone minuteur-pause" aria-label="Mettre en pause le minuteur Four à 180&nbsp;°C"><svg><use href="#i-pause" /></svg></button>
+                  </li>
+                  <li class="minuteur r-taboule" data-secondes="540">
+                    <span class="minuteur-icone"><svg><use href="#i-flamme" /></svg></span>
+                    <span class="minuteur-texte"><strong>Quinoa</strong><span>Feu 3 · égoutter ensuite</span></span>
+                    <span class="minuteur-temps">09:00</span>
+                    <button type="button" class="bouton bouton-icone minuteur-pause" aria-label="Mettre en pause le minuteur Quinoa"><svg><use href="#i-pause" /></svg></button>
+                  </li>
+                  <li class="minuteur r-curry" data-secondes="840">
+                    <span class="minuteur-icone"><svg><use href="#i-flamme" /></svg></span>
+                    <span class="minuteur-texte"><strong>Curry</strong><span>Feu 2 · mijoter à couvert</span></span>
+                    <span class="minuteur-temps">14:00</span>
+                    <button type="button" class="bouton bouton-icone minuteur-pause" aria-label="Mettre en pause le minuteur Curry"><svg><use href="#i-pause" /></svg></button>
+                  </li>
+                  <li class="minuteur r-chili" data-secondes="1440">
+                    <span class="minuteur-icone"><svg><use href="#i-flamme" /></svg></span>
+                    <span class="minuteur-texte"><strong>Chili</strong><span>Feu 1 · remuer à mi-cuisson</span></span>
+                    <span class="minuteur-temps">24:00</span>
+                    <button type="button" class="bouton bouton-icone minuteur-pause" aria-label="Mettre en pause le minuteur Chili"><svg><use href="#i-pause" /></svg></button>
+                  </li>
+                </ul>
+              </section>
+
+              <section class="carte ensuite" aria-labelledby="titre-ensuite">
+                <h2 id="titre-ensuite">Ensuite</h2>
+                <ol class="suite">
+                  <li class="r-gratin"><time>14 h 47</time><div><strong>Enfourner le gratin</strong><span>45 min à 180 °C · four</span></div></li>
+                  <li class="r-taboule"><time>14 h 47</time><div><strong>Couper concombre, tomates et persil</strong><span>13 min · plan de travail</span></div></li>
+                  <li class="r-taboule"><time>14 h 49</time><div><strong>Égoutter le quinoa, le laisser tiédir</strong><span>1 min · feu 3</span></div></li>
+                  <li class="r-curry"><time>14 h 54</time><div><strong>Couper le feu sous le curry</strong><span>Refroidir 30 min avant de portionner</span></div></li>
+                  <li class="r-commun masquee"><time>15 h 05</time><div><strong>Temps masqué : vaisselle et rangement</strong><span>11 min pendant les cuissons</span></div></li>
+                </ol>
+              </section>
+            </div>
+
+            <figure class="carte chronologie">
+              <figcaption>
+                <h2>Déroulé de la session</h2>
+                <p>Calculé à partir de vos 4 recettes : trois feux et le four tournent pendant que vous préparez la suite.</p>
+              </figcaption>
+              <div class="gantt-defilement" tabindex="0" role="region" aria-label="Frise de la session, à faire défiler horizontalement">
+                <div class="gantt" id="gantt"></div>
+              </div>
+              <ul class="legende">
+                <li class="r-chili"><span class="echantillon"></span>Chili</li>
+                <li class="r-curry"><span class="echantillon"></span>Curry</li>
+                <li class="r-gratin"><span class="echantillon"></span>Gratin</li>
+                <li class="r-taboule"><span class="echantillon"></span>Taboulé</li>
+                <li class="r-commun"><span class="echantillon"></span>Commun ou regroupé</li>
+                <li class="r-commun"><span class="echantillon passive"></span>Hachuré : passif, le cuisinier est libre</li>
+              </ul>
+            </figure>
+          </section>
+
+          <!-- ================= FRIGO ================= -->
+          <section class="vue" data-vue="frigo" aria-labelledby="titre-frigo" hidden>
+            <div class="entete">
+              <div>
+                <p class="surtitre">Frigo</p>
+                <h1 id="titre-frigo" tabindex="-1">Frigo et congélateur</h1>
+                <p class="sous-titre">Après la session du dimanche 29 novembre</p>
+              </div>
+              <div class="actions">
+                <button type="button" class="bouton bouton-secondaire" data-maquette="Maquette : ajouterait un plat hors session (restes, plat acheté…)."><svg><use href="#i-plus" /></svg>Ajouter un plat</button>
+              </div>
+            </div>
+
+            <div class="onglets-vue" role="tablist" aria-label="Contenu du frigo">
+              <button type="button" role="tab" id="onglet-plats" aria-selected="true" aria-controls="panneau-plats"><svg><use href="#i-frigo" /></svg>Plats préparés</button>
+              <button type="button" role="tab" id="onglet-reste" aria-selected="false" aria-controls="panneau-reste" tabindex="-1"><svg><use href="#i-bol" /></svg>Ce qu’il reste</button>
+            </div>
+
+            <div role="tabpanel" id="panneau-plats" aria-labelledby="onglet-plats">
+            <div class="bandeau-alerte" role="status">
+              <svg><use href="#i-alerte" /></svg>
+              <p><strong>La sauce tomate est à manger aujourd’hui.</strong> La bolognaise de lentilles du congélateur atteint sa limite le 4 décembre.</p>
+            </div>
+
+            <div class="segments" role="group" aria-label="Filtrer par lieu">
+              <button type="button" aria-pressed="true" data-lieu="tout">Tout <span>7</span></button>
+              <button type="button" aria-pressed="false" data-lieu="frigo">Frigo <span>4</span></button>
+              <button type="button" aria-pressed="false" data-lieu="congelateur">Congélateur <span>3</span></button>
+            </div>
+
+            <div class="grille-stock">
+              <ul class="liste-stock">
+                <li class="plat r-sauce" data-lieu="frigo" data-portions="1">
+                  <div class="plat-entete"><span class="puce"></span><h2>Sauce tomate maison</h2><span class="pastille pastille-alerte">Aujourd’hui</span></div>
+                  <p class="plat-meta"><svg><use href="#i-frigo" /></svg>Frigo · <span class="plat-portions">1 portion</span> · préparée le 26/11</p>
+                  <div class="fraicheur alerte"><span style="width: 6%"></span></div>
+                  <p class="plat-limite">À consommer avant ce soir</p>
+                  <div class="plat-actions">
+                    <button type="button" class="bouton bouton-secondaire bouton-petit manger">Manger 1 portion</button>
+                    <button type="button" class="bouton bouton-texte bouton-petit" data-maquette="Maquette : le plat passerait au congélateur avec une nouvelle limite.">Congeler</button>
+                  </div>
+                </li>
+                <li class="plat r-taboule" data-lieu="frigo" data-portions="4">
+                  <div class="plat-entete"><span class="puce"></span><h2>Taboulé de quinoa</h2><span class="pastille pastille-ok">3 jours</span></div>
+                  <p class="plat-meta"><svg><use href="#i-frigo" /></svg>Frigo · <span class="plat-portions">4 portions</span> · préparé aujourd’hui</p>
+                  <div class="fraicheur"><span style="width: 96%"></span></div>
+                  <p class="plat-limite">Jusqu’au mercredi 2 décembre</p>
+                  <div class="plat-actions">
+                    <button type="button" class="bouton bouton-secondaire bouton-petit manger">Manger 1 portion</button>
+                  </div>
+                </li>
+                <li class="plat r-curry" data-lieu="frigo" data-portions="4">
+                  <div class="plat-entete"><span class="puce"></span><h2>Curry de lentilles corail</h2><span class="pastille pastille-ok">3 jours</span></div>
+                  <p class="plat-meta"><svg><use href="#i-frigo" /></svg>Frigo · <span class="plat-portions">4 portions</span> · préparé aujourd’hui</p>
+                  <div class="fraicheur"><span style="width: 96%"></span></div>
+                  <p class="plat-limite">Jusqu’au mercredi 2 décembre</p>
+                  <div class="plat-actions">
+                    <button type="button" class="bouton bouton-secondaire bouton-petit manger">Manger 1 portion</button>
+                    <button type="button" class="bouton bouton-texte bouton-petit" data-maquette="Maquette : le plat passerait au congélateur avec une nouvelle limite.">Congeler</button>
+                  </div>
+                </li>
+                <li class="plat r-gratin" data-lieu="frigo" data-portions="4">
+                  <div class="plat-entete"><span class="puce"></span><h2>Gratin de courge butternut</h2><span class="pastille pastille-ok">3 jours</span></div>
+                  <p class="plat-meta"><svg><use href="#i-frigo" /></svg>Frigo · <span class="plat-portions">4 portions</span> · préparé aujourd’hui</p>
+                  <div class="fraicheur"><span style="width: 96%"></span></div>
+                  <p class="plat-limite">Jusqu’au mercredi 2 décembre</p>
+                  <p class="plat-conseil"><svg><use href="#i-alerte" /></svg>2 portions prévues jeudi : à congeler</p>
+                  <div class="plat-actions">
+                    <button type="button" class="bouton bouton-secondaire bouton-petit manger">Manger 1 portion</button>
+                    <button type="button" class="bouton bouton-texte bouton-petit" data-maquette="Maquette : 2 portions passeraient au congélateur.">Congeler 2 portions</button>
+                  </div>
+                </li>
+                <li class="plat r-chili" data-lieu="congelateur" data-portions="4">
+                  <div class="plat-entete"><span class="puce"></span><h2>Chili sin carne</h2><span class="pastille pastille-froid">3 mois</span></div>
+                  <p class="plat-meta"><svg><use href="#i-flocon" /></svg>Congélateur · <span class="plat-portions">4 portions</span> · congelé aujourd’hui</p>
+                  <div class="fraicheur froid"><span style="width: 100%"></span></div>
+                  <p class="plat-limite">Jusqu’au 28 février</p>
+                  <div class="plat-actions">
+                    <button type="button" class="bouton bouton-secondaire bouton-petit" data-maquette="Maquette : 2 portions passeraient au frigo, à manger sous 24 h.">Décongeler 2 portions</button>
+                  </div>
+                </li>
+                <li class="plat r-soupe" data-lieu="congelateur" data-portions="3">
+                  <div class="plat-entete"><span class="puce"></span><h2>Soupe de potimarron</h2><span class="pastille pastille-froid">10 sem.</span></div>
+                  <p class="plat-meta"><svg><use href="#i-flocon" /></svg>Congélateur · <span class="plat-portions">3 portions</span> · congelée le 8/11</p>
+                  <div class="fraicheur froid"><span style="width: 76%"></span></div>
+                  <p class="plat-limite">Jusqu’au 8 février</p>
+                  <div class="plat-actions">
+                    <button type="button" class="bouton bouton-secondaire bouton-petit" data-maquette="Maquette : 2 portions passeraient au frigo, à manger sous 24 h.">Décongeler 2 portions</button>
+                  </div>
+                </li>
+                <li class="plat r-bolo" data-lieu="congelateur" data-portions="2">
+                  <div class="plat-entete"><span class="puce"></span><h2>Bolognaise de lentilles</h2><span class="pastille pastille-bientot">5 jours</span></div>
+                  <p class="plat-meta"><svg><use href="#i-flocon" /></svg>Congélateur · <span class="plat-portions">2 portions</span> · congelée le 4/09</p>
+                  <div class="fraicheur bientot"><span style="width: 6%"></span></div>
+                  <p class="plat-limite">Jusqu’au 4 décembre : à prévoir cette semaine</p>
+                  <div class="plat-actions">
+                    <button type="button" class="bouton bouton-secondaire bouton-petit" data-maquette="Maquette : proposerait un créneau libre (vendredi soir).">Placer dans la semaine</button>
+                  </div>
+                </li>
+              </ul>
+
+              <aside class="carte rappels" aria-labelledby="titre-rappels">
+                <h2 id="titre-rappels">Rappels</h2>
+                <ul>
+                  <li><svg><use href="#i-flocon" /></svg><div><strong>Mercredi 2 décembre, 19 h</strong><span>Sortir 2 portions de chili pour jeudi soir.</span></div></li>
+                  <li><svg><use href="#i-alerte" /></svg><div><strong>Ce soir, fin de session</strong><span>Congeler les 2 portions de gratin prévues jeudi midi.</span></div></li>
+                  <li><svg><use href="#i-horloge" /></svg><div><strong>Mercredi 2 décembre</strong><span>Dernier jour conseillé pour le taboulé, le curry et le gratin du frigo.</span></div></li>
+                </ul>
+                <p class="note">Durées par défaut prudentes : 3 jours au frigo, 3 mois au congélateur, modifiables pour chaque recette. Ces indications ne remplacent pas les recommandations sanitaires officielles.</p>
+              </aside>
+            </div>
+            </div>
+
+            <div role="tabpanel" id="panneau-reste" aria-labelledby="onglet-reste" hidden>
+              <div class="grille-reste">
+                <section class="carte" aria-labelledby="titre-ingredients">
+                  <div class="carte-entete">
+                    <h2 id="titre-ingredients">Dans le frigo</h2>
+                    <span class="pastille" id="compte-restes"></span>
+                  </div>
+                  <p class="aide">Touchez un ingrédient pour le marquer « à finir vite » (horloge), la croix pour le retirer.</p>
+                  <ul class="restes" id="restes"></ul>
+                  <form class="ajout-reste" id="form-reste">
+                    <label for="champ-reste" class="visuellement-cache">Ajouter un ingrédient</label>
+                    <input id="champ-reste" type="text" autocomplete="off" placeholder="2 carottes, un reste de jambon…" />
+                    <button type="submit" class="bouton bouton-secondaire"><svg><use href="#i-plus" /></svg>Ajouter</button>
+                  </form>
+                  <div class="restes-session" id="restes-session">
+                    <p>D’après les courses et la session, il devrait aussi rester une demi-botte de menthe et 1 citron.</p>
+                    <button type="button" class="bouton bouton-texte bouton-petit" id="ajouter-restes-session"><svg><use href="#i-plus" /></svg>Ajouter</button>
+                  </div>
+                  <p class="note" style="margin-top: 14px">Les basiques du placard (huile, sel, poivre, épices, sauce soja) sont supposés disponibles. Le reste du stock, comme la sauce tomate, est repris automatiquement.</p>
+                </section>
+
+                <section class="carte" aria-labelledby="titre-idees">
+                  <div class="carte-entete">
+                    <h2 id="titre-idees">Idées pour tout finir</h2>
+                    <span class="pastille" id="compte-idees"></span>
+                  </div>
+                  <div class="mini-session" id="mini-session"></div>
+                  <ul class="idees" id="idees" aria-live="polite"></ul>
+                </section>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= RECETTES ================= -->
+          <section class="vue" data-vue="recettes" aria-labelledby="titre-recettes" hidden>
+            <div class="entete">
+              <div>
+                <p class="surtitre">Bibliothèque</p>
+                <h1 id="titre-recettes" tabindex="-1">Recettes</h1>
+                <p class="sous-titre"><span id="nombre-recettes">8 recettes</span> · des étapes structurées pour orchestrer la session</p>
+              </div>
+              <div class="actions">
+                <button type="button" class="bouton bouton-secondaire" data-maquette="Maquette : coller une page de recette (schema.org), un texte ou un fichier JSON."><svg><use href="#i-import" /></svg>Importer</button>
+                <button type="button" class="bouton bouton-primaire" id="ouvrir-editeur"><svg><use href="#i-plus" /></svg>Nouvelle recette</button>
+              </div>
+            </div>
+
+            <div class="outils-recettes">
+              <label class="recherche">
+                <span hidden>Rechercher une recette</span>
+                <svg><use href="#i-recherche" /></svg>
+                <input type="search" id="recherche-recette" placeholder="Rechercher une recette" aria-label="Rechercher une recette" />
+              </label>
+              <div class="puces-filtre" role="group" aria-label="Filtres">
+                <button type="button" class="puce-filtre" data-filtre="famille" aria-pressed="false">Famille et maison</button>
+                <button type="button" class="puce-filtre" data-filtre="congelable" aria-pressed="false">Congelable</button>
+                <button type="button" class="puce-filtre" data-filtre="vegetarien" aria-pressed="false">Végétarien</button>
+                <button type="button" class="puce-filtre" data-filtre="four" aria-pressed="false">Four</button>
+                <button type="button" class="puce-filtre" data-filtre="rapide" aria-pressed="false">15 min actives ou moins</button>
+              </div>
+            </div>
+
+            <div class="grille-recettes">
+              <ul class="cartes-recettes" id="cartes-recettes"></ul>
+              <aside class="carte detail-recette" id="detail-recette" aria-live="polite"></aside>
+            </div>
+          </section>
+        </main>
+      </div>
+
+      <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+    </div>
+
+    <dialog class="editeur" id="editeur" aria-labelledby="titre-editeur">
+      <form method="dialog" class="editeur-forme">
+        <div class="editeur-entete">
+          <div>
+            <p class="etiquette">Nouvelle recette</p>
+            <h2 id="titre-editeur">Une recette à vous</h2>
+          </div>
+          <button type="submit" value="annuler" class="bouton bouton-secondaire bouton-icone" aria-label="Fermer"><svg><use href="#i-croix" /></svg></button>
+        </div>
+        <div class="editeur-corps">
+          <div class="champ">
+            <label for="e-nom">Nom</label>
+            <input id="e-nom" type="text" value="Hachis parmentier de maman" />
+          </div>
+          <fieldset class="champ">
+            <legend>D’où vient-elle ?</legend>
+            <div class="choix">
+              <label><input type="radio" name="origine" value="famille" checked /><span><svg><use href="#i-coeur" /></svg>De la famille</span></label>
+              <label><input type="radio" name="origine" value="maison" /><span><svg><use href="#i-maison" /></svg>Notre recette</span></label>
+              <label><input type="radio" name="origine" value="web" /><span>Du web</span></label>
+              <label><input type="radio" name="origine" value="livre" /><span><svg><use href="#i-livre" /></svg>D’un livre</span></label>
+            </div>
+          </fieldset>
+          <div class="champs-ligne">
+            <div class="champ">
+              <label for="e-de">De qui ?</label>
+              <input id="e-de" type="text" value="Maman" />
+            </div>
+            <div class="champ">
+              <label for="e-portions">Portions</label>
+              <input id="e-portions" type="number" min="1" max="24" value="6" inputmode="numeric" />
+            </div>
+          </div>
+          <div class="champ">
+            <label for="e-texte">La recette, telle qu’on la raconte</label>
+            <p class="aide" id="aide-texte">Écrivez comme d’habitude. Ce texte est gardé tel quel ; Fournée en propose des étapes, que vous vérifiez.</p>
+            <textarea id="e-texte" rows="6" aria-describedby="aide-texte">Cuire 1 kg de pommes de terre 25 min dans l’eau salée. Pendant ce temps, faire revenir 2 oignons puis 500 g de bœuf haché. Écraser les pommes de terre avec 20 cl de lait, 50 g de beurre et une pointe de muscade. Monter dans le plat, mettre le fromage et gratiner 20 min à 200 °C.</textarea>
+          </div>
+          <div class="actions">
+            <button type="button" class="bouton bouton-secondaire" id="structurer"><svg><use href="#i-etincelles" /></svg>Proposer les étapes</button>
+            <button type="button" class="bouton bouton-texte" data-maquette="Maquette : prendrait en photo la fiche manuscrite, gardée avec la recette."><svg><use href="#i-appareil" /></svg>Photo de la fiche</button>
+          </div>
+          <section class="proposition r-hachis" id="proposition" aria-labelledby="titre-proposition" hidden>
+            <h3 id="titre-proposition" tabindex="-1">Étapes proposées, à vérifier</h3>
+            <p class="aide">5 étapes, 7 ingrédients reconnus. 3 durées devinées (en pointillés) : touchez une étiquette pour la corriger.</p>
+            <ul class="ingredients-detectes">
+              <li><span class="pastille">1 kg de pommes de terre</span></li>
+              <li><span class="pastille">2 oignons</span></li>
+              <li><span class="pastille">500 g de bœuf haché</span></li>
+              <li><span class="pastille">20 cl de lait</span></li>
+              <li><span class="pastille">50 g de beurre</span></li>
+              <li><span class="pastille">Muscade</span></li>
+              <li><span class="pastille">Fromage râpé</span></li>
+            </ul>
+            <ol class="etapes-structurees">
+              <li><span class="numero">1</span><div><p>Cuire les pommes de terre dans l’eau salée</p><div class="attributs"><span class="attribut">Feu</span><span class="attribut passif">Passif</span><span class="attribut">25 min</span></div></div></li>
+              <li><span class="numero">2</span><div><p>Faire revenir les oignons puis le bœuf</p><div class="attributs"><span class="attribut">Feu</span><span class="attribut actif">Actif</span><span class="attribut devinee">10 min ?</span><span class="attribut">Pendant l’étape 1</span></div></div></li>
+              <li><span class="numero">3</span><div><p>Écraser avec le lait, le beurre et la muscade</p><div class="attributs"><span class="attribut">Plan de travail</span><span class="attribut actif">Actif</span><span class="attribut devinee">8 min ?</span><span class="attribut">Après 1</span></div></div></li>
+              <li><span class="numero">4</span><div><p>Monter dans le plat, mettre le fromage</p><div class="attributs"><span class="attribut">Plan de travail</span><span class="attribut actif">Actif</span><span class="attribut devinee">5 min ?</span><span class="attribut">Après 2 et 3</span></div></div></li>
+              <li><span class="numero">5</span><div><p>Gratiner à 200 °C</p><div class="attributs"><span class="attribut">Four</span><span class="attribut passif">Passif</span><span class="attribut">20 min</span><span class="attribut">Après 4</span></div></div></li>
+            </ol>
+          </section>
+          <div class="champ">
+            <label for="e-mot">Son petit mot (facultatif)</label>
+            <input id="e-mot" type="text" value="Toujours une pointe de muscade, et ne pas trop écraser la purée." />
+          </div>
+        </div>
+        <div class="editeur-pied">
+          <button type="submit" value="annuler" class="bouton bouton-secondaire">Annuler</button>
+          <button type="submit" value="enregistrer" class="bouton bouton-primaire"><svg><use href="#i-valider" /></svg>Enregistrer la recette</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script>
+      (() => {
+        "use strict";
+        const $ = (s, el = document) => el.querySelector(s);
+        const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+        const INSECABLE = " ";
+        const sansAccents = (s) => s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
+
+        // Typographie française à l'affichage : espaces insécables (comme src/lib/typo.ts du quiz).
+        function typographie(racine) {
+          const parcours = document.createTreeWalker(racine, NodeFilter.SHOW_TEXT);
+          let n;
+          while ((n = parcours.nextNode())) {
+            if (n.parentElement.closest("script, style, textarea, code")) continue;
+            const v = n.nodeValue
+              .replace(/ ([:;!?»·%€])/g, INSECABLE + "$1")
+              .replace(/« /g, "«" + INSECABLE)
+              .replace(/n° /g, "n°" + INSECABLE)
+              .replace(/(\d) (?=\d{3}\b)/g, "$1" + INSECABLE)
+              .replace(/(\d) (?=[^\s\d])/g, "$1" + INSECABLE)
+              .replace(/ h (\d)/g, INSECABLE + "h" + INSECABLE + "$1");
+            if (v !== n.nodeValue) n.nodeValue = v;
+          }
+        }
+        function iconesDecoratives(racine) {
+          $$("svg:not([hidden])", racine).forEach((s) => {
+            s.setAttribute("aria-hidden", "true");
+            s.setAttribute("focusable", "false");
+          });
+        }
+
+        // Annonces de la maquette
+        const toast = $("#toast");
+        let minuterieToast;
+        function annoncer(texte) {
+          toast.textContent = texte;
+          typographie(toast);
+          toast.hidden = false;
+          clearTimeout(minuterieToast);
+          minuterieToast = setTimeout(() => (toast.hidden = true), 3200);
+        }
+        document.addEventListener("click", (e) => {
+          const b = e.target.closest("[data-maquette]");
+          if (b) annoncer(b.dataset.maquette);
+        });
+
+        // Navigation par ancre
+        const VUES = { semaine: "Semaine", courses: "Courses", session: "Session", frigo: "Frigo", recettes: "Recettes" };
+        const ALIAS = { reste: ["frigo", "reste"], stock: ["frigo", "plats"] };
+        function afficherVue(deplacerFocus) {
+          const id = location.hash.slice(1);
+          const [vue, onglet] = ALIAS[id] || [id in VUES ? id : "semaine"];
+          if (onglet) choisirOnglet(onglet);
+          $$(".vue").forEach((s) => (s.hidden = s.dataset.vue !== vue));
+          $$(".navigation ul a").forEach((a) =>
+            a.dataset.vue === vue ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"),
+          );
+          document.title = `${VUES[vue]} · Fournée`;
+          if (deplacerFocus) {
+            window.scrollTo(0, 0);
+            $(`.vue[data-vue="${vue}"] h1`).focus({ preventScroll: true });
+          }
+        }
+        addEventListener("hashchange", () => afficherVue(true));
+
+        // Thème commun : système, clair, sombre
+        const CLE = "skazy-outils:theme";
+        const racine = document.documentElement;
+        const boutonTheme = $("#bouton-theme");
+        const NOMS = {
+          systeme: `Thème${INSECABLE}: celui du système. Changer de thème`,
+          light: `Thème${INSECABLE}: clair. Changer de thème`,
+          dark: `Thème${INSECABLE}: sombre. Changer de thème`,
+        };
+        const ICONES = { systeme: "#i-systeme", light: "#i-soleil", dark: "#i-lune" };
+        const metas = $$('meta[name="theme-color"]');
+        const couleursInitiales = metas.map((m) => m.content);
+        const lireTheme = () => {
+          try {
+            const t = JSON.parse(localStorage.getItem(CLE));
+            return t === "light" || t === "dark" ? t : null;
+          } catch {
+            return null;
+          }
+        };
+        let theme = lireTheme();
+        function appliquerTheme(t) {
+          theme = t;
+          if (t) racine.dataset.theme = t;
+          else delete racine.dataset.theme;
+          const etat = t || "systeme";
+          boutonTheme.setAttribute("aria-label", NOMS[etat]);
+          boutonTheme.title = NOMS[etat];
+          $("use", boutonTheme).setAttribute("href", ICONES[etat]);
+          const fond = getComputedStyle(racine).getPropertyValue("--fond").trim();
+          metas.forEach((m, i) => (m.content = t ? fond : couleursInitiales[i]));
+        }
+        boutonTheme.addEventListener("click", () => {
+          const suivant = theme === null ? "light" : theme === "light" ? "dark" : null;
+          try {
+            if (suivant) localStorage.setItem(CLE, JSON.stringify(suivant));
+            else localStorage.removeItem(CLE);
+          } catch {}
+          appliquerTheme(suivant);
+        });
+        addEventListener("storage", (e) => {
+          if (e.key === CLE || e.key === null) appliquerTheme(lireTheme());
+        });
+        addEventListener("pageshow", (e) => {
+          if (e.persisted) appliquerTheme(lireTheme());
+        });
+
+        // Semaine : portions
+        $$(".compteur").forEach((c) => {
+          const sortie = $("output", c);
+          $(".compteur-moins", c).addEventListener("click", () => (sortie.textContent = Math.max(1, +sortie.textContent - 1)));
+          $(".compteur-plus", c).addEventListener("click", () => (sortie.textContent = Math.min(24, +sortie.textContent + 1)));
+        });
+
+        // Courses
+        const cases = $$(".articles input[type=checkbox]");
+        function majCourses() {
+          const n = cases.filter((c) => c.checked).length;
+          $("#courses-compte").textContent = `${n}${INSECABLE}sur ${cases.length}`;
+          $("#courses-jauge").style.width = `${(n / cases.length) * 100}%`;
+          cases.forEach((c) => c.closest(".article").classList.toggle("coche", c.checked));
+        }
+        cases.forEach((c) => c.addEventListener("change", majCourses));
+        $("#masquer-coches").addEventListener("change", (e) => $(".rayons").classList.toggle("masquer", e.target.checked));
+
+        // Session : minuteurs de démonstration
+        const deuxChiffres = (n) => String(n).padStart(2, "0");
+        const minuteurs = $$(".minuteur").map((el) => ({ el, reste: +el.dataset.secondes, actif: true }));
+        function dessinerMinuteur(m) {
+          $(".minuteur-temps", m.el).textContent = m.reste > 0 ? `${deuxChiffres(Math.floor(m.reste / 60))}:${deuxChiffres(m.reste % 60)}` : "Terminé";
+          m.el.classList.toggle("bientot", m.reste > 60 && m.reste <= 600);
+          m.el.classList.toggle("urgent", m.reste > 0 && m.reste <= 60);
+          m.el.classList.toggle("fini", m.reste === 0);
+        }
+        minuteurs.forEach((m) => {
+          dessinerMinuteur(m);
+          const bouton = $(".minuteur-pause", m.el);
+          const nom = $("strong", m.el).textContent;
+          bouton.addEventListener("click", () => {
+            m.actif = !m.actif;
+            $("use", bouton).setAttribute("href", m.actif ? "#i-pause" : "#i-lecture");
+            bouton.setAttribute("aria-label", `${m.actif ? "Mettre en pause" : "Reprendre"} le minuteur ${nom}`);
+          });
+        });
+        setInterval(() => minuteurs.forEach((m) => m.actif && m.reste > 0 && (m.reste--, dessinerMinuteur(m))), 1000);
+
+        // Session : mode cuisine (gros caractères, écran maintenu allumé)
+        let verrouEcran = null;
+        $("#mode-cuisine").addEventListener("click", async (e) => {
+          const b = e.currentTarget;
+          const actif = b.getAttribute("aria-pressed") !== "true";
+          b.setAttribute("aria-pressed", String(actif));
+          $(".vue-session").classList.toggle("mode-cuisine", actif);
+          if (actif && "wakeLock" in navigator) {
+            try {
+              verrouEcran = await navigator.wakeLock.request("screen");
+            } catch {}
+          } else if (verrouEcran) {
+            verrouEcran.release();
+            verrouEcran = null;
+          }
+        });
+
+        // Session : frise calculée (données de démonstration, en minutes depuis 14 h)
+        const DUREE = 125;
+        const MAINTENANT = 40;
+        const DEBUT = 14 * 60;
+        const POSTES = [
+          ["plan", "Plan de travail", "#i-ustensiles"],
+          ["feu1", "Feu 1", "#i-flamme"],
+          ["feu2", "Feu 2", "#i-flamme"],
+          ["feu3", "Feu 3", "#i-flamme"],
+          ["four", "Four", "#i-four"],
+          ["repos", "Refroidir", "#i-flocon"],
+        ];
+        // [poste, début, durée, recette, texte, passive, temps masqué]
+        const ETAPES = [
+          ["plan", 0, 10, "gratin", "Éplucher et couper la courge"],
+          ["plan", 10, 8, "commun", "Émincer 4 oignons et 4 gousses d’ail (chili + curry)"],
+          ["feu1", 18, 6, "chili", "Faire revenir"],
+          ["feu2", 24, 6, "curry", "Faire revenir, épices"],
+          ["plan", 30, 4, "commun", "Rincer quinoa et lentilles"],
+          ["four", 30, 17, "gratin", "Préchauffer à 180 °C", true],
+          ["feu1", 24, 40, "chili", "Mijoter le chili", true],
+          ["feu2", 34, 20, "curry", "Mijoter le curry", true],
+          ["feu3", 34, 15, "taboule", "Cuire le quinoa", true],
+          ["plan", 34, 13, "gratin", "Monter le gratin"],
+          ["four", 47, 45, "gratin", "Cuire le gratin", true],
+          ["plan", 47, 13, "taboule", "Couper concombre, tomates, persil"],
+          ["repos", 49, 11, "taboule", "Tiédir le quinoa", true],
+          ["repos", 54, 30, "curry", "Refroidir le curry", true],
+          ["plan", 60, 5, "taboule", "Assembler"],
+          ["plan", 65, 11, "commun", "Vaisselle (temps masqué)", false, true],
+          ["repos", 64, 30, "chili", "Refroidir le chili", true],
+          ["repos", 92, 18, "gratin", "Refroidir le gratin", true],
+          ["plan", 110, 15, "commun", "Portionner et étiqueter"],
+        ];
+        const heure = (m) => {
+          const t = DEBUT + m;
+          const h = Math.floor(t / 60);
+          const mn = t % 60;
+          return mn ? `${h} h ${deuxChiffres(mn)}` : `${h} h`;
+        };
+        const pourcent = (m) => `${((m / DUREE) * 100).toFixed(3)}%`;
+        function rendreFrise() {
+          const frise = $("#gantt");
+          frise.style.setProperty("--maintenant", pourcent(MAINTENANT));
+          let html = '<div class="gantt-axe"><div class="gantt-poste"></div><div class="gantt-piste">';
+          for (let m = 0; m <= 120; m += 15) html += `<span class="tic" style="left:${pourcent(m)}">${heure(m)}</span>`;
+          html += '<span class="repere-maintenant">Maintenant</span></div></div>';
+          for (const [id, nom, icone] of POSTES) {
+            const voies = [];
+            const barres = ETAPES.filter((e) => e[0] === id)
+              .sort((a, b) => a[1] - b[1])
+              .map(([, debut, duree, recette, texte, passive, masquee]) => {
+                let v = voies.findIndex((fin) => fin <= debut);
+                if (v < 0) v = voies.push(0) - 1;
+                voies[v] = debut + duree;
+                const etat = debut + duree <= MAINTENANT ? "finie" : debut <= MAINTENANT ? "en-cours" : "";
+                const titre = `${heure(debut)} · ${texte} · ${duree} min${passive ? " (passif)" : ""}`;
+                return `<div class="etape r-${recette}${passive ? " passive" : ""}${masquee ? " masquee" : ""} ${etat}" style="left:${pourcent(debut)};width:${pourcent(duree)};top:${6 + v * 40}px" title="${titre}"><span>${texte}</span></div>`;
+              })
+              .join("");
+            html += `<div class="gantt-ligne"><div class="gantt-poste"><svg><use href="${icone}"/></svg>${nom}</div><div class="gantt-piste" style="height:${12 + Math.max(1, voies.length) * 40}px">${barres}</div></div>`;
+          }
+          frise.innerHTML = html;
+        }
+
+        // Frigo : onglets « Plats préparés » et « Ce qu'il reste »
+        const onglets = $$('.onglets-vue [role="tab"]');
+        function choisirOnglet(nom, focus) {
+          onglets.forEach((t) => {
+            const choisi = t.id === `onglet-${nom}`;
+            t.setAttribute("aria-selected", String(choisi));
+            t.tabIndex = choisi ? 0 : -1;
+            $(`#${t.getAttribute("aria-controls")}`).hidden = !choisi;
+            if (choisi && focus) t.focus();
+          });
+        }
+        onglets.forEach((t, i) => {
+          t.addEventListener("click", () => choisirOnglet(t.id.replace("onglet-", "")));
+          t.addEventListener("keydown", (e) => {
+            if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+            const j = (i + (e.key === "ArrowRight" ? 1 : -1) + onglets.length) % onglets.length;
+            choisirOnglet(onglets[j].id.replace("onglet-", ""), true);
+            e.preventDefault();
+          });
+        });
+
+        // Ce qu'il reste : ingrédients et idées (correspondance par clé, quantités ignorées dans la maquette)
+        const echapper = (s) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+        const SYNONYMES = [
+          ["sauce tomate", "sauce-tomate"], ["oeuf", "oeufs"], ["courgette", "courgette"], ["feta", "feta"], ["creme", "creme"],
+          ["riz", "riz"], ["poivron", "poivron"], ["tomate", "tomates"], ["fromage", "fromage"], ["emmental", "fromage"],
+          ["oignon", "oignon"], ["lait", "lait"], ["concombre", "concombre"], ["olive", "olives"], ["menthe", "menthe"],
+          ["citron", "citron"], ["carotte", "carottes"], ["jambon", "jambon"], ["pomme de terre", "pommes-de-terre"],
+          ["epinard", "epinards"], ["champignon", "champignons"], ["pate", "pates"],
+        ];
+        const cleDe = (nom) => {
+          const n = sansAccents(nom).replace(/œ/g, "oe");
+          const trouve = SYNONYMES.find(([mot]) => n.includes(mot));
+          return trouve ? trouve[1] : n;
+        };
+        let restes = [
+          { nom: "½ courgette", vite: true },
+          { nom: "100 g de feta", vite: true },
+          { nom: "10 cl de crème", vite: true },
+          { nom: "1 bol de riz cuit", vite: true },
+          { nom: "1 portion de sauce tomate maison", vite: true, plat: true },
+          { nom: "3 œufs", vite: false },
+          { nom: "1 poivron rouge", vite: false },
+          { nom: "2 tomates", vite: false },
+          { nom: "50 g de fromage râpé", vite: false },
+          { nom: "½ oignon", vite: false },
+        ].map((r) => ({ ...r, cle: cleDe(r.nom) }));
+        const MANQUANTS = { lait: "du lait", concombre: "1 concombre", olives: "des olives", "pommes-de-terre": "des pommes de terre", pates: "des pâtes", jambon: "du jambon", epinards: "des épinards" };
+        const IDEES = [
+          { nom: "Frittata courgette, poivron et feta", duree: 20, r: "taboule", ingredients: ["oeufs", "courgette", "poivron", "feta", "oignon"] },
+          { nom: "Riz sauté aux légumes et à l’œuf", duree: 15, r: "curry", ingredients: ["riz", "oeufs", "poivron", "courgette", "oignon"] },
+          { nom: "Shakshuka à la sauce tomate maison", duree: 25, r: "sauce", ingredients: ["sauce-tomate", "oeufs", "poivron", "oignon", "feta"] },
+          { nom: "Quiche sans pâte", duree: 40, r: "gratin", ingredients: ["oeufs", "creme", "fromage", "courgette", "tomates"] },
+          { nom: "Gratin de riz express", duree: 25, r: "soupe", ingredients: ["riz", "creme", "fromage", "tomates", "lait"] },
+          { nom: "Salade grecque tiède", duree: 10, r: "dahl", ingredients: ["tomates", "feta", "poivron", "oignon", "concombre", "olives"] },
+          { nom: "Pâtes crème, jambon et champignons", duree: 15, r: "hachis", ingredients: ["pates", "creme", "jambon", "champignons", "fromage"] },
+          { nom: "Taboulé express à la menthe", duree: 15, r: "taboule", ingredients: ["menthe", "citron", "tomates", "oignon", "riz"] },
+        ];
+        function evaluer(idee, cles, vites) {
+          const utilises = idee.ingredients.filter((k) => cles.has(k));
+          const manque = idee.ingredients.filter((k) => !cles.has(k));
+          const sauves = utilises.filter((k) => vites.has(k));
+          return { ...idee, utilises, manque, sauves, score: utilises.length + 2 * sauves.length - 1.5 * manque.length };
+        }
+        function rendreRestes() {
+          const liste = $("#restes");
+          liste.innerHTML = restes
+            .map(
+              (r, i) => `<li class="reste${r.vite ? " vite" : ""}">
+                <button type="button" class="reste-nom" data-i="${i}" aria-pressed="${r.vite}" title="À finir vite${INSECABLE}: touchez pour changer">${r.vite ? '<svg><use href="#i-horloge"/></svg>' : ""}${echapper(r.nom)}${r.vite ? '<span class="visuellement-cache">, à finir vite</span>' : ""}${r.plat ? ' <span class="pastille">Plat</span>' : ""}</button>
+                <button type="button" class="reste-retirer" data-i="${i}" aria-label="Retirer ${echapper(r.nom)}"><svg><use href="#i-croix"/></svg></button></li>`,
+            )
+            .join("");
+          $("#compte-restes").textContent = `${restes.length} ingrédient${restes.length > 1 ? "s" : ""}`;
+          const cles = new Set(restes.map((r) => r.cle));
+          const vites = new Set(restes.filter((r) => r.vite).map((r) => r.cle));
+          const toutes = IDEES.map((i) => evaluer(i, cles, vites)).filter((i) => i.utilises.length >= 2);
+          const idees = [...toutes].sort((a, b) => b.score - a.score || a.duree - b.duree).slice(0, 5);
+          $("#compte-idees").textContent = `${idees.length} idée${idees.length > 1 ? "s" : ""}`;
+          $("#idees").innerHTML =
+            idees
+              .map(
+                (i) => `<li class="idee r-${i.r}"><div class="idee-texte"><strong>${i.nom}</strong>
+                  <span>${i.duree} min · utilise ${i.utilises.length} ingrédient${i.utilises.length > 1 ? "s" : ""}${i.sauves.length ? `, dont ${i.sauves.length} à finir vite` : ""}</span></div>
+                  ${i.manque.length ? `<span class="pastille pastille-bientot">Il manque : ${i.manque.map((k) => MANQUANTS[k] || k).join(", ")}</span>` : '<span class="pastille pastille-ok">Rien à acheter</span>'}
+                  <button type="button" class="bouton bouton-secondaire bouton-petit" data-maquette="Maquette : ouvrirait la recette en mode cuisine, puis retirerait du frigo ce qui a été utilisé.">Cuisiner</button></li>`,
+              )
+              .join("") || '<li class="vide">Ajoutez au moins deux ingrédients pour voir des idées.</li>';
+          // Mini-session : la meilleure paire d'idées sans achat, qui finit le plus d'ingrédients « à finir vite »
+          const completes = toutes.filter((i) => !i.manque.length);
+          let meilleure = null;
+          for (let a = 0; a < completes.length; a++)
+            for (let b = a + 1; b < completes.length; b++) {
+              const x = completes[a], y = completes[b];
+              const v = new Set([...x.sauves, ...y.sauves]).size;
+              const u = new Set([...x.utilises, ...y.utilises]).size;
+              const d = Math.max(x.duree, y.duree) + 10;
+              if (!meilleure || v > meilleure.v || (v === meilleure.v && (u > meilleure.u || (u === meilleure.u && d < meilleure.d)))) meilleure = { x, y, v, u, d };
+            }
+          const mini = $("#mini-session");
+          mini.hidden = !meilleure || meilleure.v < 2;
+          if (!mini.hidden) {
+            mini.innerHTML = `<p class="etiquette"><svg><use href="#i-fusion"/></svg>Mini-session anti-gaspi</p>
+              <strong>${meilleure.x.nom} + ${meilleure.y.nom.charAt(0).toLowerCase() + meilleure.y.nom.slice(1)}</strong>
+              <span>Environ ${meilleure.d} min, les cuissons se chevauchent. Utilise ${meilleure.u} ingrédients sur ${restes.length}, dont ${meilleure.v} des ${vites.size} à finir vite.</span>
+              <div><button type="button" class="bouton bouton-primaire bouton-petit" data-maquette="Maquette : lancerait une session courte avec ces deux recettes.">Lancer la mini-session</button></div>`;
+          }
+          const panneau = $("#panneau-reste");
+          iconesDecoratives(panneau);
+          typographie(panneau);
+        }
+        $("#restes").addEventListener("click", (e) => {
+          const b = e.target.closest("button[data-i]");
+          if (!b) return;
+          const i = +b.dataset.i;
+          if (b.classList.contains("reste-retirer")) restes.splice(i, 1);
+          else restes[i].vite = !restes[i].vite;
+          rendreRestes();
+          const suivant = $(`#restes button[data-i="${Math.min(i, restes.length - 1)}"]${b.classList.contains("reste-retirer") ? ".reste-retirer" : ".reste-nom"}`);
+          (suivant || $("#champ-reste")).focus();
+        });
+        $("#form-reste").addEventListener("submit", (e) => {
+          e.preventDefault();
+          const champ = $("#champ-reste");
+          const nom = champ.value.trim();
+          if (!nom) return;
+          restes.push({ nom, vite: false, cle: cleDe(nom) });
+          champ.value = "";
+          rendreRestes();
+        });
+        $("#ajouter-restes-session").addEventListener("click", () => {
+          restes.push({ nom: "½ botte de menthe", vite: true, cle: "menthe" }, { nom: "1 citron", vite: false, cle: "citron" });
+          $("#restes-session").remove();
+          rendreRestes();
+          $("#champ-reste").focus();
+        });
+
+        // Frigo : plats préparés
+        $$(".segments button").forEach((b) =>
+          b.addEventListener("click", () => {
+            $$(".segments button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+            $$(".plat").forEach((p) => (p.hidden = b.dataset.lieu !== "tout" && p.dataset.lieu !== b.dataset.lieu));
+          }),
+        );
+        $$(".plat .manger").forEach((b) =>
+          b.addEventListener("click", () => {
+            const plat = b.closest(".plat");
+            const reste = +plat.dataset.portions - 1;
+            plat.dataset.portions = reste;
+            const nom = $("h2", plat).textContent;
+            if (reste <= 0) {
+              plat.remove();
+              annoncer(`${nom} : plus rien en stock. Bon appétit !`);
+            } else {
+              $(".plat-portions", plat).textContent = `${reste}${INSECABLE}portion${reste > 1 ? "s" : ""}`;
+              annoncer(`${nom} : 1 portion mangée, ${reste} restante${reste > 1 ? "s" : ""}.`);
+            }
+          }),
+        );
+
+        // Recettes
+        const RECETTES = [
+          { id: "hachis", nom: "Hachis parmentier de maman", portions: "6 portions", actif: 35, total: 70,
+            etiquettes: ["congelable", "four"], conservation: "Frigo 3 jours · congélateur 3 mois",
+            origine: { type: "famille", badge: "De maman", titre: "Recette de maman", info: "Texte d’origine conservé · ajoutée le 12 octobre",
+              mot: "« Toujours une pointe de muscade, et ne pas trop écraser la purée. »", photo: true },
+            ingredients: ["1 kg de pommes de terre", "2 oignons", "500 g de bœuf haché", "20 cl de lait", "50 g de beurre", "50 g de fromage râpé", "Muscade, sel, poivre"],
+            etapes: [["Éplucher les pommes de terre", "Plan de travail", 10, true, []], ["Cuire les pommes de terre", "Feu", 25, false, [1]], ["Faire revenir les oignons puis le bœuf", "Feu", 10, true, []], ["Écraser avec le lait, le beurre et la muscade", "Plan de travail", 8, true, [2]], ["Monter dans le plat, mettre le fromage", "Plan de travail", 5, true, [3, 4]], ["Gratiner à 200 °C", "Four", 20, false, [5]]] },
+          { id: "dahl", nom: "Notre dahl du dimanche", portions: "4 portions", actif: 15, total: 45,
+            etiquettes: ["congelable", "vegetarien"], conservation: "Frigo 3 jours · congélateur 3 mois",
+            origine: { type: "maison", badge: "Notre recette", titre: "Notre recette", info: "Mise au point à la maison · modifiée le 3 novembre",
+              mot: "« Beaucoup de coriandre, et le citron seulement à la fin. »" },
+            ingredients: ["250 g de lentilles corail", "1 oignon", "2 gousses d’ail", "40 cl de lait de coco", "1 c. à s. de garam masala", "1 citron", "Coriandre fraîche"],
+            etapes: [["Émincer l’oignon et l’ail", "Plan de travail", 5, true, []], ["Faire revenir avec les épices", "Feu", 5, true, [1]], ["Cuire lentilles et lait de coco", "Feu", 25, false, [2]], ["Finir au citron et à la coriandre", "Plan de travail", 3, true, [3]]] },
+          { id: "chili", nom: "Chili sin carne", portions: "6 portions", actif: 20, total: 70, fournee: true,
+            etiquettes: ["congelable", "vegetarien"], conservation: "Frigo 3 jours · congélateur 3 mois",
+            ingredients: ["2 oignons jaunes", "2 gousses d’ail", "2 poivrons rouges", "2 boîtes de haricots rouges", "2 boîtes de tomates concassées", "2 c. à c. de cumin", "1 c. à c. de paprika fumé"],
+            etapes: [["Émincer les oignons et l’ail", "Plan de travail", 5, true, []], ["Faire revenir avec les poivrons", "Feu", 6, true, [1]], ["Ajouter épices, tomates et haricots", "Feu", 4, true, [2]], ["Mijoter à couvert", "Feu", 40, false, [3]], ["Laisser refroidir", "Repos", 30, false, [4]], ["Portionner et étiqueter", "Plan de travail", 5, true, [5]]] },
+          { id: "curry", nom: "Curry de lentilles corail", portions: "4 portions", actif: 15, total: 40, fournee: true,
+            etiquettes: ["congelable", "vegetarien"], conservation: "Frigo 3 jours · congélateur 3 mois",
+            ingredients: ["2 oignons jaunes", "2 gousses d’ail", "3 cm de gingembre", "300 g de lentilles corail", "40 cl de lait de coco", "1 cube de bouillon", "2 c. à s. de curry", "1 citron"],
+            etapes: [["Émincer oignons, ail et gingembre", "Plan de travail", 5, true, []], ["Faire revenir avec le curry", "Feu", 6, true, [1]], ["Ajouter lentilles, lait de coco, bouillon", "Feu", 2, true, [2]], ["Mijoter", "Feu", 20, false, [3]], ["Laisser refroidir", "Repos", 30, false, [4]]] },
+          { id: "gratin", nom: "Gratin de courge butternut", portions: "4 portions", actif: 25, total: 80, fournee: true,
+            etiquettes: ["congelable", "vegetarien", "four"], conservation: "Frigo 3 jours · congélateur 3 mois",
+            ingredients: ["1,2 kg de courge butternut", "20 cl de crème liquide", "150 g d’emmental râpé", "Muscade, sel, poivre"],
+            etapes: [["Éplucher et couper la courge", "Plan de travail", 10, true, []], ["Préchauffer le four à 180 °C", "Four", 15, false, []], ["Monter le gratin", "Plan de travail", 13, true, [1]], ["Cuire", "Four", 45, false, [2, 3]], ["Laisser refroidir", "Repos", 20, false, [4]]] },
+          { id: "taboule", nom: "Taboulé de quinoa", portions: "4 portions", actif: 20, total: 35, fournee: true,
+            etiquettes: ["vegetarien"], conservation: "Frigo 3 jours · ne se congèle pas",
+            ingredients: ["250 g de quinoa", "1 concombre", "4 tomates", "1 botte de persil plat", "1 botte de menthe", "200 g de feta", "1 citron"],
+            etapes: [["Rincer le quinoa", "Plan de travail", 2, true, []], ["Cuire le quinoa", "Feu", 15, false, [1]], ["Laisser tiédir", "Repos", 11, false, [2]], ["Couper légumes et herbes", "Plan de travail", 13, true, []], ["Assembler", "Plan de travail", 5, true, [3, 4]]] },
+          { id: "soupe", nom: "Soupe de potimarron", portions: "6 portions", actif: 15, total: 45,
+            etiquettes: ["congelable", "vegetarien"], conservation: "Frigo 3 jours · congélateur 3 mois",
+            ingredients: ["1 potimarron", "1 oignon", "1 l de bouillon", "10 cl de crème"],
+            etapes: [["Couper le potimarron et l’oignon", "Plan de travail", 10, true, []], ["Faire revenir", "Feu", 5, true, [1]], ["Cuire dans le bouillon", "Feu", 25, false, [2]], ["Mixer", "Plan de travail", 5, true, [3]]] },
+          { id: "bolo", nom: "Bolognaise de lentilles", portions: "6 portions", actif: 15, total: 50,
+            etiquettes: ["congelable", "vegetarien"], conservation: "Frigo 3 jours · congélateur 3 mois",
+            ingredients: ["2 oignons", "2 carottes", "200 g de lentilles vertes", "2 boîtes de tomates concassées"],
+            etapes: [["Émincer oignons et carottes", "Plan de travail", 8, true, []], ["Faire revenir", "Feu", 6, true, [1]], ["Mijoter avec lentilles et tomates", "Feu", 35, false, [2]]] },
+          { id: "tikka", nom: "Poulet tikka masala", portions: "4 portions", actif: 20, total: 50,
+            etiquettes: ["congelable"], conservation: "Frigo 3 jours · congélateur 3 mois",
+            ingredients: ["600 g de poulet", "1 yaourt", "2 c. à s. de garam masala", "40 cl de coulis de tomate", "20 cl de crème"],
+            etapes: [["Couper et mariner le poulet", "Plan de travail", 8, true, []], ["Mariner", "Repos", 15, false, [1]], ["Saisir le poulet", "Feu", 7, true, [2]], ["Mijoter dans la sauce", "Feu", 20, false, [3]]] },
+          { id: "cookies", nom: "Cookies avoine et chocolat", portions: "20 pièces", actif: 15, total: 30,
+            etiquettes: ["congelable", "vegetarien", "four"], conservation: "Boîte 5 jours · pâte au congélateur 3 mois",
+            ingredients: ["150 g de flocons d’avoine", "120 g de farine", "100 g de beurre", "80 g de sucre", "1 œuf", "100 g de chocolat"],
+            etapes: [["Préparer la pâte", "Plan de travail", 12, true, []], ["Façonner les cookies", "Plan de travail", 3, true, [1]], ["Cuire à 180 °C", "Four", 12, false, [2]]] },
+        ];
+        const ETIQUETTES = { congelable: "Congelable", vegetarien: "Végétarien", four: "Four" };
+        const duree = (m) => (m < 60 ? `${m} min` : `${Math.floor(m / 60)} h${m % 60 ? " " + deuxChiffres(m % 60) : ""}`);
+        const filtres = new Set();
+        let recherche = "";
+        let choisie = "hachis";
+        const correspond = (r, f) => (f === "rapide" ? r.actif <= 15 : f === "famille" ? Boolean(r.origine) : r.etiquettes.includes(f));
+        function rendreRecettes() {
+          const liste = RECETTES.filter(
+            (r) =>
+              [...filtres].every((f) => correspond(r, f)) &&
+              sansAccents(r.nom).includes(recherche),
+          );
+          $("#nombre-recettes").textContent = `${liste.length} recette${liste.length > 1 ? "s" : ""}`;
+          const cartes = $("#cartes-recettes");
+          cartes.innerHTML =
+            liste
+              .map(
+                (r) => `<li><button type="button" class="carte-recette r-${r.id}" data-id="${r.id}" aria-pressed="${r.id === choisie}">
+                  <span class="carte-recette-visuel"><svg><use href="#i-bol"/></svg></span>
+                  <span class="carte-recette-corps">
+                    <span class="carte-recette-titre">${r.nom}</span>
+                    <span class="meta-recette">${r.portions} · actif ${duree(r.actif)} · total ${duree(r.total)}</span>
+                    <span class="etiquettes">${r.origine ? `<span class="pastille pastille-famille"><svg><use href="${r.origine.type === "famille" ? "#i-coeur" : "#i-maison"}"/></svg>${r.origine.badge}</span>` : ""}${r.fournee ? '<span class="pastille pastille-ok">Dans la fournée</span>' : ""}${r.etiquettes.map((e) => `<span class="pastille">${ETIQUETTES[e]}</span>`).join("")}</span>
+                  </span></button></li>`,
+              )
+              .join("") || '<li class="vide">Aucune recette ne correspond à ces filtres.</li>';
+          iconesDecoratives(cartes);
+          typographie(cartes);
+          typographie($("#nombre-recettes"));
+        }
+        function rendreDetail() {
+          const r = RECETTES.find((x) => x.id === choisie);
+          const detail = $("#detail-recette");
+          detail.className = `carte detail-recette r-${r.id}`;
+          detail.innerHTML = `
+            <p class="etiquette">Fiche recette</p>
+            <h2>${r.nom}</h2>
+            <p class="meta-recette">${r.portions} · actif ${duree(r.actif)} · total ${duree(r.total)}</p>
+            <p class="conservation"><svg><use href="#i-flocon"/></svg>${r.conservation}</p>
+            ${
+              r.origine
+                ? `<div class="origine"><span class="rond"><svg><use href="${r.origine.type === "famille" ? "#i-coeur" : "#i-maison"}"/></svg></span><div><strong>${r.origine.titre}</strong><span>${r.origine.info}</span></div></div>
+                  ${r.origine.mot ? `<blockquote class="mot">${r.origine.mot}</blockquote>` : ""}
+                  ${r.origine.photo ? '<button type="button" class="photo-fiche" data-maquette="Maquette : afficherait la photo de la fiche manuscrite d’origine."><svg><use href="#i-image"/></svg>Voir la fiche d’origine (photo)</button>' : ""}`
+                : ""
+            }
+            <h3>Ingrédients</h3>
+            <ul class="ingredients">${r.ingredients.map((i) => `<li>${i}</li>`).join("")}</ul>
+            <h3>Étapes structurées</h3>
+            <p class="aide">Le poste, la durée, le caractère actif ou passif et les dépendances permettent de construire la session.</p>
+            <ol class="etapes-structurees">${r.etapes
+              .map(
+                ([texte, poste, min, actif, apres], i) => `<li><span class="numero">${i + 1}</span><div><p>${texte}</p><div class="attributs">
+                  <span class="attribut">${poste}</span>
+                  <span class="attribut ${actif ? "actif" : "passif"}">${actif ? "Actif" : "Passif"}</span>
+                  <span class="attribut">${duree(min)}</span>
+                  ${apres.length ? `<span class="attribut">Après ${apres.join(" et ")}</span>` : ""}
+                </div></div></li>`,
+              )
+              .join("")}</ol>
+            <div class="actions">
+              <button type="button" class="bouton bouton-primaire" data-maquette="Maquette : la recette rejoindrait la fournée de la semaine.">${r.fournee ? "Dans la fournée" : "Ajouter à la fournée"}</button>
+              <button type="button" class="bouton bouton-secondaire" data-maquette="Maquette : ouvrirait l’éditeur de recette.">Modifier</button>
+            </div>`;
+          iconesDecoratives(detail);
+          typographie(detail);
+        }
+        $("#cartes-recettes").addEventListener("click", (e) => {
+          const carte = e.target.closest(".carte-recette");
+          if (!carte) return;
+          choisie = carte.dataset.id;
+          rendreRecettes();
+          rendreDetail();
+          if (matchMedia("(max-width: 1099px)").matches) {
+            $("#detail-recette").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+          }
+        });
+        $("#recherche-recette").addEventListener("input", (e) => {
+          recherche = sansAccents(e.target.value.trim());
+          rendreRecettes();
+        });
+        $$(".puce-filtre").forEach((b) =>
+          b.addEventListener("click", () => {
+            const actif = b.getAttribute("aria-pressed") !== "true";
+            b.setAttribute("aria-pressed", String(actif));
+            actif ? filtres.add(b.dataset.filtre) : filtres.delete(b.dataset.filtre);
+            rendreRecettes();
+          }),
+        );
+
+        // Éditeur de recette (famille, maison, web, livre)
+        const editeur = $("#editeur");
+        $("#ouvrir-editeur").addEventListener("click", () => {
+          $("#proposition").hidden = true;
+          editeur.showModal();
+        });
+        $("#structurer").addEventListener("click", () => {
+          $("#proposition").hidden = false;
+          $("#titre-proposition").focus();
+        });
+        editeur.addEventListener("close", () => {
+          if (editeur.returnValue === "enregistrer")
+            annoncer("Maquette : la recette rejoindrait la bibliothèque, avec son texte d’origine et ses étapes vérifiées.");
+          editeur.returnValue = "";
+        });
+
+        // Démarrage
+        rendreRestes();
+        rendreFrise();
+        rendreRecettes();
+        rendreDetail();
+        majCourses();
+        appliquerTheme(theme);
+        iconesDecoratives(document.body);
+        typographie(document.body);
+        afficherVue(false);
+      })();
+    </script>
+  </body>
+</html>
