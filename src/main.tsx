@@ -43,6 +43,11 @@ void demarrerBibliotheque();
 void demarrerFournee();
 void chargerDerniereSession();
 void rafraichirStock();
+// Ce soir : adresses du plan B et rappel du dîner (morceau séparé, hors du démarrage).
+void import('./app/soir-etat').then((m) => {
+  void m.demarrerAdresses();
+  m.demarrerRappelDiner();
+});
 
 // Hors ligne : tout le site est mis en cache ; une nouvelle version s’installe d’elle-même.
 registerSW({ immediate: true });

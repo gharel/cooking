@@ -1,13 +1,21 @@
 import { normaliser } from './texte';
 
 export type Rayon =
-  'fruits-legumes' | 'boucherie' | 'poissonnerie' | 'cremerie' | 'epicerie' | 'surgeles' | 'autre';
+  | 'fruits-legumes'
+  | 'boucherie'
+  | 'poissonnerie'
+  | 'cremerie'
+  | 'boulangerie'
+  | 'epicerie'
+  | 'surgeles'
+  | 'autre';
 
 export const RAYONS: Readonly<Record<Rayon, string>> = {
   'fruits-legumes': 'Fruits et légumes',
   boucherie: 'Boucherie et charcuterie',
   poissonnerie: 'Poissonnerie',
   cremerie: 'Crèmerie et œufs',
+  boulangerie: 'Boulangerie',
   epicerie: 'Épicerie',
   surgeles: 'Surgelés',
   autre: 'Autre',
@@ -18,6 +26,8 @@ interface Entree {
   rayon: Rayon;
   /** Formes normalisées (sans accents, minuscules) ; la plus longue qui correspond l’emporte. */
   motifs: string[];
+  /** Viande ou poisson crus : planche et mains à laver après (hygiène de la session). */
+  cru?: true;
 }
 
 const ENTREES: Entree[] = [
@@ -47,6 +57,8 @@ const ENTREES: Entree[] = [
   { cle: 'basilic', rayon: 'fruits-legumes', motifs: ['basilic'] },
   { cle: 'menthe', rayon: 'fruits-legumes', motifs: ['menthe'] },
   { cle: 'concombre', rayon: 'fruits-legumes', motifs: ['concombres', 'concombre'] },
+  { cle: 'salade', rayon: 'fruits-legumes', motifs: ['salade verte', 'laitue', 'salade'] },
+  { cle: 'avocat', rayon: 'fruits-legumes', motifs: ['avocats', 'avocat'] },
   { cle: 'champignon', rayon: 'fruits-legumes', motifs: ['champignons', 'champignon'] },
   { cle: 'epinard', rayon: 'fruits-legumes', motifs: ['epinards', 'epinard'] },
   { cle: 'poireau', rayon: 'fruits-legumes', motifs: ['poireaux', 'poireau'] },
@@ -55,11 +67,13 @@ const ENTREES: Entree[] = [
     cle: 'boeuf-hache',
     rayon: 'boucherie',
     motifs: ['boeuf hache', 'viande hachee', 'steak hache', 'steaks haches'],
+    cru: true,
   },
-  { cle: 'chair-a-saucisse', rayon: 'boucherie', motifs: ['chair a saucisse'] },
+  { cle: 'chair-a-saucisse', rayon: 'boucherie', motifs: ['chair a saucisse'], cru: true },
   { cle: 'lardons', rayon: 'boucherie', motifs: ['lardons', 'lardon'] },
   { cle: 'jambon', rayon: 'boucherie', motifs: ['jambon'] },
-  { cle: 'poulet', rayon: 'boucherie', motifs: ['poulet'] },
+  { cle: 'poulet', rayon: 'boucherie', motifs: ['blancs de poulet', 'blanc de poulet', 'poulet'], cru: true },
+  { cle: 'saumon', rayon: 'poissonnerie', motifs: ['saumon'], cru: true },
   { cle: 'morue', rayon: 'poissonnerie', motifs: ['morue'] },
   // Crèmerie et œufs
   { cle: 'oeuf', rayon: 'cremerie', motifs: ['oeufs', 'oeuf'] },
@@ -73,6 +87,9 @@ const ENTREES: Entree[] = [
   { cle: 'camembert', rayon: 'cremerie', motifs: ['camembert'] },
   { cle: 'fromage', rayon: 'cremerie', motifs: ['fromage rape', 'fromage'] },
   { cle: 'pate-brisee', rayon: 'cremerie', motifs: ['pate brisee', 'pate feuilletee'] },
+  // Boulangerie
+  { cle: 'baguette', rayon: 'boulangerie', motifs: ['baguettes', 'baguette'] },
+  { cle: 'pain-de-mie', rayon: 'boulangerie', motifs: ['pain de mie'] },
   // Épicerie
   { cle: 'lentilles-corail', rayon: 'epicerie', motifs: ['lentilles corail', 'lentille corail'] },
   { cle: 'lentilles', rayon: 'epicerie', motifs: ['lentilles', 'lentille'] },
@@ -97,6 +114,17 @@ const ENTREES: Entree[] = [
   { cle: 'chocolat', rayon: 'epicerie', motifs: ['chocolat'] },
   { cle: 'chapelure', rayon: 'epicerie', motifs: ['chapelure'] },
   { cle: 'sauce-soja', rayon: 'epicerie', motifs: ['sauce soja'] },
+  { cle: 'thon', rayon: 'epicerie', motifs: ['thon'] },
+  { cle: 'mais', rayon: 'epicerie', motifs: ['mais doux'] },
+  { cle: 'cornichon', rayon: 'epicerie', motifs: ['cornichons', 'cornichon'] },
+  { cle: 'tortilla', rayon: 'epicerie', motifs: ['galettes de ble', 'tortillas', 'tortilla'] },
+  { cle: 'vinaigre', rayon: 'epicerie', motifs: ['vinaigre'] },
+  { cle: 'moutarde', rayon: 'epicerie', motifs: ['moutarde'] },
+  {
+    cle: 'epices-fajitas',
+    rayon: 'epicerie',
+    motifs: ['epices a fajitas', 'epices fajitas', 'melange fajitas'],
+  },
   { cle: 'huile-olive', rayon: 'epicerie', motifs: ["huile d'olive"] },
   { cle: 'huile', rayon: 'epicerie', motifs: ['huile'] },
   { cle: 'vin-rouge', rayon: 'epicerie', motifs: ['vin rouge'] },
@@ -128,6 +156,10 @@ const FORMES = ENTREES.flatMap((e) =>
     expression: new RegExp(`(^|[^a-z0-9])(${echapper(motif)})(?=[^a-z0-9]|$)`, 'g'),
   })),
 ).sort((a, b) => b.motif.length - a.motif.length);
+
+const CRUS = new Set(ENTREES.filter((e) => e.cru).map((e) => e.cle));
+/** Viandes et poissons crus (poulet, bœuf haché, chair à saucisse, saumon). */
+export const estCru = (cle: string): boolean => CRUS.has(cle);
 
 export interface Reconnu {
   cle: string;

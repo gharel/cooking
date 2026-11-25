@@ -63,6 +63,8 @@ export interface Recette {
   note: string | null;
   portions: number;
   vegetarien: boolean;
+  /** Recette du soir : à cuisiner le jour même, hors session. */
+  soir: boolean;
   ingredients: Ingredient[];
   etapes: Etape[];
   conservation: { frigoJours: number; congelateurMois: number | null };

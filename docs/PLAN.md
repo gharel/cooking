@@ -209,6 +209,8 @@ Chaque lot commence par une spec courte dans `docs/specs/` et se termine par une
 | **4. Frigo**              | Plats préparés (entrée en fin de session, dates limites, alertes, décongélation, consommation) ; « Ce qu’il reste » (ingrédients, à finir vite, idées, mini-session anti-gaspi)                            | Les dates proposées suivent les durées de la recette ; l’alerte du jour apparaît à l’ouverture ; « Manger 1 portion » à 0 retire le plat ; retirer un ingrédient met les idées à jour ; une idée sans achat est signalée « Rien à acheter » ; cuisiner une idée retire du frigo ce qu’elle utilise |
 | **5. Confort**            | Statistiques (temps gagné), import depuis une page web, partage d’une recette de famille (fichier ou fiche imprimable), partage d’une fournée, quantités dans les idées, reconnaissance de texte sur photo | Import d’une page schema.org `Recipe` collée ; une recette de famille exportée puis importée sur un autre appareil garde texte, mot et photo                                                                                                                                                       |
 
+| **6. Ce soir et session à plusieurs** (spec 007) | Widget « Ce soir », plan B (adresses, roulette), rappel du dîner et agenda, recettes du soir, prénoms et répartition des tâches, hygiène, vaisselle et nettoyage dans le déroulé | Voir la spec 007 : roulette uniforme, adresses gardées, `.ics` correct, légumes avant la viande crue, lavage des mains au début et rangement à la fin, personne avec deux tâches à la fois |
+
 L’import direct par URL se heurte au CORS dans un navigateur : au MVP, on colle le contenu ou on partage la page vers l’application (Web Share Target). Un petit relais serveur reste une option pour plus tard.
 
 ## 11. Qualité et vérifications
@@ -236,6 +238,8 @@ Décisions prises en livrant (détail dans les specs) :
 - **Décongélation** : 24 h au frigo ; rappel la veille au soir.
 - **Écrans chargés à la demande** pour tenir le budget de 60 ko au démarrage (56 ko avec Dexie).
 - **Reconnaissance de texte sur photo** reportée (ADR 0002) ; import web par copier-coller (CORS).
+- **Notification du dîner** sans serveur : minuterie dans la page et agenda `.ics` (ADR 0003).
+- **Session à plusieurs** : une tâche active va à la personne libre qui a le moins travaillé ; le lavage de la planche après la viande crue fait partie de la découpe (spec 007).
 - **Référencement** : la page reste en `noindex`, comme les autres outils de gharel.github.io : une application personnelle, locale, n’a rien à gagner à être indexée.
 
 Points ouverts : nom définitif (« Fournée » en attendant), licence du code (aucune pour l’instant, donc tous droits réservés).

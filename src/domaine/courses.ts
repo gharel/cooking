@@ -19,6 +19,8 @@ export const PLACARD_PAR_DEFAUT: readonly string[] = [
   'thym',
   'laurier',
   'muscade',
+  'vinaigre',
+  'moutarde',
 ];
 
 export interface Part {

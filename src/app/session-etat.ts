@@ -5,7 +5,8 @@ import type { Recette } from '../domaine/modele';
 import {
   ordonnancer,
   planifier,
-  preparerTaches,
+  tachesDeSession,
+  type OptionsSession,
   type Placement,
   type Planning,
 } from '../domaine/ordonnanceur';
@@ -40,17 +41,23 @@ export async function chargerDerniereSession(): Promise<void> {
   derniereSession.value = historique.value[0] ?? null;
 }
 
-/** Planning vu maintenant : avant la session, le plan prévu ; pendant, recalculé depuis l’état réel. */
+const SANS_HYGIENE: OptionsSession = { hygiene: false, laveVaisselle: false };
+
+/**
+ * Planning vu maintenant : avant la session, le plan prévu avec les options des réglages ; pendant, recalculé
+ * depuis l’état réel avec les options figées au lancement.
+ */
 export function planningCourant(
   f: Fournee,
   recettes: readonly Recette[],
   equipement: Equipement,
+  options: OptionsSession,
   maintenantMs: number,
 ): { planning: Omit<Planning, 'sequentielle'> & { sequentielle: number }; m: number } {
   const s = f.session;
-  if (!s) return { planning: planifier(f.plats, recettes, equipement), m: 0 };
+  if (!s) return { planning: planifier(f.plats, recettes, equipement, {}, options), m: 0 };
   const m = minutesEcoulees(s, maintenantMs);
-  const { taches, veille } = preparerTaches(f.plats, recettes);
+  const { taches, veille } = tachesDeSession(f.plats, recettes, s.options ?? SANS_HYGIENE);
   const { placements, duree } = ordonnancer(taches, equipement, {
     figees: figeesEffectives(s, taches, m),
     apartir: m,
@@ -58,12 +65,16 @@ export function planningCourant(
   return { planning: { taches, veille, placements, duree, sequentielle: s.sequentielle }, m };
 }
 
-export async function lancerSession(recettes: readonly Recette[], equipement: Equipement): Promise<void> {
+export async function lancerSession(
+  recettes: readonly Recette[],
+  equipement: Equipement,
+  options: OptionsSession,
+): Promise<void> {
   preparerSon();
   void demanderNotifications();
   void garderEcranAllume(true);
   await modifierFournee((f) => {
-    const p = planifier(f.plats, recettes, equipement);
+    const p = planifier(f.plats, recettes, equipement, {}, options);
     return {
       ...f,
       statut: 'session',
@@ -73,6 +84,7 @@ export async function lancerSession(recettes: readonly Recette[], equipement: Eq
         faites: [],
         prevue: Math.round(p.duree),
         sequentielle: Math.round(p.sequentielle),
+        options,
       },
     };
   });

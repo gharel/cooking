@@ -25,6 +25,7 @@ interface Brouillon {
   sousTitre: string;
   portions: number;
   vegetarien: boolean;
+  soir: boolean;
   origine: TypeOrigine;
   de: string;
   mot: string;
@@ -48,6 +49,7 @@ function depuisRecette(r: Recette | undefined): Brouillon {
     sousTitre: r?.sousTitre ?? '',
     portions: r?.portions ?? 4,
     vegetarien: r?.vegetarien ?? false,
+    soir: r?.soir ?? false,
     origine: r?.origine.type ?? 'famille',
     de: r?.origine.de ?? '',
     mot: r?.origine.mot ?? '',
@@ -87,6 +89,7 @@ function versRecette(b: Brouillon, existante: Recette | undefined, depart: Recet
     note: ouNull(b.note),
     portions: Math.max(1, Math.round(b.portions) || 4),
     vegetarien: b.vegetarien,
+    soir: b.soir,
     ingredients,
     etapes: b.etapes.map((e) => ({ ...e, texte: e.texte.trim() })).filter((e) => e.texte !== ''),
     conservation: {
@@ -578,6 +581,14 @@ export function Editeur({ recetteId, modele }: { recetteId: string | null; model
                   onChange={(e) => maj({ vegetarien: e.currentTarget.checked })}
                 />
                 Végétarien
+              </label>
+              <label class="case">
+                <input
+                  type="checkbox"
+                  checked={b.soir}
+                  onChange={(ev) => maj({ soir: ev.currentTarget.checked })}
+                />
+                Recette du soir (à cuisiner le jour même)
               </label>
             </div>
           </fieldset>

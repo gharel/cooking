@@ -1,14 +1,33 @@
-import type { Placement, Tache } from '../../domaine/ordonnanceur';
+import { DEPART, type Placement, type Tache } from '../../domaine/ordonnanceur';
 import { teinte } from '../recettes/commun';
 
 const ORDRE = ['plan', 'feu', 'four', 'repos'];
 
-export function libelleVoie(voie: string, cuisiniers: number): string {
+/** Prénom de la personne n (à partir de 1), ou « Personne n » si le prénom est vide. */
+export const nomParticipant = (participants: readonly string[], n: number): string =>
+  participants[n - 1]?.trim() || `Personne ${n}`;
+
+export function libelleVoie(voie: string, participants: readonly string[]): string {
   const [type, n] = voie.split(' ');
-  if (type === 'plan') return cuisiniers > 1 && n ? `Cuisinier ${n}` : 'Plan de travail';
+  if (type === 'plan')
+    return participants.length > 1 && n ? nomParticipant(participants, Number(n)) : 'Plan de travail';
   if (type === 'feu') return `Feu ${n ?? ''}`;
   if (type === 'four') return `Four ${n ?? ''}`;
   return 'Repos';
+}
+
+/** Qui fait l’étape : « Tout le monde » pour le lavage des mains du début, sinon le prénom (à plusieurs). */
+export function quiFait(p: Placement, participants: readonly string[]): string | null {
+  if (p.id === DEPART) return participants.length > 1 ? 'Tout le monde' : null;
+  return participants.length > 1 && p.cuisinier ? nomParticipant(participants, p.cuisinier) : null;
+}
+
+/** « Léa · Feu 2 », « Plan de travail », « Tout le monde » : poste et personne réunis. */
+export function libellePlace(p: Placement, participants: readonly string[]): string {
+  const qui = quiFait(p, participants);
+  const ou = libelleVoie(p.voie, participants);
+  if (!qui) return ou;
+  return p.voie.startsWith('plan') ? qui : `${qui} · ${ou}`;
 }
 
 export const classeTache = (t: Tache | undefined): string =>
@@ -20,12 +39,12 @@ interface Props {
   duree: number;
   maintenant: number | null;
   heure: (minutes: number) => string;
-  cuisiniers: number;
+  participants: readonly string[];
   terminees: ReadonlySet<string>;
 }
 
 /** Frise par poste : une ligne par cuisinier, feu, four ; les repos sur autant de lignes que nécessaire. */
-export function Frise({ taches, placements, duree, maintenant, heure, cuisiniers, terminees }: Props) {
+export function Frise({ taches, placements, duree, maintenant, heure, participants, terminees }: Props) {
   const parId = new Map(taches.map((t) => [t.id, t]));
   const visibles = placements.filter((p) => p.fin - p.debut > 1e-6);
   const echelle = Math.max(duree, maintenant ?? 0, 1);
@@ -66,7 +85,7 @@ export function Frise({ taches, placements, duree, maintenant, heure, cuisiniers
       </div>
       {lignes.map(({ voie, placees, hauteur }) => (
         <div key={voie} class="frise-ligne">
-          <div class="frise-voie">{libelleVoie(voie, cuisiniers)}</div>
+          <div class="frise-voie">{libelleVoie(voie, participants)}</div>
           <div class="frise-piste" style={{ height: `${12 + hauteur * 40}px` }}>
             {placees.map(({ p, piste }) => {
               const t = parId.get(p.id);

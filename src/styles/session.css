@@ -338,3 +338,49 @@
 .mode-cuisine .minuteur-temps {
   font-size: 2.2rem;
 }
+.participants {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.participants li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.participants label {
+  flex: 1;
+  min-width: 0;
+}
+.participants input {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--controle);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--texte);
+  font-weight: 600;
+}
+.grille-preparation .case {
+  margin-bottom: 6px;
+}
+.repartition {
+  display: grid;
+  gap: 16px;
+}
+@media (min-width: 900px) {
+  .repartition {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
+.repartition-personne h3 {
+  font-size: 1.05rem;
+}
+.repartition-personne .aide {
+  margin: 2px 0 10px;
+}
+.repartition .suite {
+  grid-template-columns: 1fr;
+}

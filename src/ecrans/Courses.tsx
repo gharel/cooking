@@ -4,6 +4,7 @@ import { recettes } from '../app/bibliotheque-etat';
 import { fournee, modifierFournee, modifierReglages, reglages } from '../app/fournee-etat';
 import { Icone } from '../app/icones';
 import { listeDeCourses, texteDesCourses, type LigneCourses } from '../domaine/courses';
+import { platsDuSoir } from '../domaine/soir';
 import { dateLongue } from '../domaine/dates';
 
 async function partager(texte: string): Promise<void> {
@@ -63,7 +64,10 @@ function Article({ ligne, coche }: { ligne: LigneCourses; coche: boolean }) {
 export function Courses() {
   const [masquer, setMasquer] = useState(lireMasquer);
   const f = fournee.value;
-  const liste = listeDeCourses(f?.plats ?? [], recettes.value, reglages.value.placard);
+  // Plats de la session, plus les recettes du soir prévues au planning (une portion par personne et par repas).
+  const duSoir = f ? platsDuSoir(f, recettes.value, reglages.value.personnes) : [];
+  const aAcheter = f ? [...f.plats, ...duSoir] : [];
+  const liste = listeDeCourses(aAcheter, recettes.value, reglages.value.placard);
   const coches = new Set(f?.coches ?? []);
   const lignes = liste.rayons.flatMap((r) => r.lignes);
   const faites = lignes.filter((l) => coches.has(l.cle)).length;
@@ -77,8 +81,10 @@ export function Courses() {
             Courses
           </h1>
           <p class="sous-titre">
-            {f ? `Pour la session du ${dateLongue(f.sessionLe)}` : 'Chargement'} · quantités regroupées,
-            rangées par rayon
+            {f
+              ? `Pour la session du ${dateLongue(f.sessionLe)}${duSoir.length ? ' et les recettes du soir' : ''}`
+              : 'Chargement'}{' '}
+            · quantités regroupées, rangées par rayon
           </p>
         </div>
         {lignes.length > 0 && (

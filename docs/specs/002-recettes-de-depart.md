@@ -1,9 +1,10 @@
-# Annexe 002 : les 13 recettes de départ
+# Annexe 002 : les recettes de départ
 
 > Fichier **généré** à partir de `src/donnees/recettes-de-depart.ts` par `npm run annexe` : ne pas le modifier à la main. Un test vérifie qu’il est à jour.
 
 - Quantités et étapes vérifiées le 25 novembre 2026 (sources en fin de document).
-- Toutes les recettes sont pour **4 portions** ; le nombre de portions se choisira au moment de préparer la session (lot 2).
+- 13 recettes de session et 7 recettes du soir (lot 6 : à cuisiner le jour même, hors session).
+- Toutes les recettes sont pour **4 portions** ; le nombre de portions se choisit au moment de prendre un plat.
 
 Lecture des étapes : texte · poste · actif ou passif · durée · dépendances. « Actif » occupe le cuisinier ; « passif » n’occupe que le poste (feu, four, repos). Durées « actif » et « total » calculées par `src/domaine/durees.ts` : « total » va jusqu’au plat prêt avec un seul cuisinier, sans le refroidissement final, les étapes facultatives ni ce qui se fait la veille.
 
@@ -25,7 +26,19 @@ Lecture des étapes : texte · poste · actif ou passif · durée · dépendance
 | Omelette normande             | 29 min | 36 min              | non         |            |      |
 | Brandade de morue             | 26 min | 43 min + la veille  | oui, 3 mois |            | oui  |
 
-Filtres attendus : Végétarien 4, Four 7, Congelable 12, 15 min actives ou moins 3.
+Filtres attendus (recettes de session) : Végétarien 4, Four 7, Congelable 12, 15 min actives ou moins 3.
+
+## Recettes du soir
+
+| Recette du soir   | Actif  | Total  | Végétarien | Four |
+| ----------------- | ------ | ------ | ---------- | ---- |
+| One pot pasta     | 21 min | 21 min | oui        |      |
+| Salade composée   | 18 min | 18 min |            |      |
+| Baguettes garnies | 15 min | 15 min |            |      |
+| Pâtes carbonara   | 12 min | 23 min |            |      |
+| Soupe fajitas     | 28 min | 48 min |            |      |
+| Croque-monsieur   | 10 min | 20 min |            | oui  |
+| Wraps au poulet   | 25 min | 25 min |            |      |
 
 ## Dahl de lentilles
 
@@ -330,6 +343,138 @@ Version salée · 4 portions · frigo 2 jours · ne se congèle pas
 6. Écraser les pommes de terre et la morue avec l’ail, l’huile et un peu du lait chaud ; ajouter le persil · plan de travail · actif · 10 min · après 3 et 5
 7. Parsemer de chapelure et gratiner au four à 200 °C · four · passif · 15 min · après 6 · facultative
 8. Laisser refroidir avant de portionner · repos · passif · 30 min · après 7
+
+## One pot pasta
+
+Tomate et basilic · 4 portions · frigo 2 jours · ne se congèle pas
+
+- 350 g de spaghetti
+- 1 boîte de tomates concassées (400 g)
+- 1 oignon
+- 2 gousses d’ail
+- 1 l de bouillon de légumes
+- ½ botte de basilic
+- 50 g de parmesan
+- 2 c. à s. d’huile d’olive
+- sel
+- poivre
+
+1. Émincer l’oignon et l’ail · plan de travail · actif · 5 min
+2. Mettre dans une grande casserole les pâtes, les tomates, l’oignon, l’ail, le bouillon et l’huile · plan de travail · actif · 2 min · après 1
+3. Cuire à feu moyen en remuant souvent, jusqu’à ce que le liquide soit absorbé · feu · actif · 12 min · après 2
+4. Ajouter le basilic ciselé et le parmesan · plan de travail · actif · 2 min · après 3
+
+## Salade composée
+
+Thon, œufs, maïs · 4 portions · frigo 1 jours · ne se congèle pas
+
+- 1 salade verte
+- 4 tomates
+- 1 concombre
+- 4 œufs
+- 1 boîte de thon (140 g)
+- 1 boîte de maïs doux (285 g)
+- 3 c. à s. d’huile d’olive
+- 1 c. à s. de vinaigre
+- 1 c. à c. de moutarde
+- sel
+- poivre
+
+1. Cuire les œufs durs · feu · passif · 10 min
+2. Laver et couper la salade, les tomates et le concombre · plan de travail · actif · 10 min
+3. Écaler les œufs et les couper en quartiers · plan de travail · actif · 3 min · après 1
+4. Préparer la vinaigrette : moutarde, vinaigre, huile, sel, poivre · plan de travail · actif · 2 min
+5. Assembler la salade avec le thon, le maïs et les œufs ; assaisonner au moment de servir · plan de travail · actif · 3 min · après 2 et 3 et 4
+
+## Baguettes garnies
+
+Jambon, fromage, crudités · 4 portions · frigo 1 jours · ne se congèle pas
+
+- 2 baguettes
+- 200 g de jambon blanc
+- 150 g d’emmental en tranches
+- 2 tomates
+- 1 salade verte
+- 40 g de beurre
+- 8 cornichons
+
+1. Couper les baguettes en deux et les ouvrir · plan de travail · actif · 3 min
+2. Laver la salade, couper les tomates en rondelles et les cornichons en lamelles · plan de travail · actif · 5 min
+3. Beurrer et garnir : jambon, emmental, tomates, cornichons, salade · plan de travail · actif · 7 min · après 1 et 2
+
+## Pâtes carbonara
+
+À la crème fraîche · 4 portions · frigo 2 jours · ne se congèle pas
+
+- 400 g de spaghetti
+- 200 g de lardons
+- 20 cl de crème fraîche
+- 2 jaunes d’œufs
+- 60 g de parmesan
+- poivre
+
+1. Porter à ébullition une grande casserole d’eau salée · feu · passif · 10 min
+2. Cuire les pâtes · feu · passif · 10 min · après 1
+3. Faire dorer les lardons à sec · feu · actif · 6 min
+4. Mélanger la crème, les jaunes d’œufs et le parmesan, poivrer · plan de travail · actif · 3 min
+5. Égoutter les pâtes, mélanger hors du feu avec les lardons et la crème · plan de travail · actif · 3 min · après 2 et 3 et 4
+
+## Soupe fajitas
+
+Poulet, poivrons, haricots rouges · 4 portions · frigo 3 jours · congélateur 3 mois
+
+- 400 g de blancs de poulet
+- 2 poivrons (1 rouge, 1 vert)
+- 1 oignon
+- 2 gousses d’ail
+- 1 boîte de tomates concassées (400 g)
+- 1 boîte de haricots rouges (400 g)
+- 1 boîte de maïs doux (285 g)
+- 1 l de bouillon de volaille
+- 2 c. à c. d’épices à fajitas
+- 1 citron vert
+- 2 c. à s. d’huile
+- 10 cl de crème fraîche (facultatif)
+
+1. Émincer l’oignon et l’ail, couper les poivrons en lanières · plan de travail · actif · 8 min
+2. Couper le poulet en lanières · plan de travail · actif · 6 min
+3. Faire revenir l’oignon, l’ail et les poivrons dans l’huile · feu · actif · 6 min · après 1
+4. Ajouter le poulet et les épices, faire dorer · feu · actif · 6 min · après 2 et 3
+5. Ajouter les tomates, les haricots rincés, le maïs et le bouillon ; mijoter · feu · passif · 20 min · après 4
+6. Ajouter le jus du citron vert ; servir avec la crème · plan de travail · actif · 2 min · après 5
+
+## Croque-monsieur
+
+4 portions · frigo 1 jours · ne se congèle pas
+
+- 8 tranches de pain de mie
+- 4 tranches de jambon blanc
+- 4 tranches d’emmental
+- 100 g de gruyère râpé
+- 40 g de beurre
+
+1. Préchauffer le four à 200 °C · four · passif · 10 min
+2. Beurrer les tranches de pain de mie · plan de travail · actif · 4 min
+3. Garnir de jambon et d’emmental, refermer, parsemer de gruyère · plan de travail · actif · 6 min · après 2
+4. Cuire au four jusqu’à ce que ce soit doré · four · passif · 10 min · après 1 et 3
+
+## Wraps au poulet
+
+4 portions · frigo 1 jours · ne se congèle pas
+
+- 4 galettes de blé
+- 300 g de blancs de poulet
+- 1 avocat
+- 2 tomates
+- 1 salade verte
+- 10 cl de crème fraîche
+- 1 c. à c. d’épices à fajitas
+- 1 c. à s. d’huile
+
+1. Laver la salade, couper les tomates et l’avocat · plan de travail · actif · 6 min
+2. Couper le poulet en lanières · plan de travail · actif · 5 min
+3. Faire dorer le poulet avec les épices · feu · actif · 8 min · après 2
+4. Garnir les galettes : crème, salade, tomates, avocat, poulet ; rouler · plan de travail · actif · 6 min · après 1 et 3
 
 ## Sources
 

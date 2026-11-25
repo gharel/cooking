@@ -33,6 +33,13 @@ export default defineConfig(({ command, isPreview }) => ({
         display: 'standalone',
         background_color: '#faf7f2',
         theme_color: '#faf7f2',
+        // Raccourcis de l’icône (appui long) : les widgets du système sont hors de portée (ADR 0003).
+        shortcuts: [
+          { name: 'Ce soir', short_name: 'Ce soir', url: './#semaine' },
+          { name: 'Liste de courses', short_name: 'Courses', url: './#courses' },
+          { name: 'Session de cuisine', short_name: 'Session', url: './#session' },
+          { name: 'Ce qu’il reste', short_name: 'Restes', url: './#reste' },
+        ],
         // Recevoir le partage d’une page de recette depuis une autre application (Android).
         share_target: {
           action: './',

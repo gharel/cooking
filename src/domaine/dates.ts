@@ -78,3 +78,7 @@ export function dateCourte(d: DateISO): string {
   const x = versDate(d);
   return `${deux(x.getDate())}/${deux(x.getMonth() + 1)}`;
 }
+
+/** « 19:30 » devient « 19 h 30 », « 14:00 » devient « 14 h ». */
+export const heureLisible = (h: string) =>
+  h.replace(/^0?(\d+):(\d+)$/, (_, hh: string, mm: string) => (mm === '00' ? `${hh} h` : `${hh} h ${mm}`));

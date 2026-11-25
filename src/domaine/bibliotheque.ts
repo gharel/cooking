@@ -2,9 +2,10 @@ import { dureeActive } from './durees';
 import { estCongelable, passeAuFour, type Recette } from './modele';
 import { normaliser } from './texte';
 
-export type Filtre = 'famille' | 'congelable' | 'vegetarien' | 'four' | 'rapide';
+export type Filtre = 'soir' | 'famille' | 'congelable' | 'vegetarien' | 'four' | 'rapide';
 
 export const FILTRES: readonly { id: Filtre; nom: string }[] = [
+  { id: 'soir', nom: 'Du soir' },
   { id: 'famille', nom: 'Famille et maison' },
   { id: 'congelable', nom: 'Congelable' },
   { id: 'vegetarien', nom: 'Végétarien' },
@@ -14,6 +15,8 @@ export const FILTRES: readonly { id: Filtre; nom: string }[] = [
 
 export function correspond(recette: Recette, filtre: Filtre): boolean {
   switch (filtre) {
+    case 'soir':
+      return recette.soir;
     case 'famille':
       return recette.origine.type === 'famille' || recette.origine.type === 'maison';
     case 'congelable':

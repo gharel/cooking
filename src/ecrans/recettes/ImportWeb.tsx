@@ -36,6 +36,7 @@ function ImportWebOuvert({
       note: null,
       portions: lue.portions ?? 4,
       vegetarien: false,
+      soir: false,
       ingredients: lue.ingredients.map((l) => analyserIngredient(l)),
       etapes: [],
       conservation: { frigoJours: 3, congelateurMois: 3 },

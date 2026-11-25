@@ -3,7 +3,8 @@ import { fournee, modifierFournee, modifierReglages, reglages } from '../app/fou
 import { Icone, type NomIcone } from '../app/icones';
 import { ancreFiche } from '../app/routage';
 import { listeDeCourses } from '../domaine/courses';
-import { dateLongue, dateSansJour, jourCourt, nomDuJour, numeroDuJour } from '../domaine/dates';
+import { dateLongue, dateSansJour, heureLisible, jourCourt, nomDuJour, numeroDuJour } from '../domaine/dates';
+import { platsDuSoir } from '../domaine/soir';
 import {
   alertes,
   changerDateSession,
@@ -25,6 +26,7 @@ import { partagerTexte } from '../app/partager';
 import { plats as platsStock } from '../app/stock-etat';
 import { aujourdhui } from '../domaine/dates';
 import { teinte } from './recettes/commun';
+import { CeSoir } from './semaine/CeSoir';
 import { Compteur, ouvrirChoixPlat } from './semaine/ChoixPlat';
 
 const ICONES_ALERTES: Readonly<Record<TypeAlerte, NomIcone>> = {
@@ -35,8 +37,6 @@ const ICONES_ALERTES: Readonly<Record<TypeAlerte, NomIcone>> = {
 };
 
 const pluriel = (n: number, mot: string) => `${n} ${mot}${n > 1 ? 's' : ''}`;
-export const heureLisible = (h: string) =>
-  h.replace(/^0?(\d+):(\d+)$/, (_, hh: string, mm: string) => (mm === '00' ? `${hh} h` : `${hh} h ${mm}`));
 
 function ListeAlertes({ liste }: { liste: Alerte[] }) {
   if (liste.length === 0) return <p class="aide">Rien à signaler pour l’instant.</p>;
@@ -86,7 +86,10 @@ export function Semaine() {
     personnes,
     aujourdhui(),
   );
-  const articles = listeDeCourses(plats, recettes.value, placard).total;
+  const duSoir = platsDuSoir(f, recettes.value, personnes);
+  const articles = listeDeCourses([...plats, ...duSoir], recettes.value, placard).total;
+  const enPlats = new Set(plats.map((p) => p.recetteId));
+  const recettesDuSoir = recettes.value.filter((r) => r.soir && !enPlats.has(r.id));
 
   return (
     <section class="vue" aria-labelledby="titre-semaine">
@@ -111,6 +114,8 @@ export function Semaine() {
           />
         </div>
       </div>
+
+      <CeSoir />
 
       <div class="carte carte-session">
         <div>
@@ -330,6 +335,15 @@ export function Semaine() {
                             {plats.map((p) => (
                               <option key={p.recetteId} value={`r:${p.recetteId}`}>
                                 {parId.get(p.recetteId)?.nom}
+                              </option>
+                            ))}
+                          </optgroup>
+                        )}
+                        {recettesDuSoir.length > 0 && (
+                          <optgroup label="Recettes du soir (le jour même)">
+                            {recettesDuSoir.map((r) => (
+                              <option key={r.id} value={`r:${r.id}`}>
+                                {r.nom}
                               </option>
                             ))}
                           </optgroup>

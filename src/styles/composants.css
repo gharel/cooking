@@ -170,3 +170,11 @@
   width: 18px;
   height: 18px;
 }
+
+/* Rangée de boutons (comme dans la maquette). */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}

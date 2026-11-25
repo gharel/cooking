@@ -15,13 +15,24 @@ export async function installerRecettesDeDepart(
   base: BaseFournee,
   { manquantesSeulement = false } = {},
 ): Promise<number> {
-  if (!manquantesSeulement && (await base.reglages.get(CLE_DEPART))) return 0;
   const depart = await chargerDepart();
   return base.transaction('rw', base.recettes, base.reglages, async () => {
+    // Recettes de départ déjà proposées : une liste d’identifiants ; avant le lot 6, une simple date
+    // voulait dire « les recettes de session ». Les nouvelles (recettes du soir) s’ajoutent une fois.
+    const reglage = (await base.reglages.get(CLE_DEPART))?.valeur;
+    const proposees = new Set<string>(
+      Array.isArray(reglage)
+        ? (reglage as string[])
+        : reglage
+          ? depart.filter((r) => !r.soir).map((r) => r.id)
+          : [],
+    );
     const presentes = new Set(await base.recettes.toCollection().primaryKeys());
-    const aAjouter = depart.filter((r) => !presentes.has(r.id));
+    const aAjouter = depart.filter(
+      (r) => !presentes.has(r.id) && (manquantesSeulement || !proposees.has(r.id)),
+    );
     await base.recettes.bulkAdd(aAjouter);
-    await base.reglages.put({ cle: CLE_DEPART, valeur: new Date().toISOString() });
+    await base.reglages.put({ cle: CLE_DEPART, valeur: depart.map((r) => r.id) });
     return aAjouter.length;
   });
 }

@@ -1,10 +1,19 @@
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
 import {
+  ajouterHygiene,
+  APRES_CRU,
+  DEPART,
+  DUREE_APRES_CRU,
   dureeSequentielle,
+  estDecoupeCrue,
+  estTacheCommune,
+  MENAGE_FIN,
+  MENAGE_MILIEU,
   ordonnancer,
   planifier,
   preparerTaches,
+  RANGEMENT,
   type Placement,
   type Tache,
 } from '../../src/domaine/ordonnanceur';
@@ -184,6 +193,84 @@ describe('ordonnanceur : la fournée de démonstration', () => {
     expect(huit[0]?.duree).toBe(Math.round((quatre[0]?.duree ?? 0) * 1.5));
     expect(huit.find((t) => t.texte.includes('mijoter'))?.duree).toBe(
       quatre.find((t) => t.texte.includes('mijoter'))?.duree,
+    );
+  });
+});
+
+describe('hygiène, ménage et session à plusieurs', () => {
+  const fajitas = [{ recetteId: 'soir-soupe-fajitas', portions: 4 }];
+  const debutDe = (pl: readonly Placement[], id: string) => pl.find((p) => p.id === id)?.debut ?? NaN;
+  const finDe = (pl: readonly Placement[], id: string) => pl.find((p) => p.id === id)?.fin ?? NaN;
+
+  it('soupe fajitas : légumes avant le poulet cru, puis planche et mains lavées par la même personne', () => {
+    for (const cuisiniers of [1, 2]) {
+      const p = planifier(fajitas, recettes, { ...MAISON, cuisiniers });
+      const legumes = p.taches.find((t) => t.texte.startsWith('Émincer l’oignon'));
+      const poulet = p.taches.find((t) => t.texte.startsWith('Couper le poulet'));
+      expect(legumes && poulet).toBeTruthy();
+      if (!legumes || !poulet) return;
+      expect(estDecoupeCrue(poulet)).toBe(true);
+      expect(poulet.texte).toBe(`Couper le poulet en lanières, ${APRES_CRU}`);
+      expect(poulet.duree).toBeGreaterThanOrEqual(6 + DUREE_APRES_CRU);
+      expect(debutDe(p.placements, poulet.id)).toBeGreaterThanOrEqual(finDe(p.placements, legumes.id) - EPS);
+    }
+  });
+
+  it('commence par le lavage des mains, finit par le rangement, compte vaisselle et nettoyage', () => {
+    const avec = planifier(fajitas, recettes, MAISON, {}, { hygiene: true, laveVaisselle: true });
+    const sans = planifier(fajitas, recettes, MAISON, {}, { hygiene: true, laveVaisselle: false });
+    for (const p of [avec, sans]) {
+      expect(debutDe(p.placements, DEPART)).toBe(0);
+      for (const t of p.taches)
+        if (t.id !== DEPART && !t.prechauffage)
+          expect(debutDe(p.placements, t.id)).toBeGreaterThanOrEqual(3 - EPS);
+      expect(finDe(p.placements, RANGEMENT)).toBe(p.duree);
+    }
+    const duree = (p: typeof avec, id: string) => p.taches.find((t) => t.id === id)?.duree;
+    expect([duree(avec, MENAGE_MILIEU), duree(avec, MENAGE_FIN)]).toEqual([5, 12]);
+    expect([duree(sans, MENAGE_MILIEU), duree(sans, MENAGE_FIN)]).toEqual([15, 25]);
+    expect(avec.taches.find((t) => t.id === MENAGE_MILIEU)?.texte).toMatch(/lave-vaisselle/);
+    expect(sans.taches.find((t) => t.id === MENAGE_FIN)?.texte).toMatch(/Finir la vaisselle/);
+    expect(sans.duree).toBeGreaterThan(avec.duree);
+    const brut = planifier(fajitas, recettes, MAISON, {}, { hygiene: false, laveVaisselle: true });
+    expect(brut.taches.some((t) => estTacheCommune(t.id))).toBe(false);
+  });
+
+  it('à deux : chaque tâche active a sa personne, personne n’en fait deux à la fois, la charge est partagée', () => {
+    const demo = ['depart-chili', 'depart-gratin-dauphinois', 'soir-soupe-fajitas'].map((recetteId) => ({
+      recetteId,
+      portions: 4,
+    }));
+    const eq = { ...MAISON, cuisiniers: 2 };
+    const p = planifier(demo, recettes, eq);
+    const parId = new Map(p.taches.map((t) => [t.id, t]));
+    const actives = p.placements.filter((x) => parId.get(x.id)?.active && x.fin - x.debut > EPS);
+    for (const x of actives) expect([1, 2]).toContain(x.cuisinier);
+    for (const a of actives)
+      for (const b of actives)
+        if (a !== b && a.cuisinier === b.cuisinier)
+          expect(a.fin <= b.debut + EPS || b.fin <= a.debut + EPS).toBe(true);
+    const travail = (k: number) =>
+      actives.filter((x) => x.cuisinier === k).reduce((s, x) => s + x.fin - x.debut, 0);
+    expect(Math.min(travail(1), travail(2))).toBeGreaterThan(0.6 * Math.max(travail(1), travail(2)));
+    expect(p.duree).toBeLessThan(planifier(demo, recettes, MAISON).duree);
+  });
+
+  it('propriétés de l’ordonnanceur toujours vraies avec l’hygiène et le ménage', () => {
+    fc.assert(
+      fc.property(arbTaches, arbEquipement, fc.boolean(), (brutes, eq, lv) => {
+        const taches = ajouterHygiene(brutes, 3, lv);
+        const { placements, duree } = ordonnancer(taches, eq);
+        expect(placements).toHaveLength(taches.length);
+        const parId = new Map(placements.map((p) => [p.id, p]));
+        for (const t of taches)
+          for (const d of t.apres)
+            expect(parId.get(t.id)?.debut ?? 0).toBeGreaterThanOrEqual((parId.get(d)?.fin ?? 0) - EPS);
+        verifierRessources(taches, placements, eq);
+        expect(duree).toBeGreaterThanOrEqual(cheminCritique(taches) - EPS);
+        expect(parId.get(RANGEMENT)?.fin).toBe(duree);
+      }),
+      { numRuns: 200 },
     );
   });
 });

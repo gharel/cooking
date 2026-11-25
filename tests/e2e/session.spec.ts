@@ -27,13 +27,40 @@ test('préparer : durée estimée, gain, équipement, veille, déroulé complet'
   await expect(page.locator('.veille')).toContainText('Dessaler la morue');
   const etapes = page.locator('.deroule li');
   await expect(etapes.first()).toBeVisible();
+  // Lavage des mains au début (en même temps que le préchauffage), rangement à la fin.
+  const mains = etapes.filter({ hasText: 'Tout le monde se lave les mains' });
+  await expect(mains).toHaveCount(1);
+  expect(await mains.locator('time').textContent()).toBe(await etapes.first().locator('time').textContent());
+  await expect(etapes.last()).toContainText('Portionner, étiqueter');
+  await expect(page.locator('.deroule')).toContainText('Charger le lave-vaisselle');
   const avant = await etapes.count();
-  await page
-    .getByRole('group', { name: 'Cuisiniers' })
-    .getByRole('button', { name: /une de plus/ })
-    .click();
-  await expect(page.locator('.frise-voie', { hasText: 'Cuisinier 2' })).toHaveCount(1);
+
+  // À deux : prénoms, répartition, frise par personne.
+  await page.getByLabel('Prénom de la personne 1').fill('Alex');
+  await page.getByRole('button', { name: 'Ajouter une personne' }).click();
+  await page.getByLabel('Prénom de la personne 2').fill('Sam');
+  await expect(page.locator('.frise-voie', { hasText: 'Sam' })).toHaveCount(1);
+  await expect(page.getByRole('heading', { name: 'Qui fait quoi' })).toBeVisible();
+  await expect(page.locator('.repartition-personne')).toHaveCount(2);
+  await expect(page.locator('.repartition-personne').nth(1)).toContainText(/\d+\sétapes?\s·/);
   expect(await etapes.count()).toBe(avant);
+
+  // Sans lave-vaisselle : la vaisselle à la main, plus longue.
+  await page.getByRole('checkbox', { name: 'Lave-vaisselle' }).uncheck();
+  await expect(page.locator('.deroule')).toContainText('Faire la vaisselle de la préparation');
+  await page.reload();
+  await expect(page.getByLabel('Prénom de la personne 2')).toHaveValue('Sam');
+  await expect(page.getByRole('checkbox', { name: 'Lave-vaisselle' })).not.toBeChecked();
+});
+
+test('soupe fajitas : les légumes passent sur la planche avant le poulet cru', async ({ page }) => {
+  await preparerFournee(page, ['Soupe fajitas']);
+  const textes = await page.locator('.deroule li strong').allTextContents();
+  const legumes = textes.findIndex((t) => t.startsWith('Émincer l’oignon'));
+  const poulet = textes.findIndex((t) => t.startsWith('Couper le poulet'));
+  expect(legumes).toBeGreaterThan(0);
+  expect(poulet).toBeGreaterThan(legumes);
+  expect(textes[poulet]).toContain('puis laver la planche et le couteau, se laver les mains');
 });
 
 test('en direct : étape terminée, minuteur qui s’écoule, fin de session et plats rangés', async ({

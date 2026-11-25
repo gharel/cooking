@@ -8,9 +8,18 @@ import { genererAnnexe } from '../outils/annexe';
 const recettes = recettesDeDepart();
 
 describe('recettes de départ', () => {
-  it('sont les 13 recettes de la maison, pour 4 portions, aux identifiants uniques', () => {
-    expect(recettes).toHaveLength(13);
-    expect(new Set(recettes.map((r) => r.id)).size).toBe(13);
+  it('sont 13 recettes de session et 7 du soir, pour 4 portions, aux identifiants uniques', () => {
+    expect(recettes.filter((r) => !r.soir)).toHaveLength(13);
+    expect(recettes.filter((r) => r.soir).map((r) => r.nom)).toEqual([
+      'One pot pasta',
+      'Salade composée',
+      'Baguettes garnies',
+      'Pâtes carbonara',
+      'Soupe fajitas',
+      'Croque-monsieur',
+      'Wraps au poulet',
+    ]);
+    expect(new Set(recettes.map((r) => r.id)).size).toBe(20);
     expect(recettes.every((r) => r.portions === 4)).toBe(true);
   });
 
@@ -39,7 +48,7 @@ describe('recettes de départ', () => {
     ['congelable', 12],
     ['rapide', 3],
   ] as const)('filtre %s : %i recettes', (filtre, attendu) => {
-    expect(recettes.filter((r) => correspond(r, filtre)).length).toBe(attendu);
+    expect(recettes.filter((r) => !r.soir && correspond(r, filtre)).length).toBe(attendu);
   });
 
   it('se retrouvent par la recherche, sans accents', () => {

@@ -86,6 +86,8 @@ export function verifierRecette(v: unknown, chemin = 'recette'): string[] {
   if (!estNombre(v.portions) || v.portions < 1)
     erreurs.push(`${chemin}.portions : nombre de portions invalide`);
   if (!estBooleen(v.vegetarien)) erreurs.push(`${chemin}.vegetarien : valeur invalide`);
+  // Absent des exports d’avant le lot 6 : une recette sans indication n’est pas « du soir ».
+  if (v.soir !== undefined && !estBooleen(v.soir)) erreurs.push(`${chemin}.soir : valeur invalide`);
   if (!estChaineOuNull(v.texteOriginal)) erreurs.push(`${chemin}.texteOriginal : valeur invalide`);
   if (!estChaineOuNull(v.sousTitre) || !estChaineOuNull(v.note))
     erreurs.push(`${chemin} : sous-titre ou note invalide`);

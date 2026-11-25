@@ -1,4 +1,4 @@
-import { reperer } from './dictionnaire';
+import { estCru, reperer } from './dictionnaire';
 import type { PlatDeFournee } from './fournee';
 import type { Etape, Poste, Recette } from './modele';
 import type { Equipement } from './reglages';
@@ -221,6 +221,8 @@ export function ordonnancer(
   for (const [id, p] of Object.entries(contraintes.figees ?? {})) if (parId.has(id)) placer({ ...p, id });
 
   const actifs = (t: number) => placements.filter((p) => p.fin - p.debut > EPS && couvre(p, t));
+  const travail = (k: number) =>
+    placements.reduce((s, p) => s + (p.cuisinier === k && parId.get(p.id)?.active ? p.fin - p.debut : 0), 0);
 
   function voieLibre(
     x: Tache,
@@ -229,8 +231,16 @@ export function ordonnancer(
     const occupes = actifs(t);
     let cuisinier: number | null = null;
     if (x.active) {
-      for (let k = 1; k <= cuisiniers && cuisinier === null; k++)
-        if (!occupes.some((p) => p.cuisinier === k)) cuisinier = k;
+      // Parmi les cuisiniers libres, celui qui a le moins travaillé : la charge est partagée.
+      let moins = Infinity;
+      for (let k = 1; k <= cuisiniers; k++) {
+        if (occupes.some((p) => p.cuisinier === k)) continue;
+        const fait = travail(k);
+        if (fait < moins - EPS) {
+          moins = fait;
+          cuisinier = k;
+        }
+      }
       if (cuisinier === null) return null;
     }
     if (x.poste === 'feu') {
@@ -324,17 +334,155 @@ export function ordonnancer(
   return { placements, duree: Math.max(0, ...placements.map((p) => p.fin)) };
 }
 
-/** Durée en enchaînant les recettes une à une (un cuisinier, même équipement) : la référence du gain. */
+/** Options d’organisation de la session (réglages). */
+export interface OptionsSession {
+  /** Gestes d’hygiène, vaisselle, nettoyage et rangement dans le déroulé. */
+  hygiene: boolean;
+  laveVaisselle: boolean;
+}
+
+export const OPTIONS_PAR_DEFAUT: OptionsSession = { hygiene: true, laveVaisselle: true };
+
+const DECOUPE =
+  /^(couper|emincer|hacher|decouper|tailler|parer|detailler|eplucher|ciseler|raper|laver et couper)\b/;
+const estDecoupe = (t: Tache) => t.active && t.poste === 'plan' && DECOUPE.test(normaliser(t.texte));
+/** Découpe de viande ou de poisson crus (poulet, bœuf haché, chair à saucisse, saumon). */
+export const estDecoupeCrue = (t: Tache): boolean =>
+  estDecoupe(t) && reperer(normaliser(t.texte)).some((o) => estCru(o.cle));
+
+export const DEPART = 'hygiene:depart';
+export const MENAGE_MILIEU = 'menage:milieu';
+export const MENAGE_FIN = 'menage:fin';
+export const RANGEMENT = 'rangement';
+export const estTacheCommune = (id: string): boolean =>
+  id === DEPART || id === MENAGE_MILIEU || id === MENAGE_FIN || id === RANGEMENT || id.startsWith('hygiene:');
+
+const tache = (
+  id: string,
+  texte: string,
+  duree: number,
+  apres: string[],
+  recettes: string[] = [],
+): Tache => ({
+  id,
+  texte,
+  recettes,
+  poste: 'plan',
+  duree,
+  active: true,
+  apres,
+  facultative: false,
+  temperature: null,
+  prechauffage: false,
+});
+
+function descendants(taches: readonly Tache[], id: string): Set<string> {
+  const successeurs = new Map<string, string[]>();
+  for (const t of taches) for (const d of t.apres) successeurs.set(d, [...(successeurs.get(d) ?? []), t.id]);
+  const vus = new Set<string>();
+  const pile = [id];
+  while (pile.length) {
+    const x = pile.pop() ?? '';
+    for (const s of successeurs.get(x) ?? [])
+      if (!vus.has(s)) {
+        vus.add(s);
+        pile.push(s);
+      }
+  }
+  return vus;
+}
+
+/** Ajouté à la découpe de viande crue, par la même personne, juste après. */
+export const APRES_CRU = 'puis laver la planche et le couteau, se laver les mains';
+export const DUREE_APRES_CRU = 2;
+
+/**
+ * Hygiène et ménage dans le déroulé : mains lavées au début ; légumes découpés avant la viande crue, puis
+ * planche, couteau et mains lavés par la même personne ; vaisselle ou lave-vaisselle après les préparations ; nettoyage pendant le
+ * refroidissement ; portionnage, étiquetage et rangement à la fin.
+ */
+export function ajouterHygiene(taches: readonly Tache[], nbPlats: number, laveVaisselle: boolean): Tache[] {
+  if (taches.length === 0) return [];
+  const liste = taches.map((t) => ({ ...t, apres: [...t.apres] }));
+  const crues = liste.filter(estDecoupeCrue);
+  const legumes = liste.filter((t) => estDecoupe(t) && !estDecoupeCrue(t));
+  for (const c of crues)
+    for (const l of legumes) {
+      if (c.apres.includes(l.id) || descendants(liste, c.id).has(l.id)) continue;
+      c.apres.push(l.id);
+    }
+  for (const c of crues) {
+    c.texte = `${c.texte}, ${APRES_CRU}`;
+    c.duree += DUREE_APRES_CRU;
+  }
+  const resultat: Tache[] = liste;
+  for (const t of resultat) if (t.apres.length === 0 && !t.prechauffage) t.apres = [DEPART];
+  const depart = tache(
+    DEPART,
+    'Tout le monde se lave les mains ; sortir planches, couteaux et contenants',
+    3,
+    [],
+  );
+  const preparations = resultat.filter((t) => t.active && t.poste === 'plan').map((t) => t.id);
+  const milieu = tache(
+    MENAGE_MILIEU,
+    laveVaisselle
+      ? 'Charger le lave-vaisselle avec la vaisselle de la préparation'
+      : 'Faire la vaisselle de la préparation',
+    laveVaisselle ? 5 : 15,
+    [DEPART, ...preparations],
+  );
+  const fin = tache(
+    MENAGE_FIN,
+    laveVaisselle
+      ? 'Lancer le lave-vaisselle, nettoyer le plan de travail, les feux et l’évier'
+      : 'Finir la vaisselle, nettoyer le plan de travail, les feux et l’évier',
+    laveVaisselle ? 12 : 25,
+    [...resultat.filter((t) => t.poste !== 'repos').map((t) => t.id), MENAGE_MILIEU],
+  );
+  const rangement = tache(
+    RANGEMENT,
+    'Portionner, étiqueter (nom, date) et ranger au frigo ou au congélateur',
+    Math.max(5, 2 * nbPlats),
+    [DEPART, ...resultat.map((t) => t.id), MENAGE_MILIEU, MENAGE_FIN],
+  );
+  return [depart, ...resultat, milieu, fin, rangement];
+}
+
+/** Session complète : tâches des plats, puis hygiène et ménage si l’option est active. */
+export function tachesDeSession(
+  plats: readonly PlatDeFournee[],
+  recettes: readonly Recette[],
+  options: OptionsSession = OPTIONS_PAR_DEFAUT,
+): { taches: Tache[]; veille: TacheVeille[] } {
+  const { taches, veille } = preparerTaches(plats, recettes);
+  return {
+    taches: options.hygiene ? ajouterHygiene(taches, plats.length, options.laveVaisselle) : taches,
+    veille,
+  };
+}
+
+/**
+ * Durée en enchaînant les recettes une à une (un cuisinier, même équipement), plus l’hygiène et le ménage
+ * qu’on ferait de toute façon : la référence du gain.
+ */
 export function dureeSequentielle(
   plats: readonly PlatDeFournee[],
   recettes: readonly Recette[],
   equipement: Equipement,
+  options: OptionsSession = OPTIONS_PAR_DEFAUT,
 ): number {
-  return plats.reduce(
+  const recetteParRecette = plats.reduce(
     (total, p) =>
       total + ordonnancer(preparerTaches([p], recettes).taches, { ...equipement, cuisiniers: 1 }).duree,
     0,
   );
+  const somme = (ts: readonly Tache[]) => ts.reduce((total, t) => total + t.duree, 0);
+  const sans = preparerTaches(plats, recettes).taches;
+  const communes = options.hygiene
+    ? somme(ajouterHygiene(sans, plats.length, options.laveVaisselle)) - somme(sans)
+    : 0;
+  return recetteParRecette + communes;
 }
 
 export interface Planning {
@@ -350,8 +498,15 @@ export function planifier(
   recettes: readonly Recette[],
   equipement: Equipement,
   contraintes: Contraintes = {},
+  options: OptionsSession = OPTIONS_PAR_DEFAUT,
 ): Planning {
-  const { taches, veille } = preparerTaches(plats, recettes);
+  const { taches, veille } = tachesDeSession(plats, recettes, options);
   const { placements, duree } = ordonnancer(taches, equipement, contraintes);
-  return { taches, veille, placements, duree, sequentielle: dureeSequentielle(plats, recettes, equipement) };
+  return {
+    taches,
+    veille,
+    placements,
+    duree,
+    sequentielle: dureeSequentielle(plats, recettes, equipement, options),
+  };
 }

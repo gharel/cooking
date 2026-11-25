@@ -245,6 +245,7 @@ export function recetteDepuisIdee(idee: IdeeCatalogue, id: string, maintenant: s
     note: 'Adaptez aux restes du frigo : les quantités sont indicatives.',
     portions: 4,
     vegetarien: idee.vegetarien,
+    soir: true,
     ingredients: idee.ingredients.map((l) => analyserIngredient(l)),
     etapes: structurer(idee.texte).etapes,
     conservation: { frigoJours: 2, congelateurMois: null },

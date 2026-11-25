@@ -9,7 +9,7 @@ const cartes = (page: Page) => page.locator('.carte-recette');
 
 async function bibliotheque(page: Page): Promise<void> {
   await page.goto('./#recettes');
-  await expect(cartes(page)).toHaveCount(13);
+  await expect(cartes(page)).toHaveCount(20);
 }
 
 /** Les confirmations (supprimer, abandonner) sont acceptées. */
@@ -28,7 +28,7 @@ async function creerHachis(page: Page): Promise<void> {
   await editeur.getByRole('button', { name: 'Proposer les étapes' }).click();
 }
 
-test('la bibliothèque contient les 13 recettes de départ, se fouille et se filtre', async ({ page }) => {
+test('la bibliothèque contient les 20 recettes de départ, se fouille et se filtre', async ({ page }) => {
   await bibliotheque(page);
   const recherche = page.getByRole('searchbox', { name: 'Rechercher une recette' });
   await recherche.fill('gratin');
@@ -38,13 +38,13 @@ test('la bibliothèque contient les 13 recettes de départ, se fouille et se fil
   await recherche.fill('');
   const filtres = page.getByRole('group', { name: 'Filtres' });
   await filtres.getByRole('button', { name: 'Végétarien' }).click();
-  await expect(cartes(page)).toHaveCount(4);
+  await expect(cartes(page)).toHaveCount(5);
   await filtres.getByRole('button', { name: 'Four' }).click();
   await expect(cartes(page)).toHaveCount(2);
   await filtres.getByRole('button', { name: 'Végétarien' }).click();
   await filtres.getByRole('button', { name: 'Four' }).click();
   await filtres.getByRole('button', { name: 'Congelable' }).click();
-  await expect(cartes(page)).toHaveCount(12);
+  await expect(cartes(page)).toHaveCount(13);
 });
 
 test('la fiche montre les étapes, ce qui se fait la veille et les sous-recettes', async ({ page }) => {
@@ -62,7 +62,7 @@ test('la fiche montre les étapes, ce qui se fait la veille et les sous-recettes
 test('un identifiant inconnu affiche la bibliothèque et un message', async ({ page }) => {
   await page.goto('./#recettes/nimporte-quoi');
   await expect(page.getByText(/Cette recette n’existe pas ou plus/)).toBeVisible();
-  await expect(cartes(page)).toHaveCount(13);
+  await expect(cartes(page)).toHaveCount(20);
 });
 
 test('une recette de famille racontée devient structurée, et son texte est gardé à l’identique', async ({
@@ -114,7 +114,7 @@ test('modifier, abandonner, dupliquer, supprimer puis annuler', async ({ page })
 
   await page.getByRole('button', { name: 'Supprimer' }).click();
   await expect(page).toHaveURL(/#recettes$/);
-  await expect(cartes(page)).toHaveCount(13);
+  await expect(cartes(page)).toHaveCount(20);
   await page.getByRole('button', { name: 'Annuler' }).click();
   await expect(page).toHaveURL(adresseCopie);
   await expect(page.locator('main h1')).toHaveText('Dahl de la maison (copie)');
@@ -124,11 +124,11 @@ test('une recette de départ supprimée se réinstalle à la demande', async ({ 
   accepterConfirmations(page);
   await page.goto('./#recettes/depart-ratatouille');
   await page.getByRole('button', { name: 'Supprimer' }).click();
-  await expect(cartes(page)).toHaveCount(12);
+  await expect(cartes(page)).toHaveCount(19);
   await page.reload();
-  await expect(cartes(page)).toHaveCount(12);
+  await expect(cartes(page)).toHaveCount(19);
   await page.getByRole('button', { name: /Réinstaller les recettes de départ manquantes \(1\)/ }).click();
-  await expect(cartes(page)).toHaveCount(13);
+  await expect(cartes(page)).toHaveCount(20);
 });
 
 test('une photo de la fiche est réduite, affichée et gardée', async ({ page }) => {
@@ -174,12 +174,12 @@ test('export puis import dans un navigateur vierge ; un fichier invalide est ref
   // Attendre la fin de l’enregistrement (fiche affichée) avant de changer d’écran.
   await expect(page.locator('main h1')).toHaveText('Hachis parmentier de maman');
   await page.goto('./#recettes');
-  await expect(cartes(page)).toHaveCount(14);
+  await expect(cartes(page)).toHaveCount(21);
   const telechargement = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Exporter' }).click();
   const fichier = await (await telechargement).path();
   const contenu = readFileSync(fichier, 'utf8');
-  expect(JSON.parse(contenu).recettes).toHaveLength(14);
+  expect(JSON.parse(contenu).recettes).toHaveLength(21);
 
   const vierge = await (await browser.newContext()).newPage();
   await bibliotheque(vierge);
@@ -190,9 +190,9 @@ test('export puis import dans un navigateur vierge ; un fichier invalide est ref
     buffer: Buffer.from(contenu),
   });
   await expect(vierge.getByRole('status').filter({ hasText: /importée/ })).toHaveText(
-    /1\srecette importée, 13\sdéjà présentes ignorées/,
+    /1\srecette importée, 20\sdéjà présentes ignorées/,
   );
-  await expect(cartes(vierge)).toHaveCount(14);
+  await expect(cartes(vierge)).toHaveCount(21);
 
   await champ.setInputFiles({
     name: 'casse.json',
@@ -209,7 +209,7 @@ test('export puis import dans un navigateur vierge ; un fichier invalide est ref
     buffer: Buffer.from(JSON.stringify(abime)),
   });
   await expect(vierge.getByRole('alert')).toContainText('nom manquant');
-  await expect(cartes(vierge)).toHaveCount(14);
+  await expect(cartes(vierge)).toHaveCount(21);
   await vierge.context().close();
 });
 

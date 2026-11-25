@@ -6,7 +6,9 @@ Les demandes explicites de l’utilisateur priment sur ce document.
 
 ## État du projet
 
-**Version 1 livrée** les 25 et 26 novembre 2026 : lots 0 à 5 du plan, une spec par lot (`docs/specs/001` à `006`), toutes au statut « livrée ». Les lots 2 à 5 ont été validés par délégation (objectif donné par l’utilisateur : « livrer l’application en suivant le plan et les décisions prises ») ; les choix faits en route sont écrits dans chaque spec et dans les ADR. La maquette reste en ligne comme référence visuelle (https://gharel.github.io/cooking/maquette/). Toute nouvelle fonctionnalité repart d’une spec `docs/specs/007-…`.
+**Version 1 livrée** les 25 et 26 novembre 2026 : lots 0 à 5 du plan, une spec par lot (`docs/specs/001` à `006`), toutes au statut « livrée ». Les lots 2 à 5 ont été validés par délégation (objectif donné par l’utilisateur : « livrer l’application en suivant le plan et les décisions prises ») ; les choix faits en route sont écrits dans chaque spec et dans les ADR. La maquette reste en ligne comme référence visuelle (https://gharel.github.io/cooking/maquette/).
+
+**Lot 6 livré** le 26 novembre 2026 (spec `007`, ADR `0003`) : widget « Ce soir », plan B (adresses, roulette), rappel du dîner et agenda `.ics`, recettes du soir, session à plusieurs (prénoms, charge partagée), hygiène et ménage dans le déroulé. Toute nouvelle fonctionnalité repart d’une spec `docs/specs/008-…`.
 
 ## Le produit
 
@@ -18,12 +20,14 @@ Une application web responsive (téléphone d’abord), locale d’abord, pour l
 index.html                 Métadonnées, script du thème en ligne (avant l’affichage), point de montage
 src/main.tsx               Polices, styles, routage par ancre, montage, typographie, service worker
 src/app/                   Coque, routage, thème, icônes, typographie du DOM, écrans à la demande (aLaDemande),
-                           état partagé en signaux (bibliotheque-, fournee-, session-, stock-etat), alarme, partage
+                           état partagé en signaux (bibliotheque-, fournee-, session-, stock-, soir-etat), alarme,
+                           partage ; soir-etat (adresses, rappel du dîner) se charge à part, hors du démarrage
 src/domaine/               Logique pure, sans DOM, testée : modèle, dictionnaire, ingrédients, structuration,
                            durées, bibliothèque, validation, dates, portions, fournée (répartition, alertes),
-                           courses, ordonnanceur, session (direct), stock (frigo, rappels, restes), idées,
+                           courses, ordonnanceur (hygiène et ménage compris), session (direct), stock (frigo,
+                           rappels, restes), idées, soir (dîner du jour, roulette, adresses, agenda .ics),
                            schema-org (import web), partage (statistiques, textes), typographie
-src/donnees/               IndexedDB (Dexie, schéma v2), recettes, photos, fournées, réglages, export et import
+src/donnees/               IndexedDB (Dexie, schéma v3), recettes, photos, fournées, réglages, adresses, export et import
 src/ecrans/                Un écran par fichier, chargé à la demande ; sous-dossiers recettes/, semaine/, session/
 src/styles/                jetons.css (seul fichier où une couleur est écrite), base, composants, coque, un par écran
 public/favicon.svg         Logo bocal ; icônes PWA générées au build (pwa-assets.config.ts)
@@ -79,11 +83,12 @@ Les recettes de départ (`src/donnees/recettes-de-depart.ts`) sont la source uni
 - **Recettes de famille** : le texte saisi est conservé à l’identique et toujours consultable ; la structuration (étapes, durées, postes) n’est qu’une proposition, enregistrée seulement après relecture, et toute valeur devinée est signalée comme telle. Ne jamais réécrire ni « corriger » le texte d’origine.
 - **Dépôt public** : aucune vraie recette de famille, photo, nom de proche ni donnée personnelle dans le dépôt, les tests ou les captures. Exemples fictifs seulement.
 - **Sécurité alimentaire** : les durées de conservation sont des valeurs par défaut prudentes (3 jours au frigo, 3 mois au congélateur), modifiables par recette et accompagnées de leur source. Ne jamais présenter l’application comme un avis sanitaire.
-- **Ordonnanceur** : fonction pure et déterministe (`src/domaine/ordonnanceur.ts`). Toute modification garde les propriétés testées avec fast-check : dépendances respectées, aucun feu ni cuisinier en double emploi, 2 plats au plus et une seule température par four, durée au moins égale au chemin critique, tâches figées respectées. La session en direct (`src/domaine/session.ts`) fige les tâches réellement commencées (dépendances finies, cuisinier libre) et recalcule le reste à partir de « maintenant ».
+- **Ordonnanceur** : fonction pure et déterministe (`src/domaine/ordonnanceur.ts`). Toute modification garde les propriétés testées avec fast-check : dépendances respectées, aucun feu ni cuisinier en double emploi, 2 plats au plus et une seule température par four, durée au moins égale au chemin critique, tâches figées respectées. La session en direct (`src/domaine/session.ts`) fige les tâches réellement commencées (dépendances finies, cuisinier libre) et recalcule le reste à partir de « maintenant ». Une tâche active va à la personne libre qui a le moins travaillé. `ajouterHygiene` ajoute lavage des mains, vaisselle, nettoyage et rangement, et fait passer les légumes avant la viande crue ; le lavage de la planche fait partie de la découpe crue (même personne). Les options d’une session sont figées à son lancement.
 - **Écritures de la fournée** : toujours par `modifierFournee` (`src/app/fournee-etat.ts`), qui applique en mémoire puis met l’écriture en file ; ne jamais écrire la fournée courante directement, sous peine d’écraser une modification plus récente.
 - **Écrans à la demande** : chaque écran est un morceau séparé (`aLaDemande`), préchargé après le premier affichage ; le budget de démarrage (60 ko) le vérifie. Un nouvel écran suit le même chemin.
 - **Partage et import** : un fichier de recette partagé est un export Fournée (sous-recettes et photos comprises) ; l’import web lit le JSON-LD schema.org collé (pas de lecture d’adresse : CORS) ; les partages reçus arrivent en `?titre=&texte=&adresse=` (Web Share Target).
 - **Reconnaissance de texte** : reportée (ADR 0002).
+- **Ce soir** : le dîner du jour vient d’abord du choix de dernière minute (réglages, valable le jour dit), puis du planning (fournée courante, puis semaine de la dernière session). Les recettes « du soir » se cuisinent le jour même : courses oui, session et alertes de conservation non. Notification seulement application ouverte ou en arrière-plan ; l’agenda `.ics` est la voie sûre (ADR 0003). Liens des adresses : `http` ou `https` seulement.
 
 ## Vérification
 

@@ -1,4 +1,4 @@
-import type { Placement } from './ordonnanceur';
+import type { OptionsSession, Placement } from './ordonnanceur';
 import { ajouterJours, dateLongue, ecartJours, nomDuJour, prochainDimanche, type DateISO } from './dates';
 import { estCongelable, type Recette } from './modele';
 
@@ -28,6 +28,8 @@ export interface EtatSession {
   prevue: number;
   /** Durée en enchaînant les recettes une à une (minutes). */
   sequentielle: number;
+  /** Hygiène et ménage au lancement ; absent pour une session lancée avant la v1.1 (sans hygiène). */
+  options?: OptionsSession;
 }
 
 export interface Bilan {
@@ -177,6 +179,8 @@ export function alertes(f: Fournee, recettes: readonly Recette[], personnes: num
   for (const r of f.repas) {
     const recette = r.recetteId ? parId.get(r.recetteId) : undefined;
     if (!recette || r.platId) continue;
+    // Une recette du soir se cuisine le jour même : rien à conserver.
+    if (recette.soir && !f.plats.some((p) => p.recetteId === recette.id)) continue;
     const jourJ = ecartJours(f.sessionLe, r.jour);
     if (jourJ <= recette.conservation.frigoJours) continue;
     if (estCongelable(recette)) {

@@ -48,7 +48,19 @@ const total = (r: Recette) =>
   (r.etapes.some((e) => e.sousRecetteId) ? ' + bolognaise' : '') +
   (r.etapes.some((e) => e.anticiper) ? ' + la veille' : '');
 
-export function genererAnnexe(recettes: Recette[]): string {
+export function genererAnnexe(toutes: Recette[]): string {
+  const recettes = toutes.filter((r) => !r.soir);
+  const soir = toutes.filter((r) => r.soir);
+  const vueSoir = tableau([
+    ['Recette du soir', 'Actif', 'Total', 'Végétarien', 'Four'],
+    ...soir.map((r) => [
+      r.nom,
+      formaterDuree(dureeActive(r)),
+      total(r),
+      r.vegetarien ? 'oui' : '',
+      passeAuFour(r) ? 'oui' : '',
+    ]),
+  ]);
   const vue = tableau([
     ['Recette', 'Actif', 'Total', 'Congelable', 'Végétarien', 'Four'],
     ...recettes.map((r) => [
@@ -64,7 +76,7 @@ export function genererAnnexe(recettes: Recette[]): string {
     ', ',
   );
 
-  const fiches = recettes.map((r) => {
+  const fiches = toutes.map((r) => {
     const conservation = [
       `frigo ${r.conservation.frigoJours} jours`,
       r.conservation.congelateurMois === null
@@ -85,12 +97,13 @@ export function genererAnnexe(recettes: Recette[]): string {
   });
 
   return [
-    '# Annexe 002 : les 13 recettes de départ',
+    '# Annexe 002 : les recettes de départ',
     '',
     '> Fichier **généré** à partir de `src/donnees/recettes-de-depart.ts` par `npm run annexe` : ne pas le modifier à la main. Un test vérifie qu’il est à jour.',
     '',
     '- Quantités et étapes vérifiées le 25 novembre 2026 (sources en fin de document).',
-    '- Toutes les recettes sont pour **4 portions** ; le nombre de portions se choisira au moment de préparer la session (lot 2).',
+    `- ${recettes.length} recettes de session et ${soir.length} recettes du soir (lot 6 : à cuisiner le jour même, hors session).`,
+    '- Toutes les recettes sont pour **4 portions** ; le nombre de portions se choisit au moment de prendre un plat.',
     '',
     'Lecture des étapes : texte · poste · actif ou passif · durée · dépendances. « Actif » occupe le cuisinier ; « passif » n’occupe que le poste (feu, four, repos). Durées « actif » et « total » calculées par `src/domaine/durees.ts` : « total » va jusqu’au plat prêt avec un seul cuisinier, sans le refroidissement final, les étapes facultatives ni ce qui se fait la veille.',
     '',
@@ -98,7 +111,11 @@ export function genererAnnexe(recettes: Recette[]): string {
     '',
     vue,
     '',
-    `Filtres attendus : ${filtres}.`,
+    `Filtres attendus (recettes de session) : ${filtres}.`,
+    '',
+    '## Recettes du soir',
+    '',
+    vueSoir,
     '',
     fiches.join('\n\n'),
     '',

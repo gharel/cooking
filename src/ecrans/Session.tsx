@@ -14,15 +14,17 @@ import {
   planningCourant,
   terminerSession,
 } from '../app/session-etat';
-import { ajouterJours, dateLongue, versDate } from '../domaine/dates';
+import { ajouterJours, dateLongue, heureLisible, versDate } from '../domaine/dates';
 import type { Fournee } from '../domaine/fournee';
 import { POSTES } from '../domaine/modele';
-import type { Placement, Tache } from '../domaine/ordonnanceur';
+import { DEPART, type OptionsSession, type Placement, type Tache } from '../domaine/ordonnanceur';
+import { equipementDeSession } from '../domaine/reglages';
 import { estTerminee, nouvellesFigees, passer, prolonger, terminer } from '../domaine/session';
 import { formaterDuree } from '../domaine/texte';
-import { heureLisible } from './Semaine';
 import { Compteur } from './semaine/ChoixPlat';
-import { classeTache, Frise, libelleVoie } from './session/Frise';
+import { classeTache, Frise, libellePlace, nomParticipant, quiFait } from './session/Frise';
+
+const MAX_PARTICIPANTS = 4;
 
 const deux = (n: number) => String(n).padStart(2, '0');
 const heureDe = (baseMs: number, minutes: number) => {
@@ -50,11 +52,13 @@ function Deroule({
   taches,
   heure,
   faites,
+  participants,
 }: {
   placements: Placement[];
   taches: Tache[];
   heure: (m: number) => string;
   faites: ReadonlySet<string>;
+  participants: readonly string[];
 }) {
   const parId = new Map(taches.map((t) => [t.id, t]));
   return (
@@ -65,14 +69,17 @@ function Deroule({
           const t = parId.get(p.id);
           if (!t) return null;
           const zero = p.fin - p.debut < 1e-6 && t.prechauffage;
+          const qui = quiFait(p, participants);
+          const recettesTache = nomsRecettes(t);
           return (
             <li key={p.id} class={`${classeTache(t)}${faites.has(p.id) ? ' faite' : ''}`}>
               <time>{heure(p.debut)}</time>
               <div>
                 <strong>{zero ? `${t.texte} : four déjà chaud` : t.texte}</strong>
                 <span>
-                  {nomsRecettes(t)} · {POSTES[t.poste]} ·{' '}
-                  {zero ? 'rien à faire' : formaterDuree(Math.round(t.duree))}
+                  {qui && t.active ? `${qui} · ` : ''}
+                  {recettesTache ? `${recettesTache} · ` : ''}
+                  {POSTES[t.poste]} · {zero ? 'rien à faire' : formaterDuree(Math.round(t.duree))}
                   {t.active ? '' : ' (passif)'}
                   {t.facultative ? ' · facultative' : ''}
                 </span>
@@ -84,14 +91,129 @@ function Deroule({
   );
 }
 
+function Participants() {
+  const liste = reglages.value.participants;
+  const changer = (modification: (ps: string[]) => string[]) =>
+    void modifierReglages((r) => ({ ...r, participants: modification(r.participants) }));
+  return (
+    <section class="carte" aria-labelledby="titre-participants">
+      <h2 id="titre-participants">Qui cuisine ?</h2>
+      <ul class="participants">
+        {liste.map((nom, i) => (
+          <li key={i}>
+            <label>
+              <span class="visuellement-cache">Prénom de la personne {i + 1}</span>
+              <input
+                type="text"
+                value={nom}
+                maxLength={30}
+                autoComplete="off"
+                placeholder={`Personne ${i + 1}`}
+                onInput={(e) => {
+                  const valeur = e.currentTarget.value;
+                  changer((ps) => ps.map((x, j) => (j === i ? valeur : x)));
+                }}
+              />
+            </label>
+            {liste.length > 1 && (
+              <button
+                type="button"
+                class="bouton bouton-texte bouton-icone"
+                aria-label={`Retirer ${nomParticipant(liste, i + 1)}`}
+                onClick={() => changer((ps) => ps.filter((_, j) => j !== i))}
+              >
+                <Icone nom="croix" />
+              </button>
+            )}
+          </li>
+        ))}
+      </ul>
+      {liste.length < MAX_PARTICIPANTS && (
+        <button
+          type="button"
+          class="bouton bouton-secondaire bouton-petit"
+          onClick={() => changer((ps) => [...ps, ''])}
+        >
+          <Icone nom="plus" />
+          Ajouter une personne
+        </button>
+      )}
+      <p class="aide">
+        {liste.length > 1
+          ? 'Les étapes sont réparties pour finir au plus tôt : chacun voit les siennes, avec son prénom.'
+          : 'Ajoutez les personnes qui cuisinent avec vous : les étapes seront réparties entre vous.'}
+      </p>
+    </section>
+  );
+}
+
+/** Qui fait quoi : les étapes actives de chacun, dans l’ordre, avec le temps de travail. */
+function Repartition({
+  placements,
+  taches,
+  heure,
+  participants,
+}: {
+  placements: Placement[];
+  taches: Tache[];
+  heure: (m: number) => string;
+  participants: readonly string[];
+}) {
+  const parId = new Map(taches.map((t) => [t.id, t]));
+  const actives = placements
+    .filter((p) => parId.get(p.id)?.active && p.fin - p.debut > 1e-6)
+    .sort((a, b) => a.debut - b.debut);
+  return (
+    <section class="carte" aria-labelledby="titre-repartition">
+      <h2 id="titre-repartition">Qui fait quoi</h2>
+      <div class="repartition">
+        {participants.map((_, i) => {
+          const n = i + 1;
+          const siennes = actives.filter((p) => p.id === DEPART || p.cuisinier === n);
+          const travail = siennes.reduce((s, p) => s + (p.fin - p.debut), 0);
+          return (
+            <section key={n} class="repartition-personne" aria-labelledby={`titre-personne-${n}`}>
+              <h3 id={`titre-personne-${n}`}>{nomParticipant(participants, n)}</h3>
+              <p class="aide">
+                {siennes.length} étape{siennes.length > 1 ? 's' : ''} · {formaterDuree(Math.round(travail))}{' '}
+                de travail
+              </p>
+              <ol class="suite">
+                {siennes.map((p) => {
+                  const t = parId.get(p.id);
+                  return (
+                    <li key={p.id} class={classeTache(t)}>
+                      <time>{heure(p.debut)}</time>
+                      <div>
+                        <strong>{t?.texte}</strong>
+                        <span>
+                          {[nomsRecettes(t), formaterDuree(Math.round(p.fin - p.debut))]
+                            .filter(Boolean)
+                            .join(' · ')}
+                        </span>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ol>
+            </section>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
 function Preparation({ f }: { f: Fournee }) {
-  const eq = reglages.value.equipement;
-  const { planning } = planningCourant(f, recettes.value, eq, Date.now());
+  const r = reglages.value;
+  const eq = equipementDeSession(r);
+  const options: OptionsSession = { hygiene: true, laveVaisselle: r.laveVaisselle };
+  const { planning } = planningCourant(f, recettes.value, eq, options, Date.now());
   const base = debutPrevu(f);
   const heure = (m: number) => heureDe(base, m);
   const gain = planning.sequentielle - planning.duree;
-  const changerEq = (cle: keyof typeof eq) => (v: number) =>
-    void modifierReglages((r) => ({ ...r, equipement: { ...r.equipement, [cle]: v } }));
+  const changerEq = (cle: 'feux' | 'fours') => (v: number) =>
+    void modifierReglages((x) => ({ ...x, equipement: { ...x.equipement, [cle]: v } }));
   return (
     <>
       <div class="entete">
@@ -124,7 +246,7 @@ function Preparation({ f }: { f: Fournee }) {
           <button
             type="button"
             class="bouton bouton-primaire bouton-grand"
-            onClick={() => void lancerSession(recettes.value, eq)}
+            onClick={() => void lancerSession(recettes.value, eq, options)}
           >
             <Icone nom="flamme" />
             Lancer la session
@@ -133,6 +255,7 @@ function Preparation({ f }: { f: Fournee }) {
       </div>
 
       <div class="grille-preparation">
+        <Participants />
         <section class="carte" aria-labelledby="titre-equipement">
           <h2 id="titre-equipement">Équipement</h2>
           <ul class="equipement">
@@ -144,17 +267,23 @@ function Preparation({ f }: { f: Fournee }) {
               <span>Fours</span>
               <Compteur valeur={eq.fours} max={3} libelle="Fours" changer={changerEq('fours')} />
             </li>
-            <li>
-              <span>Cuisiniers</span>
-              <Compteur
-                valeur={eq.cuisiniers}
-                max={3}
-                libelle="Cuisiniers"
-                changer={changerEq('cuisiniers')}
-              />
-            </li>
           </ul>
-          <p class="aide">Un four accueille deux plats à la même température.</p>
+          <label class="case">
+            <input
+              type="checkbox"
+              checked={r.laveVaisselle}
+              onChange={(e) => {
+                const oui = e.currentTarget.checked;
+                void modifierReglages((x) => ({ ...x, laveVaisselle: oui }));
+              }}
+            />
+            Lave-vaisselle
+          </label>
+          <p class="aide">
+            Un four accueille deux plats à la même température. Le déroulé compte le lavage des mains, la
+            vaisselle {r.laveVaisselle ? '(lave-vaisselle) ' : 'à la main '}et le nettoyage du plan de
+            travail.
+          </p>
         </section>
         <section class="carte" aria-labelledby="titre-veille">
           <h2 id="titre-veille">À faire la veille</h2>
@@ -207,14 +336,28 @@ function Preparation({ f }: { f: Fournee }) {
             duree={planning.duree}
             maintenant={null}
             heure={heure}
-            cuisiniers={eq.cuisiniers}
+            participants={r.participants}
             terminees={new Set()}
           />
         </div>
       </figure>
+      {r.participants.length > 1 && (
+        <Repartition
+          placements={planning.placements}
+          taches={planning.taches}
+          heure={heure}
+          participants={r.participants}
+        />
+      )}
       <section class="carte" aria-labelledby="titre-deroule">
         <h2 id="titre-deroule">Toutes les étapes, dans l’ordre</h2>
-        <Deroule placements={planning.placements} taches={planning.taches} heure={heure} faites={new Set()} />
+        <Deroule
+          placements={planning.placements}
+          taches={planning.taches}
+          heure={heure}
+          faites={new Set()}
+          participants={r.participants}
+        />
       </section>
     </>
   );
@@ -229,8 +372,15 @@ function EnCours({ f }: { f: Fournee }) {
     void garderEcranAllume(true);
   }, []);
   const maintenantMs = horloge.value;
-  const eq = reglages.value.equipement;
-  const { planning, m } = planningCourant(f, recettes.value, eq, maintenantMs);
+  const participants = reglages.value.participants;
+  const eq = equipementDeSession(reglages.value);
+  const { planning, m } = planningCourant(
+    f,
+    recettes.value,
+    eq,
+    { hygiene: true, laveVaisselle: reglages.value.laveVaisselle },
+    maintenantMs,
+  );
 
   // Les tâches qui commencent vraiment sont figées : le plan ne les déplacera plus.
   const nouvelles = s ? nouvellesFigees(s, planning, m) : [];
@@ -352,7 +502,7 @@ function EnCours({ f }: { f: Fournee }) {
                 class={`carte maintenant ${classeTache(t)}`}
                 aria-labelledby={`maintenant-${p.cuisinier}`}
               >
-                <p class="etiquette">Maintenant · {libelleVoie(p.voie, eq.cuisiniers)}</p>
+                <p class="etiquette">Maintenant · {libellePlace(p, participants)}</p>
                 <h2 id={`maintenant-${p.cuisinier}`} aria-live="polite">
                   {t.texte}
                 </h2>
@@ -412,7 +562,7 @@ function EnCours({ f }: { f: Fournee }) {
                     <span class="minuteur-texte">
                       <strong>{t?.texte}</strong>
                       <span>
-                        {nomsRecettes(t)} · {libelleVoie(p.voie, eq.cuisiniers)}
+                        {nomsRecettes(t)} · {libellePlace(p, participants)}
                         {p.temperature ? ` · ${p.temperature} °C` : ''}
                       </span>
                     </span>
@@ -445,13 +595,16 @@ function EnCours({ f }: { f: Fournee }) {
             <ol class="suite">
               {aVenir.slice(0, 6).map((p) => {
                 const t = parId.get(p.id);
+                const qui = t?.active ? quiFait(p, participants) : null;
                 return (
                   <li key={p.id} class={classeTache(t)}>
                     <time>{heure(p.debut)}</time>
                     <div>
                       <strong>{t?.texte}</strong>
                       <span>
-                        {nomsRecettes(t)} · {formaterDuree(Math.round(t?.duree ?? 0))}
+                        {[qui, nomsRecettes(t), formaterDuree(Math.round(t?.duree ?? 0))]
+                          .filter(Boolean)
+                          .join(' · ')}
                       </span>
                       {t?.facultative && (
                         <button
@@ -490,7 +643,7 @@ function EnCours({ f }: { f: Fournee }) {
             duree={planning.duree}
             maintenant={m}
             heure={heure}
-            cuisiniers={eq.cuisiniers}
+            participants={participants}
             terminees={finies}
           />
         </div>

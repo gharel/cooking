@@ -35,6 +35,7 @@ export function Etiquettes({ recette: r }: { recette: Recette }) {
           Notre recette
         </span>
       )}
+      {r.soir && <span class="pastille pastille-soir">Du soir</span>}
       {estAStructurer(r) && <span class="pastille pastille-bientot">À structurer</span>}
       {estCongelable(r) && <span class="pastille">Congelable</span>}
       {r.vegetarien && <span class="pastille">Végétarien</span>}
