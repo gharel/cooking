@@ -58,6 +58,10 @@ const TRACES = {
   ),
   plus: <path d="M12 5v14M5 12h14" />,
   moins: <path d="M5 12h14" />,
+  valider: <path d="M20 6 9 17l-5-5" />,
+  agrandir: (
+    <path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3" />
+  ),
   partage: <path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v13" />,
   importer: <path d="M12 15V3M7 8l5-5 5 5M5 21h14" />,
   exporter: <path d="M12 3v12M7 10l5 5 5-5M5 21h14" />,

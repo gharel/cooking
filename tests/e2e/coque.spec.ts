@@ -72,7 +72,7 @@ test('chaque écran pas encore construit renvoie vers la maquette, qui reste en 
   request,
 }) => {
   await ouvrir(page);
-  for (const ecran of ECRANS.filter((e) => e.id === 'session' || e.id === 'frigo')) {
+  for (const ecran of ECRANS.filter((e) => e.id === 'frigo')) {
     await page.evaluate((id) => (location.hash = id), ecran.id);
     const lien = page.getByRole('link', { name: 'Voir cet écran dans la maquette' });
     await expect(lien).toHaveAttribute('href', `/cooking/maquette/#${ecran.id}`);

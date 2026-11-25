@@ -1,3 +1,4 @@
+import type { Placement } from './ordonnanceur';
 import { ajouterJours, dateLongue, ecartJours, nomDuJour, prochainDimanche, type DateISO } from './dates';
 import { estCongelable, type Recette } from './modele';
 
@@ -17,17 +18,16 @@ export interface PlatDeFournee {
 }
 
 /** Tâche de la session déjà commencée ou terminée : minutes depuis le début de la session. */
-export interface TacheFigee {
-  debut: number;
-  fin: number;
-}
-
 export interface EtatSession {
   /** Horodatage (ms) du lancement. */
   debut: number;
-  figees: Record<string, TacheFigee>;
+  figees: Record<string, Placement>;
   /** Tâches terminées (identifiants). */
   faites: string[];
+  /** Durée prévue au lancement (minutes). */
+  prevue: number;
+  /** Durée en enchaînant les recettes une à une (minutes). */
+  sequentielle: number;
 }
 
 export interface Bilan {

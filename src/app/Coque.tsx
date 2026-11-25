@@ -1,15 +1,28 @@
 import { useEffect, useRef } from 'preact/hooks';
-import { Courses } from '../ecrans/Courses';
-import { Frigo } from '../ecrans/Frigo';
-import { Recettes } from '../ecrans/Recettes';
-import { Semaine } from '../ecrans/Semaine';
-import { Session } from '../ecrans/Session';
 import { ChoixPlat } from '../ecrans/semaine/ChoixPlat';
 import { Annonces } from './annonces';
 import { BoutonTheme } from './BoutonTheme';
 import { route } from './etat';
 import { Icone, SpriteIcones } from './icones';
-import { ECRANS, type Route } from './routage';
+import { aLaDemande } from './aLaDemande';
+import { ECRANS, type OngletFrigo, type Route } from './routage';
+
+const Semaine = aLaDemande(() => import('../ecrans/Semaine').then((m) => m.Semaine), 'Semaine');
+const Courses = aLaDemande(() => import('../ecrans/Courses').then((m) => m.Courses), 'Courses');
+const Session = aLaDemande(() => import('../ecrans/Session').then((m) => m.Session), 'Session');
+const Frigo = aLaDemande<{ onglet: OngletFrigo | undefined }>(
+  () => import('../ecrans/Frigo').then((m) => m.Frigo),
+  'Frigo et congélateur',
+);
+const Recettes = aLaDemande<{ recette: string | undefined }>(
+  () => import('../ecrans/Recettes').then((m) => m.Recettes),
+  'Recettes',
+);
+
+/** Après le premier affichage, tous les écrans se chargent en tâche de fond : la navigation reste instantanée. */
+export function prechargerEcrans(): void {
+  for (const e of [Semaine, Courses, Session, Frigo, Recettes]) void e.precharger();
+}
 
 function Ecran({ courante }: { courante: Route }) {
   switch (courante.ecran) {
