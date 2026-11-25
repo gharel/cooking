@@ -17,6 +17,10 @@ import {
   type TypeAlerte,
 } from '../domaine/fournee';
 import { estCongelable } from '../domaine/modele';
+import { rappelsDecongelation } from '../domaine/stock';
+import { derniereSession } from '../app/session-etat';
+import { plats as platsStock } from '../app/stock-etat';
+import { aujourdhui } from '../domaine/dates';
 import { teinte } from './recettes/commun';
 import { Compteur, ouvrirChoixPlat } from './semaine/ChoixPlat';
 
@@ -69,7 +73,15 @@ export function Semaine() {
   const jours = joursDeLaFournee(f.sessionLe);
   const parId = new Map(recettes.value.map((r) => [r.id, r]));
   const plats = f.plats.filter((p) => parId.has(p.recetteId));
+  const stock = platsStock.value;
   const liste = alertes(f, recettes.value, personnes);
+  const rappels = rappelsDecongelation(
+    [f, derniereSession.value].filter((x) => x !== null),
+    stock,
+    recettes.value,
+    personnes,
+    aujourdhui(),
+  );
   const articles = listeDeCourses(plats, recettes.value, placard).total;
 
   return (
@@ -212,6 +224,21 @@ export function Semaine() {
             <h2 id="titre-vigilance">À surveiller</h2>
           </div>
           <ListeAlertes liste={liste} />
+          {rappels.length > 0 && (
+            <ul class="vigilance rappels-semaine">
+              {rappels.map((r) => (
+                <li key={r.texte}>
+                  <span class="rond congeler">
+                    <Icone nom="flocon" />
+                  </span>
+                  <div>
+                    <strong>À sortir du congélateur</strong>
+                    <span>{r.texte}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
 
         <section class="carte carte-repas" aria-labelledby="titre-repas">
@@ -236,15 +263,26 @@ export function Semaine() {
                 {(['midi', 'soir'] as const).map((moment) => {
                   const index = f.repas.findIndex((r) => r.jour === jour && r.moment === moment);
                   const repas = f.repas[index];
-                  const choisi = repas?.recetteId ?? '';
+                  const choisi = repas?.platId
+                    ? `p:${repas.platId}`
+                    : repas?.recetteId
+                      ? `r:${repas.recetteId}`
+                      : '';
+                  const platStock = repas?.platId ? stock.find((x) => x.id === repas.platId) : undefined;
+                  const nomChoisi = platStock
+                    ? `${platStock.nom} (${platStock.lieu === 'frigo' ? 'frigo' : 'congélateur'})`
+                    : repas?.recetteId
+                      ? (parId.get(repas.recetteId)?.nom ?? 'Libre')
+                      : 'Libre';
+                  const teinteChoisie = platStock?.recetteId ?? repas?.recetteId ?? '';
                   return (
                     <label
                       key={moment}
-                      class={`repas${choisi ? ` teinte-${teinte(choisi)}` : ' repas-libre'}`}
+                      class={`repas${choisi ? ` teinte-${teinte(teinteChoisie || choisi)}` : ' repas-libre'}`}
                     >
                       <span class="moment">{moment === 'midi' ? 'Midi' : 'Soir'}</span>
                       <span class="repas-nom" aria-hidden="true">
-                        {choisi ? (parId.get(choisi)?.nom ?? 'Libre') : 'Libre'}
+                        {nomChoisi}
                       </span>
                       <select
                         class="repas-choix"
@@ -253,16 +291,33 @@ export function Semaine() {
                         onChange={(e) => {
                           const v = e.currentTarget.value;
                           void modifierFournee((x) =>
-                            changerRepas(x, index, { recetteId: v || null, platId: null }),
+                            changerRepas(x, index, {
+                              recetteId: v.startsWith('r:') ? v.slice(2) : null,
+                              platId: v.startsWith('p:') ? v.slice(2) : null,
+                            }),
                           );
                         }}
                       >
                         <option value="">Libre</option>
-                        {plats.map((p) => (
-                          <option key={p.recetteId} value={p.recetteId}>
-                            {parId.get(p.recetteId)?.nom}
-                          </option>
-                        ))}
+                        {plats.length > 0 && (
+                          <optgroup label="Plats de la fournée">
+                            {plats.map((p) => (
+                              <option key={p.recetteId} value={`r:${p.recetteId}`}>
+                                {parId.get(p.recetteId)?.nom}
+                              </option>
+                            ))}
+                          </optgroup>
+                        )}
+                        {stock.length > 0 && (
+                          <optgroup label="Déjà au frigo ou au congélateur">
+                            {stock.map((p) => (
+                              <option key={p.id} value={`p:${p.id}`}>
+                                {p.nom} ({p.lieu === 'frigo' ? 'frigo' : 'congélateur'}, {p.portions}{' '}
+                                portions)
+                              </option>
+                            ))}
+                          </optgroup>
+                        )}
                       </select>
                     </label>
                   );

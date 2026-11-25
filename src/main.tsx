@@ -7,6 +7,7 @@ import './styles/coque.css';
 import './styles/recettes.css';
 import './styles/semaine.css';
 import './styles/session.css';
+import './styles/frigo.css';
 import { render } from 'preact';
 import { registerSW } from 'virtual:pwa-register';
 import { demarrerBibliotheque } from './app/bibliotheque-etat';

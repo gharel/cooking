@@ -46,6 +46,7 @@ const ENTREES: Entree[] = [
   { cle: 'persil', rayon: 'fruits-legumes', motifs: ['persil'] },
   { cle: 'basilic', rayon: 'fruits-legumes', motifs: ['basilic'] },
   { cle: 'menthe', rayon: 'fruits-legumes', motifs: ['menthe'] },
+  { cle: 'concombre', rayon: 'fruits-legumes', motifs: ['concombres', 'concombre'] },
   { cle: 'champignon', rayon: 'fruits-legumes', motifs: ['champignons', 'champignon'] },
   { cle: 'epinard', rayon: 'fruits-legumes', motifs: ['epinards', 'epinard'] },
   { cle: 'poireau', rayon: 'fruits-legumes', motifs: ['poireaux', 'poireau'] },
