@@ -171,7 +171,10 @@ test('export puis import dans un navigateur vierge ; un fichier invalide est ref
   await bibliotheque(page);
   await creerHachis(page);
   await page.getByRole('button', { name: 'Enregistrer la recette' }).click();
+  // Attendre la fin de l’enregistrement (fiche affichée) avant de changer d’écran.
+  await expect(page.locator('main h1')).toHaveText('Hachis parmentier de maman');
   await page.goto('./#recettes');
+  await expect(cartes(page)).toHaveCount(14);
   const telechargement = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Exporter' }).click();
   const fichier = await (await telechargement).path();
