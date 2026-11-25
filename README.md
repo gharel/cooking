@@ -2,7 +2,7 @@
 
 Application web de batch cooking : vos recettes (y compris celles de la famille), une session de cuisine orchestrée, un frigo sous contrôle.
 
-> **Statut : fondations posées (lot 0).** L’application est en ligne sur https://gharel.github.io/cooking/ : coque, thème, hors ligne ; les écrans arrivent lot par lot. La maquette complète reste visible sur https://gharel.github.io/cooking/maquette/ (données fictives). Nom de travail : « Fournée ».
+> **Statut : lot 1 livré, les recettes.** L’application est en ligne sur https://gharel.github.io/cooking/ : bibliothèque avec 13 recettes de départ, recettes de famille, photos, export et import ; hors ligne. Les autres écrans arrivent lot par lot. La maquette complète reste visible sur https://gharel.github.io/cooking/maquette/ (données fictives). Nom de travail : « Fournée ».
 
 ## Ce que fera l’application
 

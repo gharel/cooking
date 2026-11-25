@@ -10,6 +10,14 @@ describe('lireAncre', () => {
     expect(lireAncre('#reste')).toEqual({ ecran: 'frigo', onglet: 'reste' });
   });
 
+  it('#recettes/<id> ouvre la fiche de la recette', () => {
+    expect(lireAncre('#recettes/depart-dahl')).toEqual({ ecran: 'recettes', recette: 'depart-dahl' });
+    expect(lireAncre(`#recettes/${encodeURIComponent('recette é')}`)).toEqual({
+      ecran: 'recettes',
+      recette: 'recette é',
+    });
+  });
+
   it('#stock (ancien nom) ouvre Frigo sur les plats préparés', () => {
     expect(lireAncre('#stock')).toEqual({ ecran: 'frigo', onglet: 'plats' });
   });

@@ -6,7 +6,7 @@ Les demandes explicites de l’utilisateur priment sur ce document.
 
 ## État du projet
 
-**Lot 0 (fondations) livré** le 25 novembre 2026 (spec `docs/specs/001-fondations.md`) : coque, thème, typographie, hors ligne, outillage et publication. Les cinq écrans sont vides et renvoient vers la maquette, publiée sous https://gharel.github.io/cooking/maquette/. Prochaine étape : lot 1 (recettes), qui commence par sa spec.
+**Lots 0 et 1 livrés** le 25 novembre 2026 (specs `docs/specs/001-fondations.md` et `002-recettes.md`) : coque, thème, hors ligne, publication ; bibliothèque de recettes (13 recettes de départ, recettes de famille racontées puis structurées, photos, export et import). Semaine, Courses, Session et Frigo renvoient encore vers la maquette (https://gharel.github.io/cooking/maquette/). Prochaine étape : lot 2 (semaine et courses), qui commence par sa spec ; le nombre de portions s’y choisit au moment de prendre un plat (4 proposé).
 
 ## Le produit
 
@@ -18,19 +18,22 @@ Une application web responsive (téléphone d’abord), locale d’abord, pour l
 index.html                 Métadonnées, script du thème en ligne (avant l’affichage), point de montage
 src/main.tsx               Polices, styles, routage par ancre, montage, typographie, service worker
 src/app/                   Coque (bandeau, navigation, écran courant), routage, thème, icônes, typographie du DOM
-src/domaine/               Logique pure, sans DOM, testée : typographie ; à venir : ordonnanceur, regroupement,
-                           courses, conservation, portions, structuration, idées
-src/ecrans/                Un composant Preact par écran : Semaine, Courses, Session, Frigo, Recettes
+src/domaine/               Logique pure, sans DOM, testée : modèle, dictionnaire (clés, rayons), ingrédients,
+                           structuration du texte libre, durées, bibliothèque (filtres), validation des imports,
+                           typographie ; à venir : ordonnanceur, regroupement, courses, conservation, idées
+src/donnees/               IndexedDB (Dexie, schéma v1), recettes, photos, export et import, recettes de départ
+src/ecrans/                Un composant Preact par écran ; recettes/ : Bibliothèque, Fiche, Éditeur (chargé à la demande)
 src/styles/                jetons.css (seul fichier où une couleur est écrite), base, composants, coque
 public/favicon.svg         Logo bocal ; icônes PWA générées au build (pwa-assets.config.ts)
 maquette/index.html        Maquette de référence (données fictives), copiée dans dist/maquette/
 outils/budget.js           Poids du JavaScript de démarrage (60 ko gzip au plus)
-tests/domaine/             Vitest (à venir : fast-check pour l’ordonnanceur)
+tests/domaine/             Vitest ; depart.test.ts compare l’annexe 002 aux données (à venir : fast-check)
+tests/donnees/             Vitest + fake-indexeddb : installation, duplication, suppression, export et import
 tests/e2e/                 Playwright + axe-core ; iphone.spec.ts tourne dans WebKit (iPhone 13)
 docs/                      PLAN.md, BENCHMARK.md, adr/ (décisions), specs/ (une par fonctionnalité), captures/
 ```
 
-À venir : `src/donnees/` (IndexedDB avec Dexie, schéma versionné, export et import JSON) au lot 1.
+Les recettes de départ (`src/donnees/recettes-de-depart.ts`) sont la source unique : l’annexe `docs/specs/002-recettes-de-depart.md` en est générée par `npm run annexe` ; ne jamais la modifier à la main. Les durées « actif » et « total » sont calculées (`src/domaine/durees.ts`), jamais écrites à la main.
 
 ## Commandes
 
@@ -42,6 +45,7 @@ docs/                      PLAN.md, BENCHMARK.md, adr/ (décisions), specs/ (une
 | `npm run check`                          | ESLint, Prettier, TypeScript, html-validate, Vitest                                      |
 | `npm run test:e2e`                       | Build puis Playwright + axe : 5 écrans × 5 tailles × 2 thèmes, thème, hors ligne, iPhone |
 | `npm run budget`                         | Poids du JavaScript de démarrage, après un build                                         |
+| `npm run annexe`                         | Régénère l’annexe des recettes de départ après une modification des données              |
 | `npm run build`                          | Build de production dans `dist/` (base `/cooking/`, maquette comprise)                   |
 | `npm run apercu`                         | Sert `dist/` sur http://localhost:4182/cooking/ ; `PORT_E2E` change le port des tests    |
 
@@ -68,7 +72,7 @@ docs/                      PLAN.md, BENCHMARK.md, adr/ (décisions), specs/ (une
 - **Responsive** : barre d’onglets en bas sur téléphone (zones sûres `env(safe-area-inset-*)`), barre latérale à partir de 900 px. Cibles d’au moins 44 px (36 px pour les boutons secondaires compacts). Aucun défilement horizontal de la page ; la frise de session défile dans son propre cadre.
 - **Accessibilité** : WCAG 2.2 AA, navigation au clavier, focus visible, `prefers-reduced-motion` respecté, une seule `h1` par écran, le focus va sur la `h1` après un changement d’écran.
 - **Hors ligne** : `vite-plugin-pwa` (Workbox, `autoUpdate`, `clientsClaim`, `skipWaiting`) met tout le site en cache, sauf la maquette et les sous-ensembles de polices inutiles au français. La navigation vers `/maquette/` n’est jamais servie par l’application (`navigateFallbackDenylist`).
-- **Données** : locales (IndexedDB), aucun compte, aucune télémétrie, aucune ressource distante à l’exécution (polices auto-hébergées par `@fontsource-variable` ; la maquette, elle, charge Google Fonts). Export et import JSON versionnés ; un import invalide est refusé sans rien écraser.
+- **Données** : locales (IndexedDB), aucun compte, aucune télémétrie, aucune ressource distante à l’exécution (polices auto-hébergées par `@fontsource-variable` ; la maquette, elle, charge Google Fonts). Export et import JSON versionnés ; un import invalide est refusé sans rien écraser. Schéma Dexie versionné (`src/donnees/base.ts`) : toute évolution ajoute une version, sa migration et un test. Le stockage persistant est demandé ; s’il est refusé, un avertissement (masquable) conseille l’installation et l’export.
 - **Recettes de famille** : le texte saisi est conservé à l’identique et toujours consultable ; la structuration (étapes, durées, postes) n’est qu’une proposition, enregistrée seulement après relecture, et toute valeur devinée est signalée comme telle. Ne jamais réécrire ni « corriger » le texte d’origine.
 - **Dépôt public** : aucune vraie recette de famille, photo, nom de proche ni donnée personnelle dans le dépôt, les tests ou les captures. Exemples fictifs seulement.
 - **Sécurité alimentaire** : les durées de conservation sont des valeurs par défaut prudentes (3 jours au frigo, 3 mois au congélateur), modifiables par recette et accompagnées de leur source. Ne jamais présenter l’application comme un avis sanitaire.

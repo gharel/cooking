@@ -1,0 +1,629 @@
+/* Recettes : bibliothèque, fiche, éditeur. Pilules : rayon = moitié de la hauteur d’une ligne (AGENTS.md). */
+.teinte-1 {
+  --t: var(--teinte-1);
+  --td: var(--teinte-1-doux);
+}
+.teinte-2 {
+  --t: var(--teinte-2);
+  --td: var(--teinte-2-doux);
+}
+.teinte-3 {
+  --t: var(--teinte-3);
+  --td: var(--teinte-3-doux);
+}
+.teinte-4 {
+  --t: var(--teinte-4);
+  --td: var(--teinte-4-doux);
+}
+.teinte-5 {
+  --t: var(--teinte-5);
+  --td: var(--teinte-5-doux);
+}
+.teinte-6 {
+  --t: var(--teinte-6);
+  --td: var(--teinte-6-doux);
+}
+
+.bouton-petit {
+  min-height: 36px;
+  padding: 4px 14px;
+  border-radius: 18px;
+  font-size: 0.88rem;
+}
+.bouton-texte {
+  color: var(--primaire-texte);
+}
+.bouton-texte:hover {
+  background: var(--primaire-doux);
+}
+.bouton-fichier:focus-within {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+.pastille .icone {
+  width: 14px;
+  height: 14px;
+}
+.pastille-famille {
+  background: var(--famille-doux);
+  color: var(--famille);
+}
+.pastille-bientot {
+  background: var(--bientot-doux);
+  color: var(--bientot);
+}
+.etiquettes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.aide {
+  font-size: 0.88rem;
+  color: var(--texte-doux);
+}
+.vide {
+  padding: 24px 4px;
+  color: var(--texte-doux);
+}
+
+.bandeau {
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  border-radius: var(--rayon-m);
+  font-size: 0.92rem;
+}
+.bandeau ul {
+  margin-top: 6px;
+  padding-left: 18px;
+  list-style: disc;
+}
+.bandeau-info {
+  background: var(--froid-doux);
+}
+.bandeau-alerte {
+  background: var(--alerte-doux);
+  border: 1px solid color-mix(in srgb, var(--alerte) 35%, transparent);
+}
+
+/* Bibliothèque */
+.outils-recettes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.recherche {
+  position: relative;
+  flex: 1 1 240px;
+}
+.recherche .icone {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--texte-doux);
+  pointer-events: none;
+}
+.recherche input {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 16px 0 44px;
+  border: 1px solid var(--controle);
+  border-radius: 23px;
+  background: var(--surface);
+}
+.puces-filtre {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.puce-filtre {
+  min-height: 38px;
+  padding: 4px 14px;
+  border: 1px solid var(--controle);
+  border-radius: 19px;
+  background: var(--surface);
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.25;
+  cursor: pointer;
+}
+.puce-filtre[aria-pressed='true'] {
+  background: var(--texte);
+  color: var(--fond);
+  border-color: var(--texte);
+}
+.cartes-recettes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 12px;
+}
+.cartes-recettes li {
+  display: flex;
+}
+.carte-recette {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow: hidden;
+  text-decoration: none;
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  background: var(--surface);
+  box-shadow: var(--ombre);
+}
+.carte-recette:hover {
+  border-color: var(--t);
+}
+.carte-recette-visuel {
+  display: grid;
+  place-items: center;
+  height: 64px;
+  color: var(--t);
+  background:
+    radial-gradient(circle at 85% 15%, color-mix(in srgb, var(--t) 35%, transparent) 0 22%, transparent 23%),
+    linear-gradient(135deg, var(--td), color-mix(in srgb, var(--t) 22%, var(--td)));
+}
+.carte-recette-visuel .icone {
+  width: 28px;
+  height: 28px;
+  stroke-width: 1.6;
+}
+.carte-recette-corps {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px 14px;
+}
+.carte-recette-titre {
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.25;
+}
+.carte-recette-sous-titre,
+.meta-recette {
+  font-size: 0.84rem;
+  color: var(--texte-doux);
+}
+.reinstaller {
+  margin-top: 20px;
+}
+
+/* Fiche */
+.retour {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 12px;
+  color: var(--texte-doux);
+  font-weight: 600;
+  text-decoration: none;
+  min-height: 32px;
+}
+.retour:hover {
+  color: var(--texte);
+}
+.grille-fiche {
+  display: grid;
+  gap: 16px;
+}
+@media (min-width: 1000px) {
+  .grille-fiche {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    align-items: start;
+  }
+}
+.colonne-fiche {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+.colonne-fiche h2 {
+  margin-bottom: 10px;
+}
+.carte-infos {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 5px solid var(--t);
+}
+.conservation {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.92rem;
+}
+.conservation .icone {
+  width: 16px;
+  height: 16px;
+  color: var(--froid);
+}
+.note-recette {
+  font-size: 0.9rem;
+  color: var(--texte-doux);
+}
+.origine {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: var(--rayon-m);
+  background: var(--famille-doux);
+}
+.origine .rond {
+  background: var(--surface);
+  color: var(--famille);
+}
+.origine strong {
+  display: block;
+}
+.origine span {
+  font-size: 0.84rem;
+  color: var(--texte-doux);
+}
+.mot {
+  margin: 0;
+  padding: 6px 14px;
+  border-left: 3px solid var(--famille);
+  font-family: var(--police-titre);
+  font-style: italic;
+}
+.photo-recette {
+  display: block;
+  width: 100%;
+  max-height: 420px;
+  object-fit: contain;
+  border-radius: var(--rayon-m);
+  background: var(--surface-2);
+}
+.photo-recette.vide {
+  height: 120px;
+}
+.ingredients li {
+  padding: 6px 0;
+  border-top: 1px solid var(--bordure);
+}
+.ingredients li:first-child {
+  border-top: 0;
+}
+.etapes-structurees li {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid var(--bordure);
+}
+.etapes-structurees li:first-child {
+  border-top: 0;
+}
+.numero {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--t, var(--primaire));
+  background: var(--td, var(--primaire-doux));
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.attributs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+.attribut {
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--texte-doux);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+.attribut.actif {
+  background: var(--primaire-doux);
+  color: var(--primaire-texte);
+}
+.attribut.passif {
+  background: var(--froid-doux);
+  color: var(--froid);
+}
+.attribut.bientot {
+  background: var(--bientot-doux);
+  color: var(--bientot);
+}
+.attribut.devinee {
+  background: transparent;
+  border: 1.5px dashed var(--controle);
+}
+a.attribut {
+  color: var(--primaire-texte);
+}
+.texte-original {
+  white-space: pre-wrap;
+  font-family: var(--police-titre);
+  line-height: 1.6;
+}
+
+/* Éditeur */
+.editeur {
+  width: min(860px, calc(100vw - 16px));
+  max-width: none;
+  max-height: calc(100dvh - 16px);
+  padding: 0;
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  background: var(--surface);
+  color: var(--texte);
+  box-shadow: 0 20px 60px rgb(0 0 0 / 0.35);
+}
+.editeur::backdrop {
+  background: rgb(20 15 10 / 0.55);
+}
+@media (max-width: 640px) {
+  .editeur {
+    width: 100vw;
+    height: 100dvh;
+    max-height: 100dvh;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+  }
+}
+.editeur-forme {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: inherit;
+}
+.editeur-entete {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: calc(14px + env(safe-area-inset-top)) 18px 12px;
+  border-bottom: 1px solid var(--bordure);
+}
+.editeur-entete h2 {
+  font-size: 1.3rem;
+}
+.editeur-entete .surtitre {
+  margin-bottom: 2px;
+}
+.editeur-corps {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 18px;
+  overflow: auto;
+}
+.editeur-pied {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 12px 18px calc(12px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--bordure);
+}
+.champ {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.champ > span:first-child,
+.champ legend,
+.etiquette-champ {
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+.champ legend {
+  margin-bottom: 6px;
+  padding: 0;
+}
+.champ input,
+.champ textarea,
+.champ select,
+.apercu-ingredients select {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--controle);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--texte);
+  line-height: 1.5;
+}
+.champ textarea {
+  resize: vertical;
+}
+.champ input.devinee {
+  border-style: dashed;
+}
+.champs-ligne {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.champs-ligne > .champ {
+  flex: 1 1 200px;
+}
+.champs-ligne > .champ-court,
+.champ-court {
+  flex: 0 1 150px;
+}
+.choix {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.choix label {
+  position: relative;
+}
+.choix input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.choix span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 4px 14px;
+  border: 1px solid var(--controle);
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+.choix input:checked + span {
+  background: var(--texte);
+  color: var(--fond);
+  border-color: var(--texte);
+}
+.choix input:focus-visible + span {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+.case {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.case input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--primaire);
+}
+.photos-editeur {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}
+.photos-editeur li {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.photos-editeur .photo-recette {
+  max-height: 160px;
+  object-fit: cover;
+}
+.apercu-ingredients {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.apercu-ingredients li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 12px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  font-size: 0.9rem;
+}
+.apercu-ingredients select {
+  width: auto;
+  min-height: 36px;
+  padding: 4px 8px;
+  font-size: 0.85rem;
+}
+.etapes-editeur {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.etapes-editeur h3 {
+  font-size: 1.05rem;
+}
+.etape-editable {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon-m);
+  background: var(--surface-2);
+  min-width: 0;
+}
+.etape-editable legend {
+  padding: 0 6px;
+  font-weight: 700;
+}
+.etape-reglages {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px;
+}
+.etape-cases {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 16px;
+}
+.etape-editable > .bouton {
+  align-self: flex-start;
+}
+
+/* Annonces (bas d’écran) */
+.annonce-zone {
+  position: fixed;
+  left: 50%;
+  bottom: calc(84px + env(safe-area-inset-bottom));
+  z-index: 50;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 32px);
+}
+@media (min-width: 900px) {
+  .annonce-zone {
+    bottom: 24px;
+  }
+}
+.annonce {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  padding: 10px 12px 10px 18px;
+  border-radius: 14px;
+  background: var(--texte);
+  color: var(--fond);
+  box-shadow: var(--ombre);
+  font-size: 0.92rem;
+}
+.bouton-annonce {
+  min-height: 36px;
+  padding: 4px 14px;
+  border-radius: 18px;
+  border-color: color-mix(in srgb, var(--fond) 50%, transparent);
+  color: var(--fond);
+}
+.bandeau-fermable {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+}
+.bandeau-fermable p {
+  flex: 1 1 260px;
+}

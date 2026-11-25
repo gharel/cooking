@@ -4,6 +4,7 @@ import { Frigo } from '../ecrans/Frigo';
 import { Recettes } from '../ecrans/Recettes';
 import { Semaine } from '../ecrans/Semaine';
 import { Session } from '../ecrans/Session';
+import { Annonces } from './annonces';
 import { BoutonTheme } from './BoutonTheme';
 import { route } from './etat';
 import { Icone, SpriteIcones } from './icones';
@@ -20,7 +21,7 @@ function Ecran({ courante }: { courante: Route }) {
     case 'frigo':
       return <Frigo onglet={courante.onglet} />;
     case 'recettes':
-      return <Recettes />;
+      return <Recettes recette={courante.recette} />;
   }
 }
 
@@ -100,6 +101,7 @@ export function Coque() {
           </main>
         </div>
       </div>
+      <Annonces />
     </>
   );
 }

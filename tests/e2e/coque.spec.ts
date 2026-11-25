@@ -67,12 +67,12 @@ test('le lien d’évitement mène au contenu sans changer d’écran', async ({
   await expect(page).toHaveTitle('Courses\u00a0· Fournée');
 });
 
-test('chaque écran renvoie vers son équivalent dans la maquette, qui reste en ligne', async ({
+test('chaque écran pas encore construit renvoie vers la maquette, qui reste en ligne', async ({
   page,
   request,
 }) => {
   await ouvrir(page);
-  for (const ecran of ECRANS) {
+  for (const ecran of ECRANS.filter((e) => e.id !== 'recettes')) {
     await page.evaluate((id) => (location.hash = id), ecran.id);
     const lien = page.getByRole('link', { name: 'Voir cet écran dans la maquette' });
     await expect(lien).toHaveAttribute('href', `/cooking/maquette/#${ecran.id}`);

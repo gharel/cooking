@@ -8,3 +8,4 @@ package-lock.json
 # Référence visuelle figée, écrite à la main : ne pas la reformater.
 maquette/
 docs/captures/
+docs/specs/002-recettes-de-depart.md

@@ -1,6 +1,7 @@
 import { typographier } from '../domaine/typographie';
 
-const IGNORES = 'script, style, textarea, code, pre';
+// [data-brut] : texte à montrer tel que saisi (texte d’origine d’une recette de famille).
+const IGNORES = 'script, style, textarea, code, pre, [data-brut]';
 
 function corrigerTexte(noeud: Text): void {
   const parent = noeud.parentElement;

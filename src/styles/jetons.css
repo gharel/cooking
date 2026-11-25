@@ -31,6 +31,19 @@
   --alerte-doux: #fde7e4;
   --famille: #9b2c5a;
   --famille-doux: #fbe4ef;
+  /* Teintes décoratives des recettes (bandeau des cartes) */
+  --teinte-1: #d6455d;
+  --teinte-1-doux: #fbe3e7;
+  --teinte-2: #c98a12;
+  --teinte-2-doux: #fbefd6;
+  --teinte-3: #7c5cc9;
+  --teinte-3-doux: #ece6fa;
+  --teinte-4: #2f9467;
+  --teinte-4-doux: #def3e8;
+  --teinte-5: #e07a2e;
+  --teinte-5-doux: #fdebdc;
+  --teinte-6: #4a6fa5;
+  --teinte-6-doux: #e4ecf7;
   --ombre: 0 1px 2px rgb(40 30 20 / 0.05), 0 6px 20px rgb(40 30 20 / 0.06);
 }
 
@@ -61,6 +74,18 @@
     --alerte-doux: #401b17;
     --famille: #f19cc4;
     --famille-doux: #44192f;
+    --teinte-1: #f07a8e;
+    --teinte-1-doux: #47202a;
+    --teinte-2: #f2c15a;
+    --teinte-2-doux: #3f3117;
+    --teinte-3: #ab92f0;
+    --teinte-3-doux: #2d2550;
+    --teinte-4: #6fd3a4;
+    --teinte-4-doux: #183a2b;
+    --teinte-5: #f5a25e;
+    --teinte-5-doux: #43291a;
+    --teinte-6: #8fb0e3;
+    --teinte-6-doux: #1f2c42;
     --ombre: 0 1px 2px rgb(0 0 0 / 0.3), 0 6px 20px rgb(0 0 0 / 0.25);
   }
 }
@@ -92,6 +117,18 @@
   --alerte-doux: #401b17;
   --famille: #f19cc4;
   --famille-doux: #44192f;
+  --teinte-1: #f07a8e;
+  --teinte-1-doux: #47202a;
+  --teinte-2: #f2c15a;
+  --teinte-2-doux: #3f3117;
+  --teinte-3: #ab92f0;
+  --teinte-3-doux: #2d2550;
+  --teinte-4: #6fd3a4;
+  --teinte-4-doux: #183a2b;
+  --teinte-5: #f5a25e;
+  --teinte-5-doux: #43291a;
+  --teinte-6: #8fb0e3;
+  --teinte-6-doux: #1f2c42;
   --ombre: 0 1px 2px rgb(0 0 0 / 0.3), 0 6px 20px rgb(0 0 0 / 0.25);
 }
 
