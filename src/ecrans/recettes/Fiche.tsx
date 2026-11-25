@@ -7,6 +7,7 @@ import { formaterDuree } from '../../domaine/texte';
 import { obtenirBase } from '../../donnees/base';
 import { annulerSuppression, dupliquerRecette, supprimerRecette } from '../../donnees/recettes';
 import { Etiquettes, resume, teinte } from './commun';
+import { ouvrirChoixPlat } from '../semaine/ChoixPlat';
 import { ouvrirEditeur } from './etat-editeur';
 import { PhotoRecette } from './PhotoRecette';
 
@@ -77,7 +78,11 @@ export function Fiche({ recette: r }: { recette: Recette }) {
           <p class="sous-titre">{[r.sousTitre, resume(r)].filter(Boolean).join(' · ')}</p>
         </div>
         <div class="actions">
-          <button type="button" class="bouton bouton-primaire" onClick={() => ouvrirEditeur(r.id)}>
+          <button type="button" class="bouton bouton-primaire" onClick={() => ouvrirChoixPlat(r.id)}>
+            <Icone nom="plus" />
+            Ajouter à la fournée
+          </button>
+          <button type="button" class="bouton bouton-secondaire" onClick={() => ouvrirEditeur(r.id)}>
             <Icone nom="crayon" />
             Modifier
           </button>

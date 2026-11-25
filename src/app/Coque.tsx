@@ -4,6 +4,7 @@ import { Frigo } from '../ecrans/Frigo';
 import { Recettes } from '../ecrans/Recettes';
 import { Semaine } from '../ecrans/Semaine';
 import { Session } from '../ecrans/Session';
+import { ChoixPlat } from '../ecrans/semaine/ChoixPlat';
 import { Annonces } from './annonces';
 import { BoutonTheme } from './BoutonTheme';
 import { route } from './etat';
@@ -101,6 +102,7 @@ export function Coque() {
           </main>
         </div>
       </div>
+      <ChoixPlat />
       <Annonces />
     </>
   );

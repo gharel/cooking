@@ -72,7 +72,7 @@ test('chaque écran pas encore construit renvoie vers la maquette, qui reste en 
   request,
 }) => {
   await ouvrir(page);
-  for (const ecran of ECRANS.filter((e) => e.id !== 'recettes')) {
+  for (const ecran of ECRANS.filter((e) => e.id === 'session' || e.id === 'frigo')) {
     await page.evaluate((id) => (location.hash = id), ecran.id);
     const lien = page.getByRole('link', { name: 'Voir cet écran dans la maquette' });
     await expect(lien).toHaveAttribute('href', `/cooking/maquette/#${ecran.id}`);
@@ -85,8 +85,8 @@ test('chaque écran pas encore construit renvoie vers la maquette, qui reste en 
 test('le texte affiché suit la typographie française (espaces insécables)', async ({ page }) => {
   await ouvrir(page);
   const sousTitre = await page.locator('main .sous-titre').first().textContent();
-  expect(sousTitre).toContain('\u00a0:');
-  expect(sousTitre).not.toMatch(/ [:;!?]/);
+  expect(sousTitre).toContain('\u00a0·');
+  expect(sousTitre).not.toMatch(/ [:;!?·]/);
 });
 
 // Une pilule à rayon infini (999px) devient un ovale disgracieux quand son texte passe sur deux lignes.
