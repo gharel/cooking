@@ -210,6 +210,7 @@ Chaque lot commence par une spec courte dans `docs/specs/` et se termine par une
 | **5. Confort**            | Statistiques (temps gagné), import depuis une page web, partage d’une recette de famille (fichier ou fiche imprimable), partage d’une fournée, quantités dans les idées, reconnaissance de texte sur photo | Import d’une page schema.org `Recipe` collée ; une recette de famille exportée puis importée sur un autre appareil garde texte, mot et photo                                                                                                                                                       |
 
 | **6. Ce soir et session à plusieurs** (spec 007) | Widget « Ce soir », plan B (adresses, roulette), rappel du dîner et agenda, recettes du soir, prénoms et répartition des tâches, hygiène, vaisselle et nettoyage dans le déroulé | Voir la spec 007 : roulette uniforme, adresses gardées, `.ics` correct, légumes avant la viande crue, lavage des mains au début et rangement à la fin, personne avec deux tâches à la fois |
+| **7. Repas à l’extérieur et installation** (spec 008) | Repas « À l’extérieur » (ponctuel ou tous les midis, tous les soirs de la semaine), bouton « Installer » (fenêtre du navigateur, marche à suivre sur iPhone) | Voir la spec 008 : repas exclu du compte, de la répartition et des rappels ; bouton qui disparaît une fois installée |
 
 L’import direct par URL se heurte au CORS dans un navigateur : au MVP, on colle le contenu ou on partage la page vers l’application (Web Share Target). Un petit relais serveur reste une option pour plus tard.
 
@@ -240,6 +241,8 @@ Décisions prises en livrant (détail dans les specs) :
 - **Reconnaissance de texte sur photo** reportée (ADR 0002) ; import web par copier-coller (CORS).
 - **Notification du dîner** sans serveur : minuterie dans la page et agenda `.ics` (ADR 0003).
 - **Session à plusieurs** : une tâche active va à la personne libre qui a le moins travaillé ; le lavage de la planche après la viande crue fait partie de la découpe (spec 007).
+- **Repas à l’extérieur** : un drapeau du repas, sans état de semaine à part ; les cases « Midis » et « Soirs » s’en déduisent (spec 008).
+- **Installation** : invitation du navigateur quand elle existe ; sur iPhone, marche à suivre (Partager, « Sur l’écran d’accueil ») et rappel que l’application installée y a son propre stockage (spec 008).
 - **Référencement** : la page reste en `noindex`, comme les autres outils de gharel.github.io : une application personnelle, locale, n’a rien à gagner à être indexée.
 
 Points ouverts : nom définitif (« Fournée » en attendant), licence du code (aucune pour l’instant, donc tous droits réservés).

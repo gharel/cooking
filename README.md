@@ -2,19 +2,19 @@
 
 Application web de batch cooking : vos recettes (y compris celles de la famille), une session de cuisine orchestrée, un frigo sous contrôle.
 
-> **Version 1.1 en ligne : https://gharel.github.io/cooking/** (installable, utilisable hors ligne). La maquette de départ reste visible sur https://gharel.github.io/cooking/maquette/. Nom de travail : « Fournée ».
+> **Version 1.2 en ligne : https://gharel.github.io/cooking/** (installable, utilisable hors ligne). La maquette de départ reste visible sur https://gharel.github.io/cooking/maquette/. Nom de travail : « Fournée ».
 
 ## Ce que fait l’application
 
 | Écran    | Rôle                                                                                                                                                    |
 | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Semaine  | Widget « Ce soir » (dîner du jour, roulette, nos adresses, rappel et agenda) ; plats de la fournée, repas de la semaine, alertes, statistiques, partage |
+| Semaine  | Widget « Ce soir » (dîner du jour, roulette, nos adresses, rappel et agenda) ; plats, repas de la semaine (dont à l’extérieur), alertes, statistiques   |
 | Courses  | Liste consolidée par rayon (une ligne par ingrédient, quantités mises à l’échelle), placard, articles cochés, partage                                   |
 | Session  | Déroulé calculé à une ou plusieurs personnes (qui fait quoi), hygiène et vaisselle comprises, puis guidage en direct : « Maintenant », minuteurs, frise |
 | Frigo    | Plats préparés (fraîcheur, manger, congeler, décongeler) ; « Ce qu’il reste » : idées anti-gaspi et mini-session sans achat                             |
 | Recettes | 21 recettes de départ (dont 8 du soir), recettes de famille racontées puis structurées, photos, import web, partage, impression, export et import       |
 
-Locale d’abord : pas de compte, pas d’abonnement, données sur l’appareil (exportables). Thème clair, sombre ou système.
+Locale d’abord : pas de compte, pas d’abonnement, données sur l’appareil (exportables). Thème clair, sombre ou système. Bouton « Installer » dans le bandeau (sur iPhone : Partager, puis « Sur l’écran d’accueil »).
 
 ## Développement
 

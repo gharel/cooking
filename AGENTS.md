@@ -8,7 +8,9 @@ Les demandes explicites de l’utilisateur priment sur ce document.
 
 **Version 1 livrée** les 25 et 26 novembre 2026 : lots 0 à 5 du plan, une spec par lot (`docs/specs/001` à `006`), toutes au statut « livrée ». Les lots 2 à 5 ont été validés par délégation (objectif donné par l’utilisateur : « livrer l’application en suivant le plan et les décisions prises ») ; les choix faits en route sont écrits dans chaque spec et dans les ADR. La maquette reste en ligne comme référence visuelle (https://gharel.github.io/cooking/maquette/).
 
-**Lot 6 livré** le 26 novembre 2026 (spec `007`, ADR `0003`) : widget « Ce soir », plan B (adresses, roulette), rappel du dîner et agenda `.ics`, recettes du soir, session à plusieurs (prénoms, charge partagée), hygiène et ménage dans le déroulé. Toute nouvelle fonctionnalité repart d’une spec `docs/specs/008-…`.
+**Lot 6 livré** le 26 novembre 2026 (spec `007`, ADR `0003`) : widget « Ce soir », plan B (adresses, roulette), rappel du dîner et agenda `.ics`, recettes du soir, session à plusieurs (prénoms, charge partagée), hygiène et ménage dans le déroulé.
+
+**Lot 7 livré** le 26 novembre 2026 (spec `008`) : repas « À l’extérieur » (ponctuel, ou tous les midis, tous les soirs de la semaine) et bouton « Installer ». Toute nouvelle fonctionnalité repart d’une spec `docs/specs/009-…`.
 
 ## Le produit
 
@@ -30,7 +32,7 @@ src/domaine/               Logique pure, sans DOM, testée : modèle, dictionnai
 src/donnees/               IndexedDB (Dexie, schéma v3), recettes, photos, fournées, réglages, adresses, export et import
 src/ecrans/                Un écran par fichier, chargé à la demande ; sous-dossiers recettes/, semaine/, session/
 src/styles/                jetons.css (seul fichier où une couleur est écrite), base, composants, coque, un par écran
-public/favicon.svg         Logo bocal ; icônes PWA générées au build (pwa-assets.config.ts)
+public/favicon.svg         Logo cocotte (Lucide) ; icônes PWA générées au build (pwa-assets.config.ts)
 maquette/index.html        Maquette de référence (données fictives), copiée dans dist/maquette/
 outils/budget.js           Poids du JavaScript de démarrage (60 ko gzip au plus)
 tests/domaine/             Vitest ; ordonnanceur.test.ts vérifie ses propriétés avec fast-check ;
@@ -89,6 +91,9 @@ Les recettes de départ (`src/donnees/recettes-de-depart.ts`) sont la source uni
 - **Partage et import** : un fichier de recette partagé est un export Fournée (sous-recettes et photos comprises) ; l’import web lit le JSON-LD schema.org collé (pas de lecture d’adresse : CORS) ; les partages reçus arrivent en `?titre=&texte=&adresse=` (Web Share Target).
 - **Reconnaissance de texte** : reportée (ADR 0002).
 - **Ce soir** : le dîner du jour vient d’abord du choix de dernière minute (réglages, valable le jour dit), puis du planning (fournée courante, puis semaine de la dernière session). Les recettes « du soir » se cuisinent le jour même : courses oui, session et alertes de conservation non. Notification seulement application ouverte ou en arrière-plan ; l’agenda `.ics` est la voie sûre (ADR 0003). Liens des adresses : `http` ou `https` seulement.
+- **Repas à l’extérieur** : drapeau `dehors` du repas (absent = à la maison, sans migration) ; un tel repas n’a ni recette ni plat, ne compte pas dans les repas à couvrir, est sauté par la répartition, n’a ni rappel ni événement d’agenda. Les cases « Midis » et « Soirs » se déduisent des repas.
+- **Installation** : `beforeinstallprompt` capté au démarrage (`src/app/installation.ts`) ; sans lui, marche à suivre (iPhone, Android) ; pas de bouton sur ordinateur sans invitation ni une fois installée. Sur iPhone, l’application installée a son propre stockage : le dire.
+- **Budget de démarrage** : 59,3 ko sur 60 ; un nouvel ajout au démarrage doit se payer ailleurs ou passer par un morceau à la demande.
 
 ## Vérification
 
