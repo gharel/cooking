@@ -22,7 +22,8 @@
     "test:e2e": "npm run build && playwright test",
     "budget": "node outils/budget.js",
     "prepare": "simple-git-hooks",
-    "annexe": "vitest run --update tests/domaine/depart.test.ts"
+    "annexe": "vitest run --update tests/domaine/depart.test.ts",
+    "captures": "node outils/captures.js"
   },
   "simple-git-hooks": {
     "pre-commit": "npm run check",
