@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'preact/hooks';
 import { ChoixPlat } from '../ecrans/semaine/ChoixPlat';
 import { Annonces } from './annonces';
+import { BoutonInstaller } from './BoutonInstaller';
 import { BoutonTheme } from './BoutonTheme';
 import { route } from './etat';
 import { Icone, SpriteIcones } from './icones';
@@ -107,6 +108,7 @@ export function Coque() {
           <header class="barre">
             <Marque classe="marque" />
             <span class="barre-espace" />
+            <BoutonInstaller />
             <BoutonTheme />
           </header>
           <main id="contenu" tabIndex={-1}>

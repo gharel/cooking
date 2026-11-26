@@ -61,6 +61,13 @@ const TRACES = {
   partage: <path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v13" />,
   importer: <path d="M12 15V3M7 8l5-5 5 5M5 21h14" />,
   exporter: <path d="M12 3v12M7 10l5 5 5-5M5 21h14" />,
+  'ajout-carre': (
+    <>
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+      <path d="M8 12h8M12 8v8" />
+    </>
+  ),
+  'menu-points': <path d="M12 5h.01M12 12h.01M12 19h.01" />,
   coeur: (
     <path d="M19 14c1.5-1.5 3-3.3 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7z" />
   ),

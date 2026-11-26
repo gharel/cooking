@@ -16,6 +16,7 @@ import { demarrerFournee } from './app/fournee-etat';
 import { chargerDerniereSession } from './app/session-etat';
 import { rafraichirStock } from './app/stock-etat';
 import { route } from './app/etat';
+import { demarrerInstallation } from './app/installation';
 import { lireAncre } from './app/routage';
 import { demarrerTypographie } from './app/typographie-dom';
 
@@ -30,6 +31,9 @@ if (recu.has('texte') || recu.has('adresse')) {
   history.replaceState(null, '', `${location.pathname}#recettes`);
   void import('./ecrans/recettes/ImportWeb').then((m) => (m.importWeb.value = { texte, adresse }));
 }
+
+// Installation : capter l’invitation du navigateur avant qu’elle ne passe.
+demarrerInstallation();
 
 route.value = lireAncre(location.hash);
 addEventListener('hashchange', () => {

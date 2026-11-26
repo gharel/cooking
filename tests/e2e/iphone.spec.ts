@@ -1,6 +1,6 @@
 import { createRequire } from 'node:module';
 import { expect, test, type Page } from '@playwright/test';
-import { ouvrir } from './outils';
+import { debordement, ouvrir, violationsAxe } from './outils';
 
 const require = createRequire(import.meta.url);
 const darkreader = require.resolve('darkreader/darkreader.js');
@@ -37,4 +37,19 @@ test('iPhone : sans le verrou, Dark Reader repeindrait la page (contrôle)', asy
   await page.evaluate(() => document.querySelector('meta[name="darkreader-lock"]')?.remove());
   await activerDarkReader(page);
   expect(await fond(page)).not.toBe('rgb(250, 247, 242)');
+});
+
+test('iPhone : « Installer » explique Partager, puis « Sur l’écran d’accueil »', async ({ page }) => {
+  await ouvrir(page);
+  const bouton = page.getByRole('button', { name: 'Installer', exact: true });
+  await bouton.click();
+  const dialogue = page.getByRole('dialog', { name: 'Installer Fournée' });
+  await expect(dialogue).toContainText('Partager');
+  await expect(dialogue).toContainText('« Sur l’écran d’accueil »');
+  await expect(dialogue).toContainText('exportez-les');
+  expect(await debordement(page)).toBe(0);
+  expect(await violationsAxe(page)).toEqual([]);
+  await dialogue.getByRole('button', { name: 'J’ai compris' }).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(bouton).toBeFocused();
 });

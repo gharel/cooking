@@ -197,3 +197,30 @@ main {
     padding: 28px 32px 56px;
   }
 }
+
+/* Installer : bouton du bandeau et marche à suivre (iPhone, Android sans invitation du navigateur). */
+.bouton-installer {
+  flex: none;
+}
+.etapes-installation {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 12px 0 16px;
+  padding: 0;
+  list-style: none;
+}
+.etapes-installation li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.etapes-installation .icone {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  padding: 8px;
+  border-radius: var(--rayon-m);
+  background: var(--primaire-doux);
+  color: var(--primaire-texte);
+}
