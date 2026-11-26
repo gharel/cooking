@@ -4,6 +4,7 @@ import { ajouterPlat, alertes, changerRepas, nouvelleFournee, type Fournee } fro
 import { completerReglages, equipementDeSession } from '../../src/domaine/reglages';
 import {
   ADRESSES_DE_DEPART,
+  DINER_DEHORS,
   appliquerChoix,
   calendrierDesDiners,
   delaiAvantDiner,
@@ -16,6 +17,7 @@ import {
   tirer,
   type Adresse,
 } from '../../src/domaine/soir';
+import { texteDeLaFournee } from '../../src/domaine/partage';
 import type { Plat } from '../../src/domaine/stock';
 import { recettesDeDepart } from '../../src/donnees/recettes-de-depart';
 
@@ -172,6 +174,23 @@ describe('agenda et rappel', () => {
     expect(ics.match(/BEGIN:VEVENT/g)).toHaveLength(3);
     expect(ics.match(/BEGIN:VALARM/g)).toHaveLength(3);
     expect(ics).toContain('DTSTAMP:20261201T080000Z');
+  });
+
+  it('un dîner à l’extérieur : affiché, sans événement, et la semaine précédente n’est pas consultée', () => {
+    const dehors = changerRepas(fournee(), soirDu(fournee(), '2026-12-01'), {
+      recetteId: null,
+      platId: null,
+      dehors: true,
+    });
+    const autre = { ...prevoir(fournee(), '2026-12-01', 'depart-chili'), id: 'f0' };
+    const d = dinerDuSoir([dehors, autre], recettes, [], '2026-12-01');
+    expect(d).toMatchObject({ source: 'dehors', nom: DINER_DEHORS, recetteId: null });
+    // Un choix de dernière minute passe avant.
+    const choix = { jour: '2026-12-01', recetteId: 'soir-croque-monsieur', adresseId: null };
+    expect(appliquerChoix(d, choix, recettes, []).nom).toBe('Croque-monsieur');
+    const ics = calendrierDesDiners([dehors, autre], recettes, [], 2, '19:30', '2026-12-01', new Date());
+    expect(ics).not.toContain('BEGIN:VEVENT');
+    expect(texteDeLaFournee(dehors, recettes, [], '14 h')).toContain('- mardi soir : à l’extérieur');
   });
 
   it('délai avant le dîner', () => {

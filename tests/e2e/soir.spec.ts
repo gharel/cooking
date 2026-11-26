@@ -144,6 +144,48 @@ test('rappel du dîner : l’autorisation accordée active la notification à l�
     .toEqual(['Ce soir : rien de prévu']);
 });
 
+test('un dîner à l’extérieur : affiché la veille et le soir même, sans rappel ni agenda', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const vues: string[] = [];
+    (window as unknown as { notifications: string[] }).notifications = vues;
+    class FausseNotification {
+      static permission = 'granted';
+      static requestPermission = () => Promise.resolve('granted');
+      onclick: (() => void) | null = null;
+      constructor(titre: string) {
+        vues.push(titre);
+      }
+      close() {}
+    }
+    Object.defineProperty(window, 'Notification', { value: FausseNotification });
+  });
+  await page.goto('./#semaine');
+  // La semaine affichée est celle de la prochaine session : mercredi 9 décembre.
+  await page.getByRole('combobox', { name: 'Repas du mercredi soir' }).selectOption('d');
+
+  await page.clock.setSystemTime(new Date('2026-12-08T17:00:00'));
+  await page.reload();
+  await expect(widget(page)).toContainText('Demain soir : à l’extérieur');
+
+  await page.clock.setSystemTime(new Date('2026-12-09T17:00:00'));
+  await page.reload();
+  await expect(widget(page).getByRole('heading', { level: 2 })).toHaveText('Dîner à l’extérieur');
+  await expect(widget(page)).toContainText('Rien à cuisiner ce soir');
+  await widget(page).getByText('Être prévenu du dîner').click();
+  await page.getByLabel('Heure du dîner', { exact: true }).fill('17:30');
+  await page.getByLabel('Heure du dîner', { exact: true }).blur();
+  await page.getByRole('checkbox', { name: 'Me prévenir à l’heure du dîner' }).check();
+  await page.clock.runFor(31 * 60_000);
+  expect(await page.evaluate(() => (window as unknown as { notifications: string[] }).notifications)).toEqual(
+    [],
+  );
+  // Rien d’autre de prévu : pas de fichier d’agenda.
+  await page.getByRole('button', { name: 'Ajouter les dîners à mon agenda' }).click();
+  await expect(page.getByRole('status').filter({ hasText: /Aucun dîner prévu/ })).toHaveCount(1);
+});
+
 for (const theme of ['light', 'dark'] as const)
   for (const largeur of [360, 1280])
     test(`widget et roulette à ${largeur} px en thème ${theme}`, async ({ page }) => {

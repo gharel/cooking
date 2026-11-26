@@ -6,10 +6,14 @@ import {
   alertes,
   changerDateSession,
   changerRepas,
+  momentALaMaison,
+  momentDehors,
   nouvelleFournee,
   repartir,
+  repasALaMaison,
   repasCouverts,
   retirerPlat,
+  type Fournee,
 } from '../../src/domaine/fournee';
 import { analyserIngredient } from '../../src/domaine/ingredients';
 import { arrondirQuantite, formaterQuantite, texteMisALEchelle } from '../../src/domaine/portions';
@@ -124,6 +128,50 @@ describe('fournée', () => {
     expect(types).toContainEqual(['veille', 'depart-brandade']);
     const congeler = alertes(f, recettes, 2).find((a) => a.type === 'congeler');
     expect(congeler?.detail).toMatch(/sortez-les mercredi soir/);
+  });
+});
+
+describe('repas à l’extérieur', () => {
+  const mardiSoir = (f: Fournee) => f.repas.findIndex((r) => r.jour === '2026-12-01' && r.moment === 'soir');
+
+  it('un repas à l’extérieur perd son plat, sort du compte et n’est pas rempli par la répartition', () => {
+    let f = ajouterPlat(fournee(), 'depart-chili', 12);
+    f = changerRepas(f, mardiSoir(f), { recetteId: 'depart-chili', platId: null });
+    f = changerRepas(f, mardiSoir(f), { recetteId: null, platId: null, dehors: true });
+    expect(f.repas[mardiSoir(f)]).toMatchObject({ recetteId: null, platId: null, dehors: true });
+    expect(repasALaMaison(f)).toBe(13);
+    f = repartir(f, recettes, 1);
+    expect(f.repas[mardiSoir(f)]).toMatchObject({ recetteId: null, dehors: true });
+    expect(repasCouverts(f)).toBe(12);
+    // Choisir un plat le remet à la maison.
+    f = changerRepas(f, mardiSoir(f), { recetteId: 'depart-chili', platId: null });
+    expect(f.repas[mardiSoir(f)]?.dehors).toBe(false);
+    expect(repasALaMaison(f)).toBe(14);
+  });
+
+  it('tous les midis à l’extérieur, puis de retour à la maison ; la date de session les emporte', () => {
+    let f = changerRepas(fournee(), 0, { recetteId: 'depart-dahl', platId: null });
+    const avant = f;
+    f = momentDehors(f, 'midi', true);
+    expect(avant.repas[0]?.recetteId).toBe('depart-dahl');
+    expect(f.repas.filter((r) => r.moment === 'midi').every((r) => r.dehors && !r.recetteId)).toBe(true);
+    expect(f.repas.filter((r) => r.moment === 'soir').some((r) => r.dehors)).toBe(false);
+    expect([momentALaMaison(f, 'midi'), momentALaMaison(f, 'soir')]).toEqual([false, true]);
+    expect(repasALaMaison(f)).toBe(7);
+    expect(changerDateSession(f, '2026-12-06').repas[0]).toMatchObject({ jour: '2026-12-07', dehors: true });
+    f = momentDehors(f, 'midi', false);
+    expect(repasALaMaison(f)).toBe(14);
+    expect(momentALaMaison(f, 'midi')).toBe(true);
+    // Un seul midi à la maison suffit pour que la case reste cochée.
+    f = changerRepas(momentDehors(f, 'midi', true), 0, { recetteId: null, platId: null });
+    expect(momentALaMaison(f, 'midi')).toBe(true);
+  });
+
+  it('une fournée enregistrée avant le lot 7 (sans le champ) est à la maison', () => {
+    const ancienne = fournee();
+    for (const r of ancienne.repas) delete r.dehors;
+    expect(repasALaMaison(ancienne)).toBe(14);
+    expect(momentALaMaison(ancienne, 'soir')).toBe(true);
   });
 });
 

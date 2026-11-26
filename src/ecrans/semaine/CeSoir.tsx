@@ -105,7 +105,11 @@ export function CeSoir() {
         </p>
         <h2 id="titre-ce-soir">{d.nom ?? 'Rien de prévu'}</h2>
         <p class="aide">{d.conseil}</p>
-        {demain.nom && <p class="ce-soir-demain">Demain soir : {demain.nom}</p>}
+        {demain.nom && (
+          <p class="ce-soir-demain">
+            Demain soir : {demain.source === 'dehors' ? 'à l’extérieur' : demain.nom}
+          </p>
+        )}
       </div>
       <div class="actions">
         {d.recetteId && (

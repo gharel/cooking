@@ -40,7 +40,9 @@ export function hasard(): number {
   return (tableau[0] ?? 0) / 2 ** 32;
 }
 
-export type SourceDiner = 'plat' | 'fournee' | 'soir' | 'adresse' | 'libre';
+export type SourceDiner = 'plat' | 'fournee' | 'soir' | 'adresse' | 'dehors' | 'libre';
+
+export const DINER_DEHORS = 'Dîner à l’extérieur';
 
 export interface DinerDuSoir {
   jour: DateISO;
@@ -65,8 +67,16 @@ export function dinerDuSoir(
   for (const f of fournees) {
     const index = f.repas.findIndex((r) => r.jour === jour && r.moment === 'soir');
     const repas: Repas | undefined = f.repas[index];
-    if (!repas || (!repas.recetteId && !repas.platId)) continue;
     const base = { jour, fourneeId: f.id, indexRepas: index, adresseId: null };
+    if (repas?.dehors)
+      return {
+        ...base,
+        source: 'dehors',
+        nom: DINER_DEHORS,
+        recetteId: null,
+        conseil: 'Rien à cuisiner ce soir. Une de nos adresses à appeler ?',
+      };
+    if (!repas || (!repas.recetteId && !repas.platId)) continue;
     const plat = repas.platId ? plats.find((p) => p.id === repas.platId) : undefined;
     if (plat)
       return {
@@ -222,6 +232,7 @@ export function calendrierDesDiners(
       const diner = dinerDuSoir([f], recettes, plats, r.jour);
       if (diner.source === 'libre' || !diner.nom) continue;
       vus.add(r.jour);
+      if (diner.source === 'dehors') continue;
       lignes.push(
         ...evenement(`diner-${r.jour}`, r.jour, heureDiner, `Dîner : ${diner.nom}`, diner.conseil, tampon),
       );

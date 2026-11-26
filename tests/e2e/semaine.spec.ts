@@ -58,6 +58,35 @@ test('répartir automatiquement couvre 8 repas avec 4 plats de 4 portions pour 2
   await expect(page.locator('.stat').first()).toHaveText(/8\ssur 14/);
 });
 
+test('repas à l’extérieur : un soir ponctuel, puis tous les midis de la semaine', async ({ page }) => {
+  page.on('dialog', (d) => void d.accept());
+  await ouvrirSemaine(page);
+  await ajouterPlat(page, 'Chili con carne', 8);
+  const mardiSoir = page.getByRole('combobox', { name: 'Repas du mardi soir' });
+  await mardiSoir.selectOption('d');
+  await expect(page.locator('.repas-dehors')).toHaveText(/À l’extérieur/);
+  await expect(page.locator('.stat').first()).toHaveText(/0\ssur\s13/);
+  await page.getByRole('button', { name: 'Répartir automatiquement' }).click();
+  await expect(page.locator('.stat').first()).toHaveText(/4\ssur\s13/);
+  await expect(mardiSoir).toHaveValue('d');
+  await page.reload();
+  await expect(mardiSoir).toHaveValue('d');
+
+  // Toute la semaine : les midis à l’extérieur (les plats prévus le midi sont retirés après confirmation).
+  const midis = page.getByRole('group', { name: 'À la maison cette semaine' }).getByRole('checkbox', {
+    name: 'Midis',
+  });
+  await midis.uncheck();
+  await expect(page.getByRole('combobox', { name: 'Repas du lundi midi' })).toHaveValue('d');
+  await expect(page.locator('.stat').first()).toHaveText(/sur\s6/);
+  await page.reload();
+  await expect(midis).not.toBeChecked();
+  await midis.check();
+  await expect(page.getByRole('combobox', { name: 'Repas du lundi midi' })).toHaveValue('');
+  await expect(page.locator('.stat').first()).toHaveText(/sur\s13/);
+  await expect(mardiSoir).toHaveValue('d');
+});
+
 test('un gratin prévu jeudi midi doit être congelé et sorti mercredi soir', async ({ page }) => {
   await ouvrirSemaine(page);
   await ajouterPlat(page, 'Gratin dauphinois');

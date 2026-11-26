@@ -6,15 +6,21 @@ import { listeDeCourses } from '../domaine/courses';
 import { dateLongue, dateSansJour, heureLisible, jourCourt, nomDuJour, numeroDuJour } from '../domaine/dates';
 import { platsDuSoir } from '../domaine/soir';
 import {
+  MOMENTS,
   alertes,
   changerDateSession,
   changerRepas,
   joursDeLaFournee,
+  momentALaMaison,
+  momentDehors,
   portionsTotales,
   repartir,
+  repasALaMaison,
   repasCouverts,
   retirerPlat,
   type Alerte,
+  type Fournee,
+  type Moment,
   type TypeAlerte,
 } from '../domaine/fournee';
 import { estCongelable } from '../domaine/modele';
@@ -37,6 +43,41 @@ const ICONES_ALERTES: Readonly<Record<TypeAlerte, NomIcone>> = {
 };
 
 const pluriel = (n: number, mot: string) => `${n} ${mot}${n > 1 ? 's' : ''}`;
+
+const NOMS_MOMENTS: Readonly<Record<Moment, string>> = { midi: 'Midis', soir: 'Soirs' };
+
+/** « À la maison cette semaine » : décocher met tous les midis (ou soirs) à l’extérieur. */
+function ALaMaison({ f }: { f: Fournee }) {
+  return (
+    <fieldset class="a-la-maison">
+      <legend>À la maison cette semaine</legend>
+      {MOMENTS.map((m) => (
+        <label key={m} class="case">
+          <input
+            type="checkbox"
+            checked={momentALaMaison(f, m)}
+            onChange={(e) => {
+              const oui = e.currentTarget.checked;
+              const prevus = f.repas.some((r) => r.moment === m && (r.recetteId || r.platId));
+              if (
+                !oui &&
+                prevus &&
+                !confirm(
+                  `Les plats prévus ${m === 'midi' ? 'le midi' : 'le soir'} seront retirés. Continuer ?`,
+                )
+              ) {
+                e.currentTarget.checked = true;
+                return;
+              }
+              void modifierFournee((x) => momentDehors(x, m, !oui));
+            }}
+          />
+          {NOMS_MOMENTS[m]}
+        </label>
+      ))}
+    </fieldset>
+  );
+}
 
 function ListeAlertes({ liste }: { liste: Alerte[] }) {
   if (liste.length === 0) return <p class="aide">Rien à signaler pour l’instant.</p>;
@@ -178,7 +219,7 @@ export function Semaine() {
         <li class="stat">
           <span class="stat-valeur">
             {repasCouverts(f)}
-            <small> sur 14</small>
+            <small> sur {repasALaMaison(f)}</small>
           </span>
           <span class="stat-nom">repas couverts</span>
         </li>
@@ -218,7 +259,7 @@ export function Semaine() {
                   <div class="ligne-plat-texte">
                     <a href={ancreFiche(r.id)}>{r.nom}</a>
                     <span>
-                      Frigo {r.conservation.frigoJours} jours ·{' '}
+                      Frigo {pluriel(r.conservation.frigoJours, 'jour')} ·{' '}
                       {estCongelable(r) ? 'congelable' : 'ne se congèle pas'}
                     </span>
                   </div>
@@ -285,6 +326,7 @@ export function Semaine() {
               Répartir automatiquement
             </button>
           </div>
+          <ALaMaison f={f} />
           <ol class="jours">
             {jours.map((jour) => (
               <li key={jour} class="jour">
@@ -294,22 +336,27 @@ export function Semaine() {
                 {(['midi', 'soir'] as const).map((moment) => {
                   const index = f.repas.findIndex((r) => r.jour === jour && r.moment === moment);
                   const repas = f.repas[index];
-                  const choisi = repas?.platId
-                    ? `p:${repas.platId}`
-                    : repas?.recetteId
-                      ? `r:${repas.recetteId}`
-                      : '';
+                  const dehors = repas?.dehors === true;
+                  const choisi = dehors
+                    ? 'd'
+                    : repas?.platId
+                      ? `p:${repas.platId}`
+                      : repas?.recetteId
+                        ? `r:${repas.recetteId}`
+                        : '';
                   const platStock = repas?.platId ? stock.find((x) => x.id === repas.platId) : undefined;
-                  const nomChoisi = platStock
-                    ? `${platStock.nom} (${platStock.lieu === 'frigo' ? 'frigo' : 'congélateur'})`
-                    : repas?.recetteId
-                      ? (parId.get(repas.recetteId)?.nom ?? 'Libre')
-                      : 'Libre';
+                  const nomChoisi = dehors
+                    ? 'À l’extérieur'
+                    : platStock
+                      ? `${platStock.nom} (${platStock.lieu === 'frigo' ? 'frigo' : 'congélateur'})`
+                      : repas?.recetteId
+                        ? (parId.get(repas.recetteId)?.nom ?? 'Libre')
+                        : 'Libre';
                   const teinteChoisie = platStock?.recetteId ?? repas?.recetteId ?? '';
                   return (
                     <label
                       key={moment}
-                      class={`repas${choisi ? ` teinte-${teinte(teinteChoisie || choisi)}` : ' repas-libre'}`}
+                      class={`repas${dehors ? ' repas-dehors' : choisi ? ` teinte-${teinte(teinteChoisie || choisi)}` : ' repas-libre'}`}
                     >
                       <span class="moment">{moment === 'midi' ? 'Midi' : 'Soir'}</span>
                       <span class="repas-nom" aria-hidden="true">
@@ -325,11 +372,13 @@ export function Semaine() {
                             changerRepas(x, index, {
                               recetteId: v.startsWith('r:') ? v.slice(2) : null,
                               platId: v.startsWith('p:') ? v.slice(2) : null,
+                              dehors: v === 'd',
                             }),
                           );
                         }}
                       >
                         <option value="">Libre</option>
+                        <option value="d">À l’extérieur (resto, invitation…)</option>
                         {plats.length > 0 && (
                           <optgroup label="Plats de la fournée">
                             {plats.map((p) => (

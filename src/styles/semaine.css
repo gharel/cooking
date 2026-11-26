@@ -300,6 +300,28 @@
   border: 1.5px dashed var(--bordure-forte);
   background: transparent;
 }
+/* Repas à l’extérieur : rien à prévoir, la case s’efface. */
+.repas-dehors {
+  border: 1.5px solid var(--bordure);
+  background: transparent;
+}
+.a-la-maison {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 16px;
+  margin: -6px 0 10px;
+  padding: 0;
+  border: 0;
+}
+.a-la-maison legend {
+  float: left;
+  margin-right: 0;
+  color: var(--texte-doux);
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 36px;
+}
 .moment {
   color: var(--texte-doux);
   font-size: 0.7rem;
@@ -539,9 +561,13 @@
   font-weight: 600;
   line-height: 1.25;
 }
-.repas-libre .repas-nom {
+.repas-libre .repas-nom,
+.repas-dehors .repas-nom {
   color: var(--texte-doux);
   font-weight: 500;
+}
+.repas-dehors .repas-nom {
+  font-style: italic;
 }
 .repas .repas-choix {
   position: absolute;

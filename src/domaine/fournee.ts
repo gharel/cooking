@@ -10,6 +10,8 @@ export interface Repas {
   recetteId: string | null;
   /** Plat déjà au frigo ou au congélateur (lot 4). */
   platId: string | null;
+  /** Repas pris à l’extérieur (resto, invitation) : rien à prévoir. Absent = à la maison (lot 7). */
+  dehors?: boolean;
 }
 
 export interface PlatDeFournee {
@@ -92,7 +94,8 @@ export function changerDateSession(f: Fournee, sessionLe: DateISO): Fournee {
   const nouveaux = repasVides(sessionLe);
   return { ...f, sessionLe, repas: nouveaux.map((r, i) => ({ ...r, ...pick(f.repas[i]) })) };
 }
-const pick = (r: Repas | undefined) => (r ? { recetteId: r.recetteId, platId: r.platId } : {});
+const pick = (r: Repas | undefined) =>
+  r ? { recetteId: r.recetteId, platId: r.platId, dehors: r.dehors === true } : {};
 
 export function ajouterPlat(f: Fournee, recetteId: string, portions: number): Fournee {
   const existe = f.plats.some((p) => p.recetteId === recetteId);
@@ -112,17 +115,45 @@ export function retirerPlat(f: Fournee, recetteId: string): Fournee {
   };
 }
 
-export function changerRepas(f: Fournee, index: number, choix: Pick<Repas, 'recetteId' | 'platId'>): Fournee {
-  return { ...f, repas: f.repas.map((r, i) => (i === index ? { ...r, ...choix } : r)) };
+/** Choisit un repas : un plat, une recette, « Libre » ou « À l’extérieur » (rien de prévu à la maison). */
+export function changerRepas(
+  f: Fournee,
+  index: number,
+  choix: Pick<Repas, 'recetteId' | 'platId'> & { dehors?: boolean },
+): Fournee {
+  const dehors = choix.dehors === true;
+  const nouveau = dehors ? { recetteId: null, platId: null } : choix;
+  return { ...f, repas: f.repas.map((r, i) => (i === index ? { ...r, ...nouveau, dehors } : r)) };
 }
 
+/** Tous les midis (ou tous les soirs) de la semaine à l’extérieur, ou tous de retour à la maison (libres). */
+export function momentDehors(f: Fournee, moment: Moment, dehors: boolean): Fournee {
+  return {
+    ...f,
+    repas: f.repas.map((r) =>
+      r.moment !== moment
+        ? r
+        : dehors
+          ? { ...r, recetteId: null, platId: null, dehors: true }
+          : { ...r, dehors: false },
+    ),
+  };
+}
+
+/** Le moment est-il à la maison cette semaine ? Oui tant qu’un de ses repas l’est. */
+export const momentALaMaison = (f: Fournee, moment: Moment): boolean =>
+  f.repas.some((r) => r.moment === moment && !r.dehors);
+
 export const repasCouverts = (f: Fournee): number => f.repas.filter((r) => r.recetteId || r.platId).length;
+/** Repas à prévoir : ceux pris à la maison. */
+export const repasALaMaison = (f: Fournee): number => f.repas.filter((r) => !r.dehors).length;
 export const portionsTotales = (f: Fournee): number => f.plats.reduce((t, p) => t + p.portions, 0);
 
 /**
  * Répartit les plats de la fournée sur les repas libres : ceux qui se gardent le moins au frigo d’abord,
  * sans dépasser leurs portions (1 repas = 1 portion par personne), en évitant deux fois le même plat
- * d’affilée. Un repas au-delà de la conservation au frigo ne reçoit qu’un plat congelable.
+ * d’affilée. Un repas au-delà de la conservation au frigo ne reçoit qu’un plat congelable. Un repas à
+ * l’extérieur ne reçoit rien.
  */
 export function repartir(f: Fournee, recettes: readonly Recette[], personnes: number): Fournee {
   const parId = new Map(recettes.map((r) => [r.id, r]));
@@ -132,7 +163,7 @@ export function repartir(f: Fournee, recettes: readonly Recette[], personnes: nu
   const repas = f.repas.map((r) => ({ ...r, recetteId: r.platId ? r.recetteId : null }));
   let precedent: string | null = null;
   for (const r of repas) {
-    if (r.platId) continue;
+    if (r.platId || r.dehors) continue;
     const jourJ = ecartJours(f.sessionLe, r.jour);
     const candidats = f.plats
       .map((p) => ({ p, recette: parId.get(p.recetteId) }))

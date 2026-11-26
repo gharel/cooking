@@ -110,6 +110,8 @@ export async function activerRappelDiner(oui: boolean): Promise<NotificationPerm
 async function notifierDiner(): Promise<void> {
   if (!notificationsPossibles() || Notification.permission !== 'granted') return;
   const d = dinerDu();
+  // Dîner à l’extérieur : rien à rappeler.
+  if (d.source === 'dehors') return;
   const titre = d.nom ? `Ce soir : ${d.nom}` : 'Ce soir : rien de prévu';
   const options: NotificationOptions = { body: d.conseil, tag: `diner-${d.jour}`, icon: 'pwa-192x192.png' };
   try {

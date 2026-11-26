@@ -39,12 +39,13 @@ export function texteDeLaFournee(
     'Plats :',
     ...f.plats.map((p) => `- ${nom(p.recetteId)} (${p.portions} portions)`),
   ];
-  const repas = f.repas.filter((r) => r.recetteId || r.platId);
+  const repas = f.repas.filter((r) => r.recetteId || r.platId || r.dehors);
   if (repas.length) {
     lignes.push('', 'Repas :');
     for (const r of repas) {
       const plat = r.platId ? plats.find((p) => p.id === r.platId) : undefined;
-      lignes.push(`- ${nomDuJour(r.jour)} ${r.moment} : ${plat ? `${plat.nom} (stock)` : nom(r.recetteId)}`);
+      const quoi = r.dehors ? 'à l’extérieur' : plat ? `${plat.nom} (stock)` : nom(r.recetteId);
+      lignes.push(`- ${nomDuJour(r.jour)} ${r.moment} : ${quoi}`);
     }
   }
   return lignes.join('\n');
