@@ -13,9 +13,9 @@ import {
 import type { Equipement } from '../domaine/reglages';
 import { figeesEffectives, minutesEcoulees, platsDeLaSession } from '../domaine/session';
 import { nouvelIdentifiant, obtenirBase } from '../donnees/base';
-import { fourneesTerminees } from '../donnees/fournees';
 import { demanderNotifications, garderEcranAllume, preparerSon } from './alarme';
 import { fournee, modifierFournee, nouvelleFourneeCourante } from './fournee-etat';
+import { ajouterAHistorique } from './historique-etat';
 import { rafraichirStock } from './stock-etat';
 
 /** Heure courante, rafraîchie chaque seconde pendant la session. */
@@ -29,16 +29,6 @@ export function demarrerHorloge(): () => void {
     clearInterval(minuterie);
     minuterie = undefined;
   };
-}
-
-/** Dernière session terminée (bilan, planning des repas de la semaine en cours). */
-export const derniereSession = signal<Fournee | null>(null);
-/** Toutes les fournées terminées, de la plus récente à la plus ancienne (statistiques). */
-export const historique = signal<Fournee[]>([]);
-
-export async function chargerDerniereSession(): Promise<void> {
-  historique.value = await fourneesTerminees(obtenirBase());
-  derniereSession.value = historique.value[0] ?? null;
 }
 
 const SANS_HYGIENE: OptionsSession = { hygiene: false, laveVaisselle: false };
@@ -137,8 +127,7 @@ export async function terminerSession(recettes: readonly Recette[], personnes: n
     await base.fournees.put(terminee);
   });
   void garderEcranAllume(false);
-  derniereSession.value = terminee;
-  historique.value = [terminee, ...historique.value];
+  ajouterAHistorique(terminee);
   await nouvelleFourneeCourante();
   await rafraichirStock();
   return plats.length;

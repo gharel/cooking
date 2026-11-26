@@ -19,7 +19,7 @@ import { obtenirBase } from '../donnees/base';
 import { annoncer } from './annonces';
 import { recettes } from './bibliotheque-etat';
 import { fournee, modifierReglages, reglages } from './fournee-etat';
-import { derniereSession } from './session-etat';
+import { derniereSession } from './historique-etat';
 import { plats } from './stock-etat';
 
 /** Adresses du plan B, par ordre alphabétique. */

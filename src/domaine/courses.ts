@@ -3,25 +3,8 @@ import type { PlatDeFournee } from './fournee';
 import type { Ingredient, Recette } from './modele';
 import { arrondirQuantite, formaterQuantite, liaison, texteQuantite, uniteAccordee } from './portions';
 
-/** Basiques supposés au placard : à part dans les courses, déplaçables d’un geste. */
-export const PLACARD_PAR_DEFAUT: readonly string[] = [
-  'sel',
-  'poivre',
-  'huile',
-  'huile-olive',
-  'curry',
-  'curcuma',
-  'cumin',
-  'paprika',
-  'piment',
-  'herbes-de-provence',
-  'origan',
-  'thym',
-  'laurier',
-  'muscade',
-  'vinaigre',
-  'moutarde',
-];
+/** Basiques supposés au placard : définis avec les réglages (chargés au démarrage, sans le dictionnaire). */
+export { PLACARD_PAR_DEFAUT } from './reglages';
 
 export interface Part {
   recette: string;

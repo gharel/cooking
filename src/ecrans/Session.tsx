@@ -3,11 +3,11 @@ import { garderEcranAllume, sonner } from '../app/alarme';
 import { annoncer } from '../app/annonces';
 import { recettes } from '../app/bibliotheque-etat';
 import { fournee, modifierFournee, modifierReglages, reglages } from '../app/fournee-etat';
+import { derniereSession } from '../app/historique-etat';
 import { Icone } from '../app/icones';
 import {
   agir,
   demarrerHorloge,
-  derniereSession,
   figer,
   horloge,
   lancerSession,

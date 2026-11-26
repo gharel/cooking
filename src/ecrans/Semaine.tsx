@@ -25,7 +25,7 @@ import {
 } from '../domaine/fournee';
 import { estCongelable } from '../domaine/modele';
 import { rappelsDecongelation } from '../domaine/stock';
-import { derniereSession, historique } from '../app/session-etat';
+import { derniereSession, historique } from '../app/historique-etat';
 import { statistiques, texteDeLaFournee } from '../domaine/partage';
 import { formaterDuree } from '../domaine/texte';
 import { partagerTexte } from '../app/partager';

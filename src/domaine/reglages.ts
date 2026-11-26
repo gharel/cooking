@@ -1,5 +1,24 @@
-import { PLACARD_PAR_DEFAUT } from './courses';
 import type { ChoixDuSoir } from './soir';
+
+/** Basiques supposés au placard : à part dans les courses, déplaçables d’un geste. */
+export const PLACARD_PAR_DEFAUT: readonly string[] = [
+  'sel',
+  'poivre',
+  'huile',
+  'huile-olive',
+  'curry',
+  'curcuma',
+  'cumin',
+  'paprika',
+  'piment',
+  'herbes-de-provence',
+  'origan',
+  'thym',
+  'laurier',
+  'muscade',
+  'vinaigre',
+  'moutarde',
+];
 
 export interface Equipement {
   feux: number;

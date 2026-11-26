@@ -13,7 +13,7 @@ import { registerSW } from 'virtual:pwa-register';
 import { demarrerBibliotheque } from './app/bibliotheque-etat';
 import { Coque, prechargerEcrans } from './app/Coque';
 import { demarrerFournee } from './app/fournee-etat';
-import { chargerDerniereSession } from './app/session-etat';
+import { chargerDerniereSession } from './app/historique-etat';
 import { rafraichirStock } from './app/stock-etat';
 import { route } from './app/etat';
 import { demarrerInstallation } from './app/installation';

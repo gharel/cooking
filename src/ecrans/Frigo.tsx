@@ -5,7 +5,7 @@ import { Dialogue } from '../app/Dialogue';
 import { fournee, modifierFournee, reglages } from '../app/fournee-etat';
 import { Icone } from '../app/icones';
 import { ancreFiche, type OngletFrigo } from '../app/routage';
-import { derniereSession } from '../app/session-etat';
+import { derniereSession } from '../app/historique-etat';
 import { plats, rafraichirStock, restes } from '../app/stock-etat';
 import { ajouterJours, ajouterMois, aujourdhui, dateLongue, dateCourte } from '../domaine/dates';
 import { ajouterPlat } from '../domaine/fournee';
