@@ -43,7 +43,7 @@ function Marque({ classe }: { classe: string }) {
   return (
     <a class={classe} href="#semaine">
       <span class="logo">
-        <Icone nom="bocal" />
+        <Icone nom="cocotte" />
       </span>
       <span class="marque-texte">
         <strong>Fournée</strong>

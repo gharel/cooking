@@ -1,11 +1,7 @@
 /** Icônes : dessins Lucide (licence ISC), en sprite SVG, toujours décoratives. */
 const TRACES = {
-  bocal: (
-    <>
-      <rect x="7" y="2" width="10" height="3" rx="1" />
-      <path d="M6 8a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3v11a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3z" />
-      <path d="M6 12h12" />
-    </>
+  cocotte: (
+    <path d="M2 12h20M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8m0-4 16-4M8.86 6.78l-.45-1.81a2 2 0 0 1 1.45-2.43l1.94-.48a2 2 0 0 1 2.43 1.46l.45 1.8" />
   ),
   calendrier: (
     <>
