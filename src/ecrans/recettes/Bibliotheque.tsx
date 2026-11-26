@@ -2,26 +2,16 @@ import { useRef, useState } from 'preact/hooks';
 import { annoncer } from '../../app/annonces';
 import { chargee, manquantes, persistant, rafraichir, recettes } from '../../app/bibliotheque-etat';
 import { Icone } from '../../app/icones';
+import { RappelSauvegarde } from '../../app/RappelSauvegarde';
+import { telechargerExport } from '../../app/sauvegarde-etat';
 import { ancreFiche } from '../../app/routage';
 import { FILTRES, filtrerRecettes, type Filtre } from '../../domaine/bibliotheque';
 import { obtenirBase } from '../../donnees/base';
-import { exporter, importer } from '../../donnees/echange';
+import { importer } from '../../donnees/echange';
 import { installerRecettesDeDepart } from '../../donnees/recettes';
 import { Etiquettes, resume, teinte } from './commun';
 import { ouvrirEditeur } from './etat-editeur';
 import { importWeb } from './ImportWeb';
-
-async function telechargerExport(): Promise<void> {
-  const contenu = await exporter(obtenirBase());
-  const nom = `fournee-recettes-${contenu.exporteLe.slice(0, 10)}.json`;
-  const url = URL.createObjectURL(new Blob([JSON.stringify(contenu, null, 2)], { type: 'application/json' }));
-  const lien = document.createElement('a');
-  lien.href = url;
-  lien.download = nom;
-  lien.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-  annoncer(`Export prêt : ${nom}`);
-}
 
 const CLE_AVERTISSEMENT = 'fournee:avertissement-stockage-vu';
 const avertissementDejaVu = () => {
@@ -150,6 +140,7 @@ export function Bibliotheque({ message }: { message?: string | undefined }) {
           </button>
         </div>
       )}
+      <RappelSauvegarde />
 
       <div class="outils-recettes">
         <label class="recherche">

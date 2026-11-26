@@ -633,6 +633,11 @@ a.attribut {
 .bandeau-fermable p {
   flex: 1 1 260px;
 }
+.actions-rappel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
 .pastille-soir {
   background: var(--froid-doux);
   color: var(--froid);

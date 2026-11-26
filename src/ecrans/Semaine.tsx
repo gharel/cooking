@@ -29,6 +29,7 @@ import { derniereSession, historique } from '../app/historique-etat';
 import { statistiques, texteDeLaFournee } from '../domaine/partage';
 import { formaterDuree } from '../domaine/texte';
 import { partagerTexte } from '../app/partager';
+import { RappelSauvegarde } from '../app/RappelSauvegarde';
 import { plats as platsStock } from '../app/stock-etat';
 import { aujourdhui } from '../domaine/dates';
 import { teinte } from './recettes/commun';
@@ -157,6 +158,7 @@ export function Semaine() {
       </div>
 
       <CeSoir />
+      <RappelSauvegarde />
 
       <div class="carte carte-session">
         <div>
