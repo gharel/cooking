@@ -142,6 +142,17 @@ export function Fiche({ recette: r }: { recette: Recette }) {
               </div>
             )}
             {r.origine.mot && <blockquote class="mot">{r.origine.mot}</blockquote>}
+            {r.origine.source && (
+              <p class="source-recette">
+                {/^https?:\/\//i.test(r.origine.source) ? (
+                  <a href={r.origine.source} target="_blank" rel="noopener noreferrer">
+                    Page d’origine
+                  </a>
+                ) : (
+                  `Source : ${r.origine.source}`
+                )}
+              </p>
+            )}
             {r.photos.map((id, i) => (
               <PhotoRecette key={id} id={id} alt={`Photo ${i + 1} de la fiche « ${r.nom} »`} />
             ))}

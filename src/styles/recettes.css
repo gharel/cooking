@@ -270,6 +270,12 @@
   font-family: var(--police-titre);
   font-style: italic;
 }
+.source-recette {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--texte-doux);
+  overflow-wrap: anywhere;
+}
 .photo-recette {
   display: block;
   width: 100%;

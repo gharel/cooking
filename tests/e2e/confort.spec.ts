@@ -31,6 +31,10 @@ test('importer une recette depuis le code d’une page web', async ({ page }) =>
   await editeur.getByRole('button', { name: 'Enregistrer la recette' }).click();
   await expect(page.locator('main h1')).toHaveText('Tarte aux poireaux');
   await expect(page.locator('main .surtitre')).toHaveText(/Du web/i);
+  await expect(page.getByRole('link', { name: 'Page d’origine' })).toHaveAttribute(
+    'href',
+    'https://exemple.fr/tarte',
+  );
 });
 
 test('un partage reçu (?texte=) ouvre l’import prérempli', async ({ page }) => {
