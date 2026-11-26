@@ -6,7 +6,7 @@ Une spec par fonctionnalité, écrite et validée **avant** les tests et le code
 # NNN : titre
 
 - Statut : brouillon | validée | livrée
-- Lot : 0 à 5 (voir docs/PLAN.md)
+- Lot : son numéro (voir docs/PLAN.md, section 10)
 
 ## Contexte
 

@@ -1,6 +1,6 @@
 # 005 : frigo
 
-- Statut : **validée par délégation** (objectif du 25 novembre 2026 : livrer l’application en suivant le plan et les décisions prises)
+- Statut : **livrée** le 26 novembre 2026 (commit 0195b7c ; validée par délégation : objectif du 25 novembre 2026, « livrer l’application en suivant le plan et les décisions prises ») ; critères revérifiés le 26 novembre 2026
 - Lot : 4 (voir `docs/PLAN.md`, sections 2, 8 et 10)
 
 ## Contexte
@@ -18,13 +18,15 @@ En fin de session, les plats entrent au frigo ou au congélateur (lot 3). Il fau
 
 ## Critères d’acceptation
 
-- [ ] Fin de session : les plats apparaissent au frigo avec la bonne date limite ; les portions des repas tardifs sont au congélateur.
-- [ ] Manger la dernière portion retire le plat ; « Annuler » le remet. Congeler change de lieu et de limite ; décongeler 2 portions sur 4 laisse 2 portions au congélateur et crée un plat au frigo à manger sous 24 h.
-- [ ] Un plat à la date du jour déclenche l’alerte « à manger aujourd’hui » ; une date dépassée est signalée.
-- [ ] Un repas servi par un plat du congélateur produit le rappel « sortir … la veille au soir ».
-- [ ] « Ce qu’il reste » : retirer un ingrédient met les idées à jour ; une idée sans achat porte « Rien à acheter » ; ajouter une idée du catalogue crée une recette structurée dans la bibliothèque.
-- [ ] Tests unitaires : fraîcheur et alertes, congeler et décongeler, rappels, restes probables, idées et mini-session.
-- [ ] Frigo (deux onglets) : 5 tailles × 2 thèmes sans débordement ni violation axe.
+- [x] Fin de session : les plats apparaissent au frigo avec la bonne date limite ; les portions des repas tardifs sont au congélateur.
+- [x] Manger la dernière portion retire le plat ; « Annuler » le remet. Congeler change de lieu et de limite ; décongeler 2 portions sur 4 laisse 2 portions au congélateur et crée un plat au frigo à manger sous 24 h.
+- [x] Un plat à la date du jour déclenche l’alerte « à manger aujourd’hui » ; une date dépassée est signalée.
+- [x] Un repas servi par un plat du congélateur produit le rappel « sortir … la veille au soir ».
+- [x] « Ce qu’il reste » : retirer un ingrédient met les idées à jour ; une idée sans achat porte « Rien à acheter » ; ajouter une idée du catalogue crée une recette structurée dans la bibliothèque.
+- [x] Tests unitaires : fraîcheur et alertes, congeler et décongeler, rappels, restes probables, idées et mini-session.
+- [x] Frigo (deux onglets) : 5 tailles × 2 thèmes sans débordement ni violation axe.
+
+Vérification : `tests/domaine/frigo.test.ts` (fraîcheur, congeler, décongeler 2 portions sur 4, alertes, rappels, restes probables, idées, mini-session, catalogue), `tests/e2e/frigo.spec.ts` (fin de session, dernière portion et « Annuler », décongélation, alerte du jour, « Ce qu’il reste », 5 tailles × 2 thèmes).
 
 ## Hors périmètre
 

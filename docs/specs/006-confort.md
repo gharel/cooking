@@ -1,6 +1,6 @@
 # 006 : confort
 
-- Statut : **validée par délégation** (objectif du 25 novembre 2026 : livrer l’application en suivant le plan et les décisions prises)
+- Statut : **livrée** le 26 novembre 2026 (commit e513ffb ; validée par délégation : objectif du 25 novembre 2026, « livrer l’application en suivant le plan et les décisions prises ») ; critères revérifiés le 26 novembre 2026
 - Lot : 5 (voir `docs/PLAN.md`, section 10)
 
 ## Contexte
@@ -19,13 +19,15 @@ Les quatre écrans fonctionnent. Ce lot ajoute ce qui rend l’application agré
 
 ## Critères d’acceptation
 
-- [ ] Statistiques justes après deux sessions (tests unitaires) et affichées dans Semaine.
-- [ ] Une page contenant un JSON-LD `Recipe` (instructions en `HowToStep` ou en sections) donne nom, portions, ingrédients et instructions ; un `@graph` est parcouru ; un texte sans balisage donne titre, ingrédients et instructions.
-- [ ] Coller une page dans « Depuis une page web » ouvre l’éditeur prérempli ; enregistrer crée une recette « Du web » avec son adresse.
-- [ ] Partager une recette produit un fichier qui, importé dans un navigateur vierge, redonne la recette (et sa sous-recette).
-- [ ] Le texte de la fournée liste les plats, les portions et les repas prévus.
-- [ ] Une adresse `?texte=…` (partage reçu) ouvre l’import prérempli.
-- [ ] Écrans touchés : 5 tailles × 2 thèmes sans débordement ni violation axe.
+- [x] Statistiques justes après deux sessions (tests unitaires) et affichées dans Semaine.
+- [x] Une page contenant un JSON-LD `Recipe` (instructions en `HowToStep` ou en sections) donne nom, portions, ingrédients et instructions ; un `@graph` est parcouru ; un texte sans balisage donne titre, ingrédients et instructions.
+- [x] Coller une page dans « Depuis une page web » ouvre l’éditeur prérempli ; enregistrer crée une recette « Du web » avec son adresse.
+- [x] Partager une recette produit un fichier qui, importé dans un navigateur vierge, redonne la recette (et sa sous-recette).
+- [x] Le texte de la fournée liste les plats, les portions et les repas prévus.
+- [x] Une adresse `?texte=…` (partage reçu) ouvre l’import prérempli.
+- [x] Écrans touchés : 5 tailles × 2 thèmes sans débordement ni violation axe.
+
+Vérification : `tests/domaine/confort.test.ts` (JSON-LD, `@graph`, sections, texte sans balisage, statistiques sur deux sessions, texte de la fournée), `tests/e2e/confort.spec.ts` (import web, partage reçu, fichier importé ailleurs avec sa sous-recette, fournée partagée, statistiques, 5 tailles × 2 thèmes). Le 26 novembre 2026, l’adresse d’une recette « Du web » s’affiche sur sa fiche (lien « Page d’origine », `http` ou `https` seulement ; sinon le texte de la source) : elle était gardée mais invisible.
 
 ## Hors périmètre
 

@@ -1,6 +1,6 @@
 # 004 : session
 
-- Statut : **validée par délégation** (objectif du 25 novembre 2026 : livrer l’application en suivant le plan et les décisions prises)
+- Statut : **livrée** le 26 novembre 2026 (commit b3d3586 ; validée par délégation : objectif du 25 novembre 2026, « livrer l’application en suivant le plan et les décisions prises ») ; critères revérifiés le 26 novembre 2026
 - Lot : 3 (voir `docs/PLAN.md`, sections 6 et 10)
 
 ## Contexte
@@ -21,12 +21,14 @@ C’est la promesse de Fournée : à partir des plats de la fournée, calculer l
 
 ## Critères d’acceptation
 
-- [ ] Propriétés vérifiées sur des centaines de cas générés (fast-check) : dépendances respectées, jamais plus de tâches actives que de cuisiniers, de tâches sur le feu que de feux, plus de 2 plats ni deux températures dans un four ; durée au moins égale au chemin critique ; résultat identique à entrée identique ; tâches figées respectées, rien de nouveau avant « maintenant ».
-- [ ] Fournée de démonstration (chili, dahl, gratin dauphinois, quiche lorraine, 4 portions, 4 feux, 1 four, 1 cuisinier) : la session tient en moins de 75 % du temps de l’enchaînement recette par recette.
-- [ ] Gratin dauphinois et quiche sans pâte (tous deux à 180 °C) partagent le four ; le second préchauffage devient inutile.
-- [ ] Lasagne et bolognaise : les étapes de la bolognaise de la lasagne apparaissent, avant le montage.
-- [ ] En direct : « Étape terminée » passe à l’étape suivante et recalcule la fin estimée ; un minuteur atteint zéro et l’étape passe en « terminée » ; « Terminer la session » range les plats et affiche le bilan.
-- [ ] Session : 5 tailles × 2 thèmes sans débordement de page (la frise défile dans son cadre) ni violation axe.
+- [x] Propriétés vérifiées sur des centaines de cas générés (fast-check) : dépendances respectées, jamais plus de tâches actives que de cuisiniers, de tâches sur le feu que de feux, plus de 2 plats ni deux températures dans un four ; durée au moins égale au chemin critique ; résultat identique à entrée identique ; tâches figées respectées, rien de nouveau avant « maintenant ».
+- [x] Fournée de démonstration (chili, dahl, gratin dauphinois, quiche lorraine, 4 portions, 4 feux, 1 four, 1 cuisinier) : la session tient en moins de 75 % du temps de l’enchaînement recette par recette.
+- [x] Gratin dauphinois et quiche sans pâte (tous deux à 180 °C) partagent le four ; le second préchauffage devient inutile.
+- [x] Lasagne et bolognaise : les étapes de la bolognaise de la lasagne apparaissent, avant le montage.
+- [x] En direct : « Étape terminée » passe à l’étape suivante et recalcule la fin estimée ; un minuteur atteint zéro et l’étape passe en « terminée » ; « Terminer la session » range les plats et affiche le bilan.
+- [x] Session : 5 tailles × 2 thèmes sans débordement de page (la frise défile dans son cadre) ni violation axe.
+
+Vérification : `tests/domaine/ordonnanceur.test.ts` (propriétés fast-check, fournée de démonstration, four partagé, lasagne), `tests/domaine/session.test.ts` (ajouté le 26 novembre 2026 : étape finie en avance ou en retard, fin estimée recalculée, minuteur passif, étape passée, cuisinier occupé, non-mutation), `tests/e2e/session.spec.ts` (en direct, rechargement, 5 tailles × 2 thèmes).
 
 ## Hors périmètre
 
