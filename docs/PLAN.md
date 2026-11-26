@@ -1,6 +1,6 @@
 # Plan produit et technique : Fournée
 
-> Statut : **version 1 livrée** les 25 et 26 novembre 2026 (lots 0 à 5, specs `docs/specs/001` à `006`). Validé le 25 novembre avec deux ajouts demandés : les recettes de famille ou maison, et le mode « Ce qu’il reste ». « Fournée » est un nom de travail (une fournée, c’est un batch). Application : https://gharel.github.io/cooking/ ; maquette : https://gharel.github.io/cooking/maquette/.
+> Statut : **version 1 livrée** les 25 et 26 novembre 2026 (lots 0 à 5, specs `docs/specs/001` à `006`), puis lots 6 à 8 (specs `007` à `009`, version 1.3). Validé le 25 novembre avec deux ajouts demandés : les recettes de famille ou maison, et le mode « Ce qu’il reste ». « Fournée » est un nom de travail (une fournée, c’est un batch). Application : https://gharel.github.io/cooking/ ; maquette : https://gharel.github.io/cooking/maquette/.
 >
 > Décisions : charte propre (projet personnel, pas la charte Skazy) ; Preact + TypeScript ; dépôt public `gharel/cooking` publié sur GitHub Pages.
 
@@ -211,6 +211,7 @@ Chaque lot commence par une spec courte dans `docs/specs/` et se termine par une
 
 | **6. Ce soir et session à plusieurs** (spec 007) | Widget « Ce soir », plan B (adresses, roulette), rappel du dîner et agenda, recettes du soir, prénoms et répartition des tâches, hygiène, vaisselle et nettoyage dans le déroulé | Voir la spec 007 : roulette uniforme, adresses gardées, `.ics` correct, légumes avant la viande crue, lavage des mains au début et rangement à la fin, personne avec deux tâches à la fois |
 | **7. Repas à l’extérieur et installation** (spec 008) | Repas « À l’extérieur » (ponctuel ou tous les midis, tous les soirs de la semaine), bouton « Installer » (fenêtre du navigateur, marche à suivre sur iPhone) | Voir la spec 008 : repas exclu du compte, de la répartition et des rappels ; bouton qui disparaît une fois installée |
+| **8. Rappel de sauvegarde** (spec 009) | Date du dernier export, rappel dans Semaine et Recettes quand des recettes ne sont sauvegardées nulle part depuis 7 jours, « Plus tard » | Voir la spec 009 : recettes de départ intactes ignorées, rappel après 7 jours, report de 7 jours, export qui efface le rappel |
 
 L’import direct par URL se heurte au CORS dans un navigateur : au MVP, on colle le contenu ou on partage la page vers l’application (Web Share Target). Un petit relais serveur reste une option pour plus tard.
 
@@ -237,12 +238,13 @@ Décisions prises en livrant (détail dans les specs) :
 - **Temps de préparation** : ×2 portions donne ×1,5 de préparation ; les cuissons ne changent pas.
 - **Fours** : 2 plats par four à la même température ; un préchauffage devient inutile si le four est déjà chaud.
 - **Décongélation** : 24 h au frigo ; rappel la veille au soir.
-- **Écrans chargés à la demande** pour tenir le budget de 60 ko au démarrage (56 ko avec Dexie).
+- **Écrans chargés à la demande** pour tenir le budget de 60 ko au démarrage (51,9 ko depuis que l’ordonnanceur et le dictionnaire en sont sortis, le 26 novembre 2026).
 - **Reconnaissance de texte sur photo** reportée (ADR 0002) ; import web par copier-coller (CORS).
 - **Notification du dîner** sans serveur : minuterie dans la page et agenda `.ics` (ADR 0003).
 - **Session à plusieurs** : une tâche active va à la personne libre qui a le moins travaillé ; le lavage de la planche après la viande crue fait partie de la découpe (spec 007).
 - **Repas à l’extérieur** : un drapeau du repas, sans état de semaine à part ; les cases « Midis » et « Soirs » s’en déduisent (spec 008).
 - **Installation** : invitation du navigateur quand elle existe ; sur iPhone, marche à suivre (Partager, « Sur l’écran d’accueil ») et rappel que l’application installée y a son propre stockage (spec 008).
+- **Sauvegarde** : l’export (recettes et photos) note sa date ; un rappel invite à exporter les recettes qui n’existent que sur l’appareil (spec 009). Une sauvegarde complète (semaine, frigo, réglages, adresses) demandera une nouvelle version du format.
 - **Référencement** : la page reste en `noindex`, comme les autres outils de gharel.github.io : une application personnelle, locale, n’a rien à gagner à être indexée.
 
 Points ouverts : nom définitif (« Fournée » en attendant), licence du code (aucune pour l’instant, donc tous droits réservés).

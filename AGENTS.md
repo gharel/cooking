@@ -10,7 +10,9 @@ Les demandes explicites de l’utilisateur priment sur ce document.
 
 **Lot 6 livré** le 26 novembre 2026 (spec `007`, ADR `0003`) : widget « Ce soir », plan B (adresses, roulette), rappel du dîner et agenda `.ics`, recettes du soir, session à plusieurs (prénoms, charge partagée), hygiène et ménage dans le déroulé.
 
-**Lot 7 livré** le 26 novembre 2026 (spec `008`) : repas « À l’extérieur » (ponctuel, ou tous les midis, tous les soirs de la semaine) et bouton « Installer ». Toute nouvelle fonctionnalité repart d’une spec `docs/specs/009-…`.
+**Lot 7 livré** le 26 novembre 2026 (spec `008`) : repas « À l’extérieur » (ponctuel, ou tous les midis, tous les soirs de la semaine) et bouton « Installer ».
+
+**Rattrapage du 26 novembre 2026 (version 1.3)** : specs 004 à 006 revérifiées et closes ; tests de la session en direct ; budget de démarrage ramené à 51,9 ko ; Session, Frigo et Editeur découpés ; captures refaites depuis l’application ; **lot 8** (spec `009`) : rappel de sauvegarde des recettes. Toute nouvelle fonctionnalité repart d’une spec `docs/specs/010-…`.
 
 ## Le produit
 
@@ -22,19 +24,23 @@ Une application web responsive (téléphone d’abord), locale d’abord, pour l
 index.html                 Métadonnées, script du thème en ligne (avant l’affichage), point de montage
 src/main.tsx               Polices, styles, routage par ancre, montage, typographie, service worker
 src/app/                   Coque, routage, thème, icônes, typographie du DOM, écrans à la demande (aLaDemande),
-                           état partagé en signaux (bibliotheque-, fournee-, session-, stock-, soir-etat), alarme,
-                           partage ; soir-etat (adresses, rappel du dîner) se charge à part, hors du démarrage
+                           état partagé en signaux (bibliotheque-, fournee-, historique-, session-, stock-, soir-,
+                           sauvegarde-etat), alarme, partage, rappel de sauvegarde ; soir-etat (adresses, rappel
+                           du dîner) se charge à part ; session-etat (ordonnanceur) n’est jamais importé au démarrage
 src/domaine/               Logique pure, sans DOM, testée : modèle, dictionnaire, ingrédients, structuration,
                            durées, bibliothèque, validation, dates, portions, fournée (répartition, alertes),
                            courses, ordonnanceur (hygiène et ménage compris), session (direct), stock (frigo,
                            rappels, restes), idées, soir (dîner du jour, roulette, adresses, agenda .ics),
-                           schema-org (import web), partage (statistiques, textes), typographie
-src/donnees/               IndexedDB (Dexie, schéma v3), recettes, photos, fournées, réglages, adresses, export et import
-src/ecrans/                Un écran par fichier, chargé à la demande ; sous-dossiers recettes/, semaine/, session/
+                           schema-org (import web), partage (statistiques, textes), sauvegarde (rappel), typographie
+src/donnees/               IndexedDB (Dexie, schéma v3), recettes, photos, fournées, réglages, adresses, sauvegarde,
+                           export et import
+src/ecrans/                Un écran par fichier, chargé à la demande ; ses parties dans frigo/, recettes/, semaine/,
+                           session/ (un fichier par panneau ou dialogue, plus un commun pour les petites fonctions)
 src/styles/                jetons.css (seul fichier où une couleur est écrite), base, composants, coque, un par écran
 public/favicon.svg         Logo cocotte (Lucide) ; icônes PWA générées au build (pwa-assets.config.ts)
 maquette/index.html        Maquette de référence (données fictives), copiée dans dist/maquette/
 outils/budget.js           Poids du JavaScript de démarrage (60 ko gzip au plus)
+outils/captures.js         Captures de docs/captures/ depuis l’application construite (données fictives)
 tests/domaine/             Vitest ; ordonnanceur.test.ts vérifie ses propriétés avec fast-check ;
                            depart.test.ts compare l’annexe 002 aux données
 tests/donnees/             Vitest + fake-indexeddb : installation, duplication, suppression, export et import
@@ -55,6 +61,7 @@ Les recettes de départ (`src/donnees/recettes-de-depart.ts`) sont la source uni
 | `npm run test:e2e`                       | Build puis Playwright + axe : 5 écrans × 5 tailles × 2 thèmes, thème, hors ligne, iPhone |
 | `npm run budget`                         | Poids du JavaScript de démarrage, après un build                                         |
 | `npm run annexe`                         | Régénère l’annexe des recettes de départ après une modification des données              |
+| `npm run captures`                       | Refait les captures de `docs/captures/`, après un build                                  |
 | `npm run build`                          | Build de production dans `dist/` (base `/cooking/`, maquette comprise)                   |
 | `npm run apercu`                         | Sert `dist/` sur http://localhost:4182/cooking/ ; `PORT_E2E` change le port des tests    |
 
@@ -93,13 +100,15 @@ Les recettes de départ (`src/donnees/recettes-de-depart.ts`) sont la source uni
 - **Ce soir** : le dîner du jour vient d’abord du choix de dernière minute (réglages, valable le jour dit), puis du planning (fournée courante, puis semaine de la dernière session). Les recettes « du soir » se cuisinent le jour même : courses oui, session et alertes de conservation non. Notification seulement application ouverte ou en arrière-plan ; l’agenda `.ics` est la voie sûre (ADR 0003). Liens des adresses : `http` ou `https` seulement.
 - **Repas à l’extérieur** : drapeau `dehors` du repas (absent = à la maison, sans migration) ; un tel repas n’a ni recette ni plat, ne compte pas dans les repas à couvrir, est sauté par la répartition, n’a ni rappel ni événement d’agenda. Les cases « Midis » et « Soirs » se déduisent des repas.
 - **Installation** : `beforeinstallprompt` capté au démarrage (`src/app/installation.ts`) ; sans lui, marche à suivre (iPhone, Android) ; pas de bouton sur ordinateur sans invitation ni une fois installée. Sur iPhone, l’application installée a son propre stockage : le dire.
-- **Budget de démarrage** : 59,3 ko sur 60 ; un nouvel ajout au démarrage doit se payer ailleurs ou passer par un morceau à la demande.
+- **Sauvegarde** (spec 009) : l’export ne contient que les recettes et leurs photos ; chaque export note sa date (`reglages`, clé `sauvegarde`). Le rappel (Semaine, Recettes) compte les recettes créées ou modifiées depuis, sauf les recettes de départ intactes, et attend 7 jours ; « Plus tard » le reporte de 7 jours.
+- **Budget de démarrage** : 51,9 ko sur 60. Ni l’ordonnanceur ni le dictionnaire ne doivent revenir au démarrage : ce qui est chargé par `main.tsx` (états, réglages) n’importe pas `session-etat` ni `domaine/courses` (la liste du placard par défaut vit dans `domaine/reglages`). Un nouvel ajout au démarrage doit se payer ailleurs ou passer par un morceau à la demande.
+- **Dépendances** : `overrides.glob` (14.x) corrige une faille de `glob` 11 tiré par `workbox-build` (outil de build seulement) ; à retirer quand `workbox-build` passera à `glob` 14. TypeScript 7 attend `typescript-eslint` (qui s’arrête à 6.0), Babel 8 attend `@preact/preset-vite` (qui exige Babel 7).
 
 ## Vérification
 
 - Logique : tester un résultat observable, les cas limites, la non-mutation ; tests déterministes, sans réseau ni horloge réelle (minuteurs avec une horloge simulée).
 - Interface : 360, 390, 820, 1280 et 1920 px, en clair et en sombre ; pas de défilement horizontal, aucun texte coupé, axe sans violation. Pour un souci de couleurs sur téléphone, penser d’abord à Brave iOS (Dark Reader) et le reproduire avec le paquet `darkreader` injecté dans Playwright WebKit (iPhone).
-- Captures utiles dans `docs/captures/`, sans données personnelles.
+- Captures dans `docs/captures/`, sans données personnelles : `npm run build && npm run captures` après un changement visible.
 
 ## Git et publication
 
